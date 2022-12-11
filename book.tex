@@ -6,6 +6,8 @@
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage[makeroom]{cancel}
+
+\pagestyle{plain}
 \definecolor{gray75}{gray}{0.75}
 \newgeometry{vmargin={17mm}, hmargin={14mm,14mm}} 
 \RequirePackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
@@ -37,7 +39,6 @@
 \end{titlepage}
 
 \newpage
-
 \section*{Introduction}
 
 
@@ -175,6 +176,47 @@ Test cite~\cite{Dimastrogiovanni:2018xnn}
 \section*{Design choices for the stochadex}
 
 
+\newpage
+{\color{gray75} {\Huge \bfseries\sffamily 2} \hspace*{0.2em} \rule[-0.5ex]{0.3ex}{2.0em}} \hspace*{0.2em} {\Huge \bfseries\sffamily Building a Rugby Union simulator game}
+
+\vspace*{1cm}
+{\bfseries\sffamily Concept.} The idea here is 
+
+\vspace*{1cm}
+\section*{Introduction}
+
+Since the basic game engine will run using the \href{https://github.com/umbralcalc/stochadex}{stochadex} sampler, the novelties in this project are all in the design of the rugby match model itself. And, in this instance, I'm not especially keen on spending a lot of time doing detailed data analysis to come up with the most realistic values for the parameters that are dreamed up here. Even though this would also be interesting.
+
+One could do this data analysis, for instance, by scraping player-level performance data from one of the excellent websites that collect live commentary data such as \href{https://www.rugbypass.com/}{rugbypass.com} or \href{https://www.espn.co.uk/rugby/}{espn.co.uk/rugby}.
+
+This game is primarily a way of testing out the interface of the stochadex for other users to build projects with. This should help to both iron out some of the kinks in the design, as well as prioritise adding some more convenience methods for event-based modelling into its code base.
+
+\section*{Designing the event simulation engine}
+
+We need to begin by specifying an appropriate event space to live in when simulating a rugby match. It is important at this level that events are defined in quite broadly applicable terms, as it will define the state space available to our stochastic sampler and hence the simulated game will never be allowed to exist outside of it. So, in order to capture the fully detailed range of events that are possible in a real-world match, we will need to be a little imaginative in how we define certain gameplay elements when we move through the space.
+
+The diagrams below sum up what should hopefully work as a decent initial approximation while providing a little context with specific examples of play action.
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{images/trywizard-event-graph.png}
+\caption{Simplified event graph of a rugby union match.}
+\label{fig:event-graph}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width=10cm]{images/trywizard-model-ideas-sketch.png}
+\caption{Optional model ideas.}
+\label{fig:model-ideas}
+\end{figure}
+
+\section*{Linking to player attributes}
+
+\section*{Deciding on gameplay actions}
+
+\section*{Writing the game itself}
+
+
+\newpage
 \bibliographystyle{JHEP}
 \bibliography{book}
 
