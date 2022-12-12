@@ -1,55 +1,101 @@
-% Simple template for documentation based on the journal for statistical science template
-\documentclass[sts]{imsart}
+\documentclass{book}
 
-\usepackage{amsthm,amsmath}
-\usepackage{color}
-\usepackage{geometry}
+\usepackage{etoolbox}
+
+\makeatletter
+\def\subtitle#1{\gdef\@subtitle{#1}}
+\patchcmd\maketitle
+  {{\LARGE \@title \par}}
+  {{\LARGE \@title \par}%
+   \vskip 1.5em
+   {\Large \@subtitle \par}}
+\makeatother
+
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath,mathtools}
+\usepackage{amsfonts}
+\usepackage{amssymb}
 \usepackage{graphicx}
-\usepackage[makeroom]{cancel}
+\usepackage{appendix}
+\usepackage{bm}
+\usepackage{multicol}
+\usepackage{geometry}
+\usepackage{colortbl}
+\usepackage{changepage}
+\usepackage{color}
+\usepackage{mathrsfs}
+\usepackage{bigints}
+\usepackage{pdflscape}
+\usepackage{adjustbox}
+\usepackage{tocloft}
+\usepackage{lscape}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks=true,
+            linkcolor=blue,
+            urlcolor=blue,
+            citecolor=blue]{hyperref}
 
-\pagestyle{plain}
+\sloppy
+\usepackage{tikz, lipsum}% http://ctan.org/pkg/{pgf,lipsum}
+\newcommand*{\chapnumfont}{\normalfont\sffamily\huge\bfseries}
+\newcommand*{\printchapternum}{
+  \begin{tikzpicture}
+    \draw[fill,color=gray75] (0,0) rectangle (2cm,2cm);
+    \draw[color=white] (1cm,1cm) node { \chapnumfont\thechapter };
+  \end{tikzpicture}
+}
+\newcommand*{\chaptitlefont}{\normalfont\sffamily\Huge\bfseries}
+\newcommand*{\printchaptertitle}[1]{\flushright\chaptitlefont#1}
+
+\makeatletter
+% \@makechapterhead prints regular chapter heading.
+% Taken directly from report.cls and modified.
+\def\@makechapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedleft
+    \ifnum \c@secnumdepth >\m@ne
+        \printchapternum
+        \par\nobreak
+        \vskip 20\p@
+    \fi
+    \interlinepenalty\@M
+    \printchaptertitle{#1}\par\nobreak
+    \vskip 40\p@
+  }}
+% \@makeschapterhead prints starred chapter heading.
+% Taken directly from report.cls and modified.
+\def\@makeschapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedleft
+    \interlinepenalty\@M
+    \printchaptertitle{#1}\par\nobreak
+    \vskip 40\p@
+  }}
+\makeatother
+
+
+\renewcommand\contentsname{}
+
 \definecolor{gray75}{gray}{0.75}
-\newgeometry{vmargin={17mm}, hmargin={14mm,14mm}} 
-\RequirePackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
 
-% put your definitions there:
-\startlocaldefs
-\endlocaldefs
-
+\title{\Huge \bfseries\sffamily Diffusing ideas}
+\subtitle{\Large \bfseries\sffamily \color{gray75} Adventures with noise and building mathematical toys}
+\author{\bfseries\sffamily Robert J. Hardwick}
+\date{\today}
 \begin{document}
-
-\begin{titlepage}
-
-\title{Diffusing ideas}
-\runtitle{Diffusing ideas}
-\vspace*{0.3cm}
-\hspace*{-0.5cm}
-{\Large \bfseries\sffamily \color{gray75} Adventures with noise and building mathematical toys}
-
-\vspace*{3cm}
-\centering
-\includegraphics[width=15cm]{images/frontmatter_mashup.png}
-
-\vspace*{4cm}
-\author{Robert J. Hardwick}
-\affiliation{\href{mailto:umbralcalc@gmail.com}{umbralcalc@gmail.com}}
-
-\runauthor{Robert J. Hardwick}
-
-\end{titlepage}
-
-\newpage
-\section*{Introduction}
-
-
-\newpage
-{\color{gray75} {\Huge \bfseries\sffamily 1} \hspace*{0.2em} \rule[-0.5ex]{0.3ex}{2.0em}} \hspace*{0.2em} {\Huge \bfseries\sffamily Building the `stochadex'}
+\maketitle
+\frontmatter
+\chapter*{Table of contents}
+\vspace*{-3cm}
+{\sffamily \tableofcontents}
+\mainmatter
+\chapter{\sffamily Building the `stochadex'}
 
 \vspace*{1cm}
 {\bfseries\sffamily Concept.} The idea here is 
 
 \vspace*{1cm}
-\section*{Core mathematical formalism}
+\section{\sffamily Core mathematical formalism}
 
 Ideally, the stochadex sampler should be designed to try and maintain a balance between performance and flexibility of utilisation (it's meant to be a general stochastic modelling tool after all!). But before we dive into the software, we need to define the mathematical approach we're going to take. It seems reasonable to start with writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrices $S' \rightarrow S$ and $X' \rightarrow X$
 %%
@@ -73,7 +119,7 @@ So the idea here is to iterate the matrices $X$ and $S$ forward in time by a row
 
 Why go to all this trouble of storing matrix inputs for previous values of the same process? For a large class of stochastic processes this memory of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena (see, e.g., \href{https://en.wikipedia.org/wiki/Markov_chain}{Markov chains} to get a sense of their antithesis), where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process.
 
-\section*{Flavours of noise with continuous sample paths}
+\section{\sffamily Flavours of noise with continuous sample paths}
 
 For \emph{Wiener process noise}, adopting the \href{https://en.wikipedia.org/wiki/It\%C3\%B4_calculus}{Itô interpretation} in this section, we can define $W^i_{t}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
 %%
@@ -107,7 +153,7 @@ And say, e.g., \emph{fractional Brownian motion noise}, where $B^i_{t}({H_i})$ i
 where $g^i_{t+\delta t}(X', W^i_{t+\delta t}-W^i_t, \dots)$ is some continuous function of its arguments which can be expanded out with \href{https://en.wikipedia.org/wiki/It\%C3\%B4\%27s_lemma}{Itôs Lemma}.
 
 
-\section*{Flavours of noise with discontinuous sample paths}
+\section{\sffamily Flavours of noise with discontinuous sample paths}
 
 \emph{Jump process noises} generally could take the form
 %%
@@ -157,7 +203,7 @@ where the stochastic rate ${\cal I}^i_{t}(N', \dots)$ now depends on the history
 %%
 where $T^i_{t+\delta t}(X')$ is a generator of the next state to occupy. This generator uses the current state transition probabilities (which are generally conditional on $X'$) at each new step.
 
-\section*{Summary of desirable features}
+\section{\sffamily Summary of desirable features}
 
 \begin{itemize}
 \item{using the learnings from the previous sections looking at specific example processes}
@@ -173,17 +219,15 @@ where $T^i_{t+\delta t}(X')$ is a generator of the next state to occupy. This ge
 
 Test cite~\cite{Dimastrogiovanni:2018xnn}
 
-\section*{Design choices for the stochadex}
+\section{\sffamily Software design choices}
 
-
-\newpage
-{\color{gray75} {\Huge \bfseries\sffamily 2} \hspace*{0.2em} \rule[-0.5ex]{0.3ex}{2.0em}} \hspace*{0.2em} {\Huge \bfseries\sffamily Building a Rugby Union simulator game}
+\chapter{\sffamily Building a Rugby simulator game}
 
 \vspace*{1cm}
 {\bfseries\sffamily Concept.} The idea here is 
 
 \vspace*{1cm}
-\section*{Introduction}
+\section{\sffamily Introduction}
 
 Since the basic game engine will run using the \href{https://github.com/umbralcalc/stochadex}{stochadex} sampler, the novelties in this project are all in the design of the rugby match model itself. And, in this instance, I'm not especially keen on spending a lot of time doing detailed data analysis to come up with the most realistic values for the parameters that are dreamed up here. Even though this would also be interesting.
 
@@ -191,7 +235,7 @@ One could do this data analysis, for instance, by scraping player-level performa
 
 This game is primarily a way of testing out the interface of the stochadex for other users to build projects with. This should help to both iron out some of the kinks in the design, as well as prioritise adding some more convenience methods for event-based modelling into its code base.
 
-\section*{Designing the event simulation engine}
+\section{\sffamily Designing the event simulation engine}
 
 We need to begin by specifying an appropriate event space to live in when simulating a rugby match. It is important at this level that events are defined in quite broadly applicable terms, as it will define the state space available to our stochastic sampler and hence the simulated game will never be allowed to exist outside of it. So, in order to capture the fully detailed range of events that are possible in a real-world match, we will need to be a little imaginative in how we define certain gameplay elements when we move through the space.
 
@@ -209,15 +253,16 @@ The diagrams below sum up what should hopefully work as a decent initial approxi
 \label{fig:model-ideas}
 \end{figure}
 
-\section*{Linking to player attributes}
+\section{\sffamily Linking to player attributes}
 
-\section*{Deciding on gameplay actions}
+\section{\sffamily Deciding on gameplay actions}
 
-\section*{Writing the game itself}
+\section{\sffamily Writing the game itself}
 
-
-\newpage
+%\appendix
+%\chapter{First and only appendix}
+\backmatter
+\chapter*{Bibliography}
 \bibliographystyle{JHEP}
 \bibliography{book}
-
 \end{document}
