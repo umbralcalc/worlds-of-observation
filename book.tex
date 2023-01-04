@@ -88,9 +88,9 @@
 
 \chapter*{Introduction}
 
-\emph{Diffusing ideas} records a journey of research exploration and software development. It expresses a collection of interrelated ideas around the statistical inference and automated control of stochastic phenomena. In order to manifest these ideas into reality, the project has also involved designing and building a lot of new open-source scientific software utilising the \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go} progamming languages. The motivation behind developing these computational elements is to form a foundation from which one can build a variety of new applications and to make scientific research and discovery of new phenomena much more efficient. Testing and experimentation has also led to some fun digressions into a range of interesting mathematical toy models which are motivated by the real world, which we hope that the reader will enjoy exploring as well!
+\emph{Diffusing ideas} records a journey of research exploration and software development. It expresses a collection of interrelated ideas around the statistical inference and automated control of stochastic phenomena. In order to manifest these ideas into reality, the project has also involved designing and building a lot of new open-source scientific software written in the \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go} progamming languages. The motivation behind developing these computational elements is to form a foundation from which one can build a variety of new applications and to make scientific research and discovery of new phenomena much more efficient. Testing and experimentation has also led to some fun digressions into a range of interesting mathematical toy models which are motivated by the real world, which we hope that the reader will enjoy exploring as well!
 
-Any software that is described in this book will always be shared under a \href{https://opensource.org/licenses/MIT}{MIT License} in the following public git repository: \href{https://github.com/umbralcalc}{https://github.com/umbralcalc}. In all cases, note that the code should still be considered as very much `in development' and so it is advised that it is not deployed in a production pipeline without careful scrutiny at the user's own risk. 
+Any software that is described in this book will always be shared under a \href{https://opensource.org/licenses/MIT}{MIT License} in the following public git repository: \href{https://github.com/umbralcalc}{https://github.com/umbralcalc}.
 
 No quest would be complete without a map, so in this introductory section, we will now outline some of the key milestones of the book and their motivations within the context of the overall research project. Our core aims can be divided into answering 4 interdependent research questions in the following order:
 
@@ -113,31 +113,28 @@ No quest would be complete without a map, so in this introductory section, we wi
 
 \chapter{\sffamily Building the `stochadex'}
 
-\vspace*{1cm}
-{\bfseries\sffamily Concept.} The idea here is 
+{\bfseries\sffamily Concept.} We will design and build a generalised simulation engine that is able to generate samples from a `Pokédex' of possible stochastic processes that a researcher might encounter. A `Pokédex' here is just a fanciful description for a very general class of multidimensional stochastic processes that pop up everywhere in taming the mathematical wilds of real-world phenomena, and which also leads to a name for the software: the \href{https://github.com/umbralcalc/stochadex}{stochadex}. With such a thing pre-built and self-contained, it can become the basis upon which to build generalised software solutions for a lot of different problems.
 
-\vspace*{1cm}
 \section{\sffamily Core mathematical formalism}
 
-Ideally, the stochadex sampler should be designed to try and maintain a balance between performance and flexibility of utilisation (it's meant to be a general stochastic modelling tool after all!). But before we dive into the software, we need to define the mathematical approach we're going to take. It seems reasonable to start with writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrices $V' \rightarrow V$ and $X' \rightarrow X$
+Ideally, the stochadex sampler should be designed to try and maintain a balance between performance and flexibility of utilisation. But before we dive into the software, we need to define the mathematical approach we're going to take. It seems reasonable to start with writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrices $V' \rightarrow V$ and $X' \rightarrow X$
 %%
 \begin{align}
-X^{i}_{t} &= f^{i}_t(X', V', t-1) \\
-V^{i}_t &= X^{i}_{t} - X^{i}_{t-1} \\
-\Rightarrow X^{i}_{t} &= X_{t-s}^{i} + \sum_{\forall s' \leq t}V_{s'}^{i} \,,
+X^{i}_{t+1} &= F^{i}_{t+1}(X', V', t) \label{eq:x-step-def}\\
+V^{i}_{t+1} &= X^{i}_{t+1} - X^{i}_{t} \label{eq:v-step-def}\,,
 \end{align}
 %%
-where to explain things in a bit more detail, let's define
-
-\begin{itemize}
-\item[]{$i$ as an index for the dimensions of the `state' space}
-\item[]{$t$ as the current time index for either a discrete-time process or some discrete approximation to a continuous-time process}
-\item[]{$X$ as the next version of $X'$ after one timestep (and hence one new row has been added)}
-\item[]{$V$ as the next version of $V'$ (similarly to $X$ and $X'$)}
-\item[]{$f^i_{t}(X', V', t-1)$ as the latest element of an arbitrary matrix-valued function}
-\end{itemize}
+where: $i$ is an index for the dimensions of the `state' space; $t$ is the current time index for either a discrete-time process or some discrete approximation to a continuous-time process; $X$ is the next version of $X'$ after one timestep (and hence one new row has been added); $V$ as the next version of $V'$ (similarly to $X$ and $X'$); and $F^i_{t+1}(X', V', t)$ as the latest element of an arbitrary matrix-valued function.
 
 So the idea here is to iterate the matrices $X$ and $V$ forward in time by a row, and use their previous versions ($X'$ and $V'$) as entire matrix inputs into functions which populate the elements of their latest rows.
+
+Note that, based on the definition in Eq.~(\ref{eq:v-step-def}) above, the following relation is also valid
+%%
+\begin{align}
+X^{i}_{t} &= X_{s}^{i} + \sum_{s'=s}^{t}V_{s'+1}^{i} \label{eq:x-implicit-solution} \,,
+\end{align}
+%%
+where $s<t$.
 
 Why go to all this trouble of storing matrix inputs for previous values of the same process? For a large class of stochastic processes this memory of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena (see, e.g., \href{https://en.wikipedia.org/wiki/Markov_chain}{Markov chains} to get a sense of their antithesis), where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process.
 
@@ -245,10 +242,8 @@ Test cite~\cite{Dimastrogiovanni:2018xnn}
 
 \chapter{\sffamily Building a Rugby simulator game}
 
-\vspace*{1cm}
 {\bfseries\sffamily Concept.} The idea here is 
 
-\vspace*{1cm}
 \section{\sffamily Introduction}
 
 Since the basic game engine will run using the \href{https://github.com/umbralcalc/stochadex}{stochadex} sampler, the novelties in this project are all in the design of the rugby match model itself. And, in this instance, I'm not especially keen on spending a lot of time doing detailed data analysis to come up with the most realistic values for the parameters that are dreamed up here. Even though this would also be interesting.
