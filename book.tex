@@ -17,6 +17,7 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{appendix}
+\usepackage{enumitem}
 \usepackage{bm}
 \usepackage{multicol}
 \usepackage{geometry}
@@ -73,6 +74,7 @@
   }}
 \makeatother
 
+\makeatletter\@addtoreset{chapter}{part}\makeatother%
 
 \renewcommand\contentsname{}
 
@@ -88,19 +90,19 @@
 
 \chapter*{Introduction}
 
-\emph{Diffusing ideas} records a journey of research exploration and software development over several years. It's primarily an expression of interrelated ideas around the statistical inference and automated control of stochastic phenomena in general. However, in order to manifest these ideas into reality, this project has also involved designing and building a lot of new open-source scientific software written in the \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go} progamming languages as well. The main motivation behind developing these computational elements is to form a nice foundation from which anyone can build loads of new applications, and the hope is that an additional benefit should be that they make scientific research and discovery of new phenomena a more efficient experience for the scientist. 
+\emph{Diffusing ideas} records a journey of research exploration and software development over several years. It's primarily an expression of interrelated ideas around simulating, statistically inferring, manipulating and automating the control of stochastic phenomena in as general a way as possible. However, in order to manifest these ideas into reality, this project has also involved designing and building a lot of new open-source scientific software written in the \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go} progamming languages as well. The main motivation behind developing these computational elements is to form a convenient foundation of software modules from which anyone can build loads of new applications, and I hope that the resulting framework will make research into new phenomena a much more efficient experience for anyone. 
 
-Having just stated all this `altruistic' stuff, I would be remiss if I left the motivations for writing this book at that. The necessity for testing the software has provided a great excuse to study, play with and invent new derivatives of an extensive range of toy mathematical models and imagining some of these situations where the code might be useful has been a lot of fun. I'm also not going to write an `about the author' section because I think they are usually quite boring. Suffice it to say that I have a background in various fields of science which I hope will make the mathematical model digressions quite varied and interesting to the reader!
+Having just stated all this altruistic-sounding stuff, I would be remiss if I left the motivations for writing this book at that. The necessity for testing the software has provided a great excuse to study, play with and invent new derivatives of an extensive range of toy mathematical models; imagining some of these situations where the code might be useful has been a lot of fun! I'm also not going to write an `about the author' section because I think they are usually quite boring. Suffice it to say that I have a background in various fields of science which I hope will make the mathematical model digressions quite varied and interesting to the reader.
 
 A quick note on the software; any software that I describe in this book (including the \href{https://github.com/umbralcalc/diffusing-ideas}{software which compiles the book itself}) will always be shared under a \href{https://opensource.org/licenses/MIT}{MIT License} in a public Git repository.\footnote{The repositories will always be somewhere on this list: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though I apologise in advance if I don't follow these up very quickly as all of this work has to be conducted independently in my free time outside of work hours.
 
-No quest would be complete without a guide, so in this introductory section, I think it makes the most sense to now outline some of the key milestones of the book and their motivations within the context of the overall research project. My core aims can be divided into proposing answers to a set of interdependent research questions, in the following order:
+No quest would be complete without a guide, so in this introductory section, I think it makes the most sense to now outline some of the key milestones of the book and their motivations within the context of the overall research project. My core aims, which comprise the four major parts of this book, are answers to the following set of interdependent research questions:
 
-\begin{enumerate} 
-\item{How do we simulate a general set of stochastic phenomena?}
-\item{How do we then learn/identify 1. from real-world data?}
-\item{How do we simulate a general set of automated control policies to interact with 1.?}
-\item{How do we then optimise 3. to achieve a specified control objective?} 
+\begin{enumerate}[leftmargin=2.5\parindent] 
+\item[{\bfseries\sffamily Part 1.}]{How do we simulate a general set of stochastic phenomena?}
+\item[{\bfseries\sffamily Part 2.}]{How do we then learn/identify the answer to {\bfseries\sffamily Part 1} from real-world data?}
+\item[{\bfseries\sffamily Part 3.}]{How do we simulate a general set of control policies to interact with the answer to {\bfseries\sffamily Part 1}?}
+\item[{\bfseries\sffamily Part 4.}]{How do we then optimise the answer to {\bfseries\sffamily Part 3} to achieve a specified control objective?} 
 \end{enumerate}
 
 
@@ -110,6 +112,8 @@ No quest would be complete without a guide, so in this introductory section, I t
 {\sffamily \tableofcontents}
 \mainmatter
 
+
+\part*{{\sffamily Part 1. How do we simulate a general set of stochastic phenomena?}}
 
 
 \chapter{\sffamily Building a generalised simulator}
@@ -258,6 +262,9 @@ Ideally, the stochadex sampler should be designed to try and maintain a balance 
 \section{\sffamily The Lindblad equation}
 
 
+\part*{{\sffamily Part 2. How do we then learn/identify the answer to Part 1 from real-world data?}}
+
+
 \chapter{\sffamily Inferring dynamical 2D maps}
 
 {\bfseries\sffamily Concept.} The idea here is 
@@ -284,6 +291,9 @@ Ideally, the stochadex sampler should be designed to try and maintain a balance 
 {\bfseries\sffamily Concept.} The idea here is to extend the stochadex with tools for very generalised statistical inference (ABC algorithms and the like) that will work in nearly every situation. Probably need to exploit the phase space analogy of the formalism.
 
 \section{\sffamily Likelihood-free methods}
+
+
+\part*{{\sffamily Part 3. How do we simulate a general set of control policies to interact with the answer to Part 1?}}
 
 
 \chapter{\sffamily Interacting with systems in general}
@@ -332,6 +342,9 @@ The diagrams below sum up what should hopefully work as a decent initial approxi
 \chapter{\sffamily Influencing house prices}
 
 {\bfseries\sffamily Concept.} The idea here is 
+
+
+\part*{{\sffamily Part 4. How do we then optimise the answer to Part 3 to achieve a specified control objective?}}
 
 
 \chapter{\sffamily Optimising actions for control objectives}
