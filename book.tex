@@ -90,11 +90,11 @@
 
 \chapter*{Introduction}
 
-\emph{Diffusing ideas} records a journey of research exploration and software development over several years. It is the output of interrelated projects which have mainly been focused on generalising the software interfaces for simulation, statistical inference, manipulation and automated control of stochastic phenomena as much as possible. Therefore, in order to manifest these ideas into reality, these projects have involved designing and building a lot of new open-source scientific software which is predominantly written in the \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go} progamming languages. 
+\emph{Diffusing ideas} records a journey of research exploration and software development over several years. It's really the output of many interrelated projects, focused on generalising the computational mathematics for the simulation, statistical inference, manipulation and automated control of stochastic phenomena as far as possible. As a consequence, I've written a lot of new open-source scientific software in my presently-preferred languages: \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go}. 
 
-The main motivation behind developing these computational tools is to form a convenient foundation of software modules from which anyone can build loads of new applications. I also hope that the resulting framework will make research into new phenomena a much more efficient experience for anyone, regardless of their scientific background.  
+My main motivation behind developing these computational tools is to form a convenient foundation of software modules from which anyone can build loads of new applications. I also hope that the resulting framework enables everyone to explore and study new phenomena both rigorously and efficiently, regardless of their scientific background.  
 
-Having just stated all this altruistic-sounding stuff, I would be remiss if I left listing my motivations for writing this book at that. The necessity for testing the software has provided a wonderful excuse to study, play with and invent new derivatives of an extensive range of mathematical toy models with which I intend to illustrate the remarkable cross-disciplinary applicability of stochastic processes. The possibilities really seem endless! And as such, I have tried to write this book so that it reads more like an adventure for the curious --- and perhaps fairly mathematically-inclined --- software developer than a formal academic publication. I hope you, the reader, will find these mathematical model digressions interesting.
+Having just stated all this altruistic-sounding stuff, I would be remiss if I left listing my motivations for writing this book at that. The need to properly test the software has provided a wonderful excuse to study, play with and invent new derivatives of an extensive range of mathematical toy models, with which I intend to illustrate the remarkable cross-disciplinary applicability of stochastic processes. The possibilities are endless! And as such, I've tried to write this book so that it reads like an adventure for the curious (and perhaps fairly mathematically-inclined) software developer more than a formal academic publication. I hope you, the reader, will find these mathematical model digressions interesting.
 
 A quick note on the software; any software that I describe in this book (including the \href{https://github.com/umbralcalc/diffusing-ideas}{software which compiles the book itself}) will always be shared under a \href{https://opensource.org/licenses/MIT}{MIT License} in a public Git repository.\footnote{The repositories will always be somewhere on this list: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though I apologise in advance if I don't follow these up very quickly as all of this work has to be conducted independently in my free time outside of work hours.
 
@@ -131,18 +131,21 @@ X^{i}_{t+1} &= F^{i}_{t+1}(X', V', t) \label{eq:x-step-def}\\
 V^{i}_{t+1} &= X^{i}_{t+1} - X^{i}_{t} \label{eq:v-step-def}\,,
 \end{align}
 %%
-where: $i$ is an index for the dimensions of the `state' space; $t$ is the current time index for either a discrete-time process or some discrete approximation to a continuous-time process; $X$ is the next version of $X'$ after one timestep (and hence one new row has been added); $V$ as the next version of $V'$ (similarly to $X$ and $X'$); and $F^i_{t+1}(X', V', t)$ as the latest element of an arbitrary matrix-valued function.
+where: $i$ is an index for the dimensions of the `state' space; $t$ is the current time index for either a discrete-time process or some discrete approximation to a continuous-time process; $X$ is the next version of $X'$ after one timestep (and hence one new row has been added); $V$ as the next version of $V'$ (similarly to $X$ and $X'$); and $F^i_{t+1}(X', V', t)$ as the latest element of an arbitrary matrix-valued function. 
+
+As we shall discuss shortly, $F^i_{t+1}(X', V', t)$ may represent not just operations on deterministic variables, but also on stochastic ones. There is also no requirement for the function to be continuous.
 
 So the basic computational idea here is to iterate the matrices $X$ and $V$ forward in time by a row, and use their previous versions ($X'$ and $V'$) as entire matrix inputs into functions which populate the elements of their latest rows. But why go to all this trouble of storing matrix inputs for previous values of the same process? For a large class of stochastic processes this memory of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process.
 
-Note that, based on the definition in Eq.~(\ref{eq:v-step-def}) above, the following relation is also valid
+Before we go any further it's useful to note that, based on the definition in Eq.~(\ref{eq:v-step-def}) above, the following relation is also valid
 %%
 \begin{align}
 X^{i}_{t} &= X_{s}^{i} + \sum_{s'=s+1}^{t}V_{s'}^{i} \label{eq:x-implicit-solution} \,,
 \end{align}
 %%
-where $s<t$.
+where we have defined $s<t$.
 
+So now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some explicit examples.
 
 
 \section{\sffamily Flavours of noise with continuous sample paths}
@@ -150,7 +153,7 @@ where $s<t$.
 For \emph{Wiener process noise}, adopting the \href{https://en.wikipedia.org/wiki/It\%C3\%B4_calculus}{Itô interpretation} in this section, we can define $W^i_{t}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
 %%
 \begin{align}
-& X^i_{t+\delta t} = F^i_{t+\delta t}(X', t) + \textcolor{red}{W^i_{t+\delta t}-W^i_{t}}\,.
+& X^i_{t+1} = W^i_{t+1}-W^i_{t}\,.
 \end{align}
 %%
 
@@ -159,24 +162,24 @@ Other interpretations of the noise are less immediately compatible with our form
 For \emph{Geometric Brownian motion noise}, we simply have
 %%
 \begin{align}
-& X^i_{t+\delta t} = F^i_{t+\delta t}(X', t) + \textcolor{red}{X^i_{t}(W^i_{t+\delta t}-W^i_{t})}\,.
+& X^i_{t+1} = X^i_{t}(W^i_{t+1}-W^i_{t})\,.
 \end{align}
 %%
 
 And say, e.g., \emph{fractional Brownian motion noise}, where $B^i_{t}({H_i})$ is a sample from a fractional Brownian motion process with Hurst exponent $H_i$ for each of the state dimensions indexed by $i$, we simply substitute again
 %%
 \begin{align}
-& X^i_{t+\delta t} = F^i_{t+\delta t}(X', t) + \textcolor{red}{B^i_{t+\delta t}({H_i})-B^i_{t}({H_i})}\,.
+& X^i_{t+1} = B^i_{t+1}({H_i})-B^i_{t}({H_i})\,.
 \end{align}
 %%
 
 \emph{Generalised continuous noises} would take the form
 %%
 \begin{align}
-& X^i_{t+\delta t} = F^i_{t+\delta t}(X', t) + \textcolor{red}{g^i_{t+\delta t}(X', W^i_{t+\delta t}-W^i_t, \dots)}\,,
+& X^i_{t+1} = g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots) \,,
 \end{align}
 %%
-where $g^i_{t+\delta t}(X', W^i_{t+\delta t}-W^i_t, \dots)$ is some continuous function of its arguments which can be expanded out with \href{https://en.wikipedia.org/wiki/It\%C3\%B4\%27s_lemma}{Itôs Lemma}.
+where $g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots)$ is some continuous function of its arguments which can be expanded out with \href{https://en.wikipedia.org/wiki/It\%C3\%B4\%27s_lemma}{Itôs Lemma}.
 
 
 \section{\sffamily Flavours of noise with discontinuous sample paths}
@@ -184,15 +187,15 @@ where $g^i_{t+\delta t}(X', W^i_{t+\delta t}-W^i_t, \dots)$ is some continuous f
 \emph{Jump process noises} generally could take the form
 %%
 \begin{align}
-& X^i_{t+\delta t} = F^i_{t+\delta t}(X', t) + \textcolor{red}{J^i_{t+\delta t}(X', \dots )}\,,
+& X^i_{t+1} = J^i_{t+1}(X', \dots )\,,
 \end{align}
 %%
-where $J^i_{t+\delta t}(X', \dots )$ are samples from some arbitrary jump process (e.g., compound Poisson) which could generally depend on a variety of inputs, including $X'$. 
+where $J^i_{t+1}(X', \dots )$ are samples from some arbitrary jump process (e.g., compound Poisson) which could generally depend on a variety of inputs, including $X'$. 
 
 \emph{Poisson process noises} would generally take the form
 %%
 \begin{align}
-& X^i_{t+\delta t} = F^i_{t+\delta t}(X', t) + \textcolor{red}{N^i_{t+\delta t}({\lambda_i})-N^i_{t}({\lambda_i})}\,,
+& X^i_{t+1} = N^i_{t+1}({\lambda_i})-N^i_{t}({\lambda_i})\,,
 \end{align}
 %%
 where $N^i_{t}({\lambda_i})$ is a sample from a Poisson process with rate $\lambda_i$ for each of the state dimensions indexed by $i$. Note that we may also allow for correlations between the noises in different dimensions.
@@ -200,7 +203,7 @@ where $N^i_{t}({\lambda_i})$ is a sample from a Poisson process with rate $\lamb
 \emph{Time-inhomogeneous Poisson process noises} would generally take the form
 %%
 \begin{align}
-& X^i_{t+\delta t} = F^i_{t+\delta t}(X', t) + \textcolor{red}{N^i_{t+\delta t}({\lambda^i_{t+\delta t}})-N^i_{t}({\lambda^i_t})}\,,
+& X^i_{t+1} = N^i_{t+1}({\lambda^i_{t+1}})-N^i_{t}({\lambda^i_t}) \,,
 \end{align}
 %%
 where $\lambda^i_{t}$ is a deterministically-varying rate for each of the state dimensions indexed by $i$.
@@ -208,7 +211,7 @@ where $\lambda^i_{t}$ is a deterministically-varying rate for each of the state 
 \emph{Cox (doubly-stochastic) process noises} would generally take the form
 %%
 \begin{align}
-& X^i_{t+\delta t} = F^i_{t+\delta t}(X', t) + \textcolor{red}{N^i_{t+\delta t}({\Lambda^i_{t+\delta t}})-N^i_{t}({\Lambda^i_{t}})}\,,
+& X^i_{t+1} = N^i_{t+1}({\Lambda^i_{t+1}})-N^i_{t}({\Lambda^i_{t}}) \,,
 \end{align}
 %%
 where the rate $\Lambda^i_{t}$ is now a sample from some continuous-time stochastic process (in the positive-only domain) for each of the state dimensions indexed by $i$.
@@ -216,7 +219,7 @@ where the rate $\Lambda^i_{t}$ is now a sample from some continuous-time stochas
 \emph{Self-exciting process noises} would generally take the form
 %%
 \begin{align}
-& X^i_{t+\delta t} = F^i_{t+\delta t}(X', t) + \textcolor{red}{N^i_{t+\delta t}[{\cal I}^i_{t+\delta t}(N', \dots)]-N^i_{t}[{\cal I}^i_{t}(N'', \dots)]}\,,
+& X^i_{t+1} = N^i_{t+1}[{\cal I}^i_{t+1}(N', \dots)]-N^i_{t}[{\cal I}^i_{t}(N'', \dots)]\,,
 \end{align}
 %%
 where the stochastic rate ${\cal I}^i_{t}(N', \dots)$ now depends on the history of $N'$ explicitly (amongst other potential inputs - see, e.g., \href{https://en.wikipedia.org/wiki/Hawkes_process}{Hawkes processes}) for each of the state dimensions indexed by $i$.
@@ -224,10 +227,10 @@ where the stochastic rate ${\cal I}^i_{t}(N', \dots)$ now depends on the history
 \emph{Generalised probabilistic discrete state transitions} would take the form
 %%
 \begin{align}
-& X^i_{t+\delta t} = \slash{F^i_{t+\delta t}(X', t)} + \textcolor{red}{T^i_{t+\delta t}(X')}\,,
+& X^i_{t+1} = T^i_{t+1}(X')\,,
 \end{align}
 %%
-where $T^i_{t+\delta t}(X')$ is a generator of the next state to occupy. This generator uses the current state transition probabilities (which are generally conditional on $X'$) at each new step.
+where $T^i_{t+1}(X')$ is a generator of the next state to occupy. This generator uses the current state transition probabilities (which are generally conditional on $X'$) at each new step.
 
 \section{\sffamily Summary of desirable features}
 
