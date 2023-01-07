@@ -122,38 +122,36 @@ No quest would be complete without a guide, so to end this introduction, I think
 
 {\bfseries\sffamily Concept.} To design and build a generalised simulation engine that is able to generate samples from a `Pokédex' of possible stochastic processes that a researcher might encounter. A `Pokédex' here is just my fanciful description for a very general class of multidimensional stochastic processes that pop up everywhere in taming the mathematical wilds of real-world phenomena, and which also leads to a name for the software itself: the `stochadex'. With such a thing pre-built and self-contained, it can become the basis upon which to build generalised software solutions for a lot of different problems. For the mathematically-inclined, this chapter will require the introduction of a new formalism which we shall refer back to throughout the book. For the programmers, the public Git repository for the code that is described in this chapter can be found here: \href{https://github.com/umbralcalc/stochadex}{https://github.com/umbralcalc/stochadex}.
 
-\section{\sffamily Core mathematical formalism}
+\section{\sffamily Computational formalism}
 
-Before we dive into the software, we need to define the mathematical approach that we're going to take in order to be able to describe a really general set of stochastic phenomena. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrices $V' \rightarrow V$ and $X' \rightarrow X$
+Before we dive into the software and some examples, we need to mathematically define the general computational approach that we're going to take in order to be able to describe as general a set of stochastic phenomena as possible. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
 %%
 \begin{align}
-X^{i}_{t+1} &= F^{i}_{t+1}(X', V', t) \label{eq:x-step-def}\\
-V^{i}_{t+1} &= X^{i}_{t+1} - X^{i}_{t} \label{eq:v-step-def}\,,
+X^{i}_{t+1} &= F^{i}_{t+1}(X',t) \,, \label{eq:x-step-def}
 \end{align}
 %%
-where: $i$ is an index for the dimensions of the `state' space; $t$ is the current time index for either a discrete-time process or some discrete approximation to a continuous-time process; $X$ is the next version of $X'$ after one timestep (and hence one new row has been added); $V$ as the next version of $V'$ (similarly to $X$ and $X'$); and $F^i_{t+1}(X', V', t)$ as the latest element of an arbitrary matrix-valued function. 
+where: $i$ is an index for the dimensions of the `state' space; $t$ is the current time index for either a discrete-time process or some discrete approximation to a continuous-time process; $X$ is the next version of $X'$ after one timestep (and hence one new row has been added); and $F^i_{t+1}(X',t)$ as the latest element of an arbitrary matrix-valued function. As we shall discuss shortly, $F^i_{t+1}(X',t)$ may represent not just operations on deterministic variables, but also on stochastic ones. There is also no requirement for the function to be continuous.
 
-As we shall discuss shortly, $F^i_{t+1}(X', V', t)$ may represent not just operations on deterministic variables, but also on stochastic ones. There is also no requirement for the function to be continuous.
+So the basic computational idea here is to iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. Pretty simple! But why go to all this trouble of storing matrix inputs for previous values of the same process? For a large class of stochastic processes this memory of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process.
 
-So the basic computational idea here is to iterate the matrices $X$ and $V$ forward in time by a row, and use their previous versions ($X'$ and $V'$) as entire matrix inputs into functions which populate the elements of their latest rows. But why go to all this trouble of storing matrix inputs for previous values of the same process? For a large class of stochastic processes this memory of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process.
-
-Before we go any further it's useful to note that, based on the definition in Eq.~(\ref{eq:v-step-def}) above, the following relation is also valid
+Before progressing further, it will be helpful to also briefly think about constructing what we shall call `$V$ states' using the time difference in $X$ like so
+%%
+\begin{align}
+V^{i}_{t+1} &= X^{i}_{t+1} - X^{i}_{t} \label{eq:v-step-def}\,.
+\end{align}
+%%
+Given Eq.~(\ref{eq:v-step-def}), we can see that the following relation between $X$ and $V$ is also valid
 %%
 \begin{align}
 X^{i}_{t} &= X_{s}^{i} + \sum_{s'=s+1}^{t}V_{s'}^{i} \label{eq:x-implicit-solution} \,,
 \end{align}
 %%
-where we have defined $s<t$.
+where we have defined $s<t$. The resemblance of the tuple $(X_t, V_t, t)$ to a formal `phase space' will be a useful observation to consider for many systems.
 
-So now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some explicit examples.
-
-
-\section{\sffamily Flavours of noise with continuous sample paths}
-
-For \emph{Wiener process noise}, adopting the \href{https://en.wikipedia.org/wiki/It\%C3\%B4_calculus}{Itô interpretation} in this section, we can define $W^i_{t}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
+So, now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, a \emph{Wiener process noise}; adopting the Itô interpretation~\cite{rog-will-2000}, we can define $W^i_{t}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
 %%
 \begin{align}
-& X^i_{t+1} = W^i_{t+1}-W^i_{t}\,.
+& F^{i}_{t+1}(X',t) = W^i_{t+1}-W^i_{t}\,.
 \end{align}
 %%
 
@@ -162,32 +160,29 @@ Other interpretations of the noise are less immediately compatible with our form
 For \emph{Geometric Brownian motion noise}, we simply have
 %%
 \begin{align}
-& X^i_{t+1} = X^i_{t}(W^i_{t+1}-W^i_{t})\,.
+& F^{i}_{t+1}(X',t) = X^i_{t}(W^i_{t+1}-W^i_{t})\,.
 \end{align}
 %%
 
 And say, e.g., \emph{fractional Brownian motion noise}, where $B^i_{t}({H_i})$ is a sample from a fractional Brownian motion process with Hurst exponent $H_i$ for each of the state dimensions indexed by $i$, we simply substitute again
 %%
 \begin{align}
-& X^i_{t+1} = B^i_{t+1}({H_i})-B^i_{t}({H_i})\,.
+& F^{i}_{t+1}(X',t) = B^i_{t+1}({H_i})-B^i_{t}({H_i})\,.
 \end{align}
 %%
 
 \emph{Generalised continuous noises} would take the form
 %%
 \begin{align}
-& X^i_{t+1} = g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots) \,,
+& F^{i}_{t+1}(X',t) = g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots) \,,
 \end{align}
 %%
 where $g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots)$ is some continuous function of its arguments which can be expanded out with \href{https://en.wikipedia.org/wiki/It\%C3\%B4\%27s_lemma}{Itôs Lemma}.
 
-
-\section{\sffamily Flavours of noise with discontinuous sample paths}
-
-\emph{Jump process noises} generally could take the form
+So far, we have only been discussing noises with continuous sample paths, but our formalism can also adapt to discontinuous sample paths as well. For instance, \emph{jump process noises} generally would take the form
 %%
 \begin{align}
-& X^i_{t+1} = J^i_{t+1}(X', \dots )\,,
+& F^{i}_{t+1}(X',t)= J^i_{t+1}(X', \dots )\,,
 \end{align}
 %%
 where $J^i_{t+1}(X', \dots )$ are samples from some arbitrary jump process (e.g., compound Poisson) which could generally depend on a variety of inputs, including $X'$. 
@@ -195,7 +190,7 @@ where $J^i_{t+1}(X', \dots )$ are samples from some arbitrary jump process (e.g.
 \emph{Poisson process noises} would generally take the form
 %%
 \begin{align}
-& X^i_{t+1} = N^i_{t+1}({\lambda_i})-N^i_{t}({\lambda_i})\,,
+& F^{i}_{t+1}(X',t) = N^i_{t+1}({\lambda_i})-N^i_{t}({\lambda_i})\,,
 \end{align}
 %%
 where $N^i_{t}({\lambda_i})$ is a sample from a Poisson process with rate $\lambda_i$ for each of the state dimensions indexed by $i$. Note that we may also allow for correlations between the noises in different dimensions.
@@ -203,7 +198,7 @@ where $N^i_{t}({\lambda_i})$ is a sample from a Poisson process with rate $\lamb
 \emph{Time-inhomogeneous Poisson process noises} would generally take the form
 %%
 \begin{align}
-& X^i_{t+1} = N^i_{t+1}({\lambda^i_{t+1}})-N^i_{t}({\lambda^i_t}) \,,
+& F^{i}_{t+1}(X',t) = N^i_{t+1}({\lambda^i_{t+1}})-N^i_{t}({\lambda^i_t}) \,,
 \end{align}
 %%
 where $\lambda^i_{t}$ is a deterministically-varying rate for each of the state dimensions indexed by $i$.
@@ -211,7 +206,7 @@ where $\lambda^i_{t}$ is a deterministically-varying rate for each of the state 
 \emph{Cox (doubly-stochastic) process noises} would generally take the form
 %%
 \begin{align}
-& X^i_{t+1} = N^i_{t+1}({\Lambda^i_{t+1}})-N^i_{t}({\Lambda^i_{t}}) \,,
+& F^{i}_{t+1}(X',t) = N^i_{t+1}({\Lambda^i_{t+1}})-N^i_{t}({\Lambda^i_{t}}) \,,
 \end{align}
 %%
 where the rate $\Lambda^i_{t}$ is now a sample from some continuous-time stochastic process (in the positive-only domain) for each of the state dimensions indexed by $i$.
@@ -219,7 +214,7 @@ where the rate $\Lambda^i_{t}$ is now a sample from some continuous-time stochas
 \emph{Self-exciting process noises} would generally take the form
 %%
 \begin{align}
-& X^i_{t+1} = N^i_{t+1}[{\cal I}^i_{t+1}(N', \dots)]-N^i_{t}[{\cal I}^i_{t}(N'', \dots)]\,,
+& F^{i}_{t+1}(X',t) = N^i_{t+1}[{\cal I}^i_{t+1}(N', \dots)]-N^i_{t}[{\cal I}^i_{t}(N'', \dots)]\,,
 \end{align}
 %%
 where the stochastic rate ${\cal I}^i_{t}(N', \dots)$ now depends on the history of $N'$ explicitly (amongst other potential inputs - see, e.g., \href{https://en.wikipedia.org/wiki/Hawkes_process}{Hawkes processes}) for each of the state dimensions indexed by $i$.
@@ -227,7 +222,7 @@ where the stochastic rate ${\cal I}^i_{t}(N', \dots)$ now depends on the history
 \emph{Generalised probabilistic discrete state transitions} would take the form
 %%
 \begin{align}
-& X^i_{t+1} = T^i_{t+1}(X')\,,
+& F^{i}_{t+1}(X',t) = T^i_{t+1}(X')\,,
 \end{align}
 %%
 where $T^i_{t+1}(X')$ is a generator of the next state to occupy. This generator uses the current state transition probabilities (which are generally conditional on $X'$) at each new step.

@@ -1,8 +1,9 @@
 \providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{1}
 
-\bibitem{Dimastrogiovanni:2018xnn}
-E.~Dimastrogiovanni, M.~Fasiello, R.~J. Hardwick, H.~Assadullahi, K.~Koyama and
-  D.~Wands, \emph{{Non-Gaussianity from Axion-Gauge Fields Interactions during
-  Inflation}},  \href{http://arxiv.org/abs/1806.05474}{{\tt 1806.05474}}.
+\bibitem{rog-will-2000}
+L.~Rogers and D.~Williams, \emph{Diffusions, Markov Processes and Martingales
+  2: Ito Calculus}, vol.~1, pp.~xiv+480.
+\newblock 04, 2000.
+\newblock 10.1017/CBO9781107590120.
 
 \end{thebibliography}\endgroup
