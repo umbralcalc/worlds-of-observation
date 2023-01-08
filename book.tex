@@ -90,11 +90,11 @@
 
 \chapter*{Introduction}
 
-\emph{Diffusing ideas} records a journey of research exploration and software development over several years. It's really the output of many interrelated projects, focused on generalising the computational mathematics for the simulation, statistical inference, manipulation and automated control of stochastic phenomena as far as possible. As a consequence, I've written a lot of new open-source scientific software in my presently-preferred languages: \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go}. 
+\emph{Diffusing ideas} records a journey of research exploration and software development over several years. It's really the output of many interrelated projects, focused on generalising the computational mathematics for the simulation, statistical inference, manipulation and automated control of stochastic phenomena as far as possible. As a consequence, the book accompanies a lot of new open-source scientific software which is written predominantly in the \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go} progamming languages. This software is all still very much in development. 
 
-My main motivation behind developing these computational tools is to form a convenient foundation of software modules from which anyone can build loads of new applications. I also hope that the resulting framework enables everyone to explore and study new phenomena both rigorously and efficiently, regardless of their scientific background.  
+My main motivation for developing these new computational tools is to prepare a core collection of software modules to use as a foundation for developing new and more complex applications. I also hope that the resulting framework enables everyone to explore and study new phenomena both rigorously and efficiently, regardless of their scientific background.  
 
-Having just stated all this altruistic-sounding stuff, I would be remiss if I left listing my motivations for writing this book at that. The need to properly test the software has provided a wonderful excuse to study, play with and invent new derivatives of an extensive range of mathematical toy models, with which I intend to illustrate the remarkable cross-disciplinary applicability of stochastic processes. The possibilities are endless! And as such, I've tried to write this book so that it reads like an adventure for the curious (and perhaps fairly mathematically-inclined) software developer more than a formal academic publication. I hope you, the reader, will find these mathematical model digressions interesting.
+The need to properly test all this new software has also provided a wonderful excuse to study, play with and invent new derivatives of an extensive range of mathematical toy models. I've chosen these models based on my broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. The possible applications are endless! And as such, I've tried to write this book so that it reads like an adventure for the curious (and perhaps fairly mathematically-inclined) software developer more than a formal academic publication. I hope you, the reader, will find these mathematical model digressions interesting.
 
 A quick note on the software; any software that I describe in this book (including the \href{https://github.com/umbralcalc/diffusing-ideas}{software which compiles the book itself}) will always be shared under a \href{https://opensource.org/licenses/MIT}{MIT License} in a public Git repository.\footnote{The repositories will always be somewhere on this list: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though I apologise in advance if I don't follow these up very quickly as all of this work has to be conducted independently in my free time outside of work hours.
 
@@ -148,33 +148,41 @@ X^{i}_{t} &= X_{s}^{i} + \sum_{s'=s+1}^{t}V_{s'}^{i} \label{eq:x-implicit-soluti
 %%
 where we have defined $s<t$. The resemblance of the tuple $(X_t, V_t, t)$ to a formal `phase space' will be a useful observation to consider for many systems.
 
-So, now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, a \emph{Wiener process noise}; adopting the Itô interpretation~\cite{rog-will-2000}, we can define $W^i_{t}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
+So, now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, it is frequently possible to split $F$ up into deteministic (denoted $D$) and stochastic (denoted $S$) matrix-valued functions like so
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = W^i_{t+1}-W^i_{t}\,.
+& F^{i}_{t+1}(X',t) = D^{i}_{t+1}(X',t) + S^{i}_{t+1}(X',t) \,.
 \end{align}
 %%
+When modelling continuous sample paths, it's also nearly always the case with mathematical models of real-world systems that the deterministic part will at least contain the term $D^{i}_{t+1}(X',t) = X^i_t$ because the overall system is a described as some stochastic differential equation. This is not a really requirement in our general formalism, however.
 
-Other interpretations of the noise are less immediately compatible with our formalism as it is currently written, e.g., \href{https://en.wikipedia.org/wiki/Stratonovich_integral}{Stratonovich} or others within the $\alpha$-family, but it seems less necessary to complicate the details of this section further, so we'll just cover these extensions at the software implementation level. Note also that we may also allow for correlations between the noises in different dimensions. 
-
-For \emph{Geometric Brownian motion noise}, we simply have
+What about the stochastic term? For example, if we wanted to consider a \emph{Wiener process noise}, we can define $W^i_{t}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = X^i_{t}(W^i_{t+1}-W^i_{t})\,.
+& S^{i}_{t+1}(X',t) =  W^i_{t+1}-W^i_{t} \label{eq:wiener}\,,
 \end{align}
 %%
+where one draws the increments $W^i_{t+1}-W^i_{t}$ from a normal distribution with a mean of $0$ and a variance equal to the step size in time (for the continuous process one is approximating). Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
+
+In another example, for \emph{Geometric Brownian motion noise} we would simply have
+%%
+\begin{align}
+& S^{i}_{t+1}(X',t) = X^i_{t}(W^i_{t+1}-W^i_{t})\label{eq:gbm} \,.
+\end{align}
+%%
+Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{t+1}(X',t) = (X^i_{t+1}+X^i_{t})(W^i_{t+1}-W^i_{t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}.
 
 And say, e.g., \emph{fractional Brownian motion noise}, where $B^i_{t}({H_i})$ is a sample from a fractional Brownian motion process with Hurst exponent $H_i$ for each of the state dimensions indexed by $i$, we simply substitute again
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = B^i_{t+1}({H_i})-B^i_{t}({H_i})\,.
+& F^{i}_{t+1}(X',t) = X^i_{t} + B^i_{t+1}({H_i})-B^i_{t}({H_i})\,.
 \end{align}
 %%
 
 \emph{Generalised continuous noises} would take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots) \,,
+& F^{i}_{t+1}(X',t) = X^i_{t} + g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots) \,,
 \end{align}
 %%
 where $g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots)$ is some continuous function of its arguments which can be expanded out with \href{https://en.wikipedia.org/wiki/It\%C3\%B4\%27s_lemma}{Itôs Lemma}.
@@ -190,7 +198,7 @@ where $J^i_{t+1}(X', \dots )$ are samples from some arbitrary jump process (e.g.
 \emph{Poisson process noises} would generally take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = N^i_{t+1}({\lambda_i})-N^i_{t}({\lambda_i})\,,
+& F^{i}_{t+1}(X',t) = X^i_{t} + N^i_{t+1}({\lambda_i})-N^i_{t}({\lambda_i})\,,
 \end{align}
 %%
 where $N^i_{t}({\lambda_i})$ is a sample from a Poisson process with rate $\lambda_i$ for each of the state dimensions indexed by $i$. Note that we may also allow for correlations between the noises in different dimensions.
@@ -198,7 +206,7 @@ where $N^i_{t}({\lambda_i})$ is a sample from a Poisson process with rate $\lamb
 \emph{Time-inhomogeneous Poisson process noises} would generally take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = N^i_{t+1}({\lambda^i_{t+1}})-N^i_{t}({\lambda^i_t}) \,,
+& F^{i}_{t+1}(X',t) = X^i_{t} + N^i_{t+1}({\lambda^i_{t+1}})-N^i_{t}({\lambda^i_t}) \,,
 \end{align}
 %%
 where $\lambda^i_{t}$ is a deterministically-varying rate for each of the state dimensions indexed by $i$.
@@ -206,7 +214,7 @@ where $\lambda^i_{t}$ is a deterministically-varying rate for each of the state 
 \emph{Cox (doubly-stochastic) process noises} would generally take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = N^i_{t+1}({\Lambda^i_{t+1}})-N^i_{t}({\Lambda^i_{t}}) \,,
+& F^{i}_{t+1}(X',t) = X^i_{t} + N^i_{t+1}({\Lambda^i_{t+1}})-N^i_{t}({\Lambda^i_{t}}) \,,
 \end{align}
 %%
 where the rate $\Lambda^i_{t}$ is now a sample from some continuous-time stochastic process (in the positive-only domain) for each of the state dimensions indexed by $i$.
@@ -214,7 +222,7 @@ where the rate $\Lambda^i_{t}$ is now a sample from some continuous-time stochas
 \emph{Self-exciting process noises} would generally take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = N^i_{t+1}[{\cal I}^i_{t+1}(N', \dots)]-N^i_{t}[{\cal I}^i_{t}(N'', \dots)]\,,
+& F^{i}_{t+1}(X',t) = X^i_{t} + N^i_{t+1}[{\cal I}^i_{t+1}(N', \dots)]-N^i_{t}[{\cal I}^i_{t}(N'', \dots)]\,,
 \end{align}
 %%
 where the stochastic rate ${\cal I}^i_{t}(N', \dots)$ now depends on the history of $N'$ explicitly (amongst other potential inputs - see, e.g., \href{https://en.wikipedia.org/wiki/Hawkes_process}{Hawkes processes}) for each of the state dimensions indexed by $i$.

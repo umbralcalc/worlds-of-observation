@@ -1,3 +1,3 @@
 # Diffusing ideas
 
-LaTeX code for a book. WIP.
+LaTeX code for a book. WIP. To be published on [https://leanpub.com/](https://leanpub.com/) eventually...

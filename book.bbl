@@ -1,5 +1,14 @@
 \providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{1}
 
+\bibitem{van1992stochastic}
+N.~G. Van~Kampen, \emph{Stochastic processes in physics and chemistry}, vol.~1.
+\newblock Elsevier, 1992.
+
+\bibitem{risken1996fokker}
+H.~Risken, \emph{Fokker-planck equation},  in \emph{The Fokker-Planck
+  Equation}, pp.~63--95.
+\newblock Springer, 1996.
+
 \bibitem{rog-will-2000}
 L.~Rogers and D.~Williams, \emph{Diffusions, Markov Processes and Martingales
   2: Ito Calculus}, vol.~1, pp.~xiv+480.
