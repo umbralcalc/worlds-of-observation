@@ -3,11 +3,10 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: book.aux
 The style file: JHEP.bst
 Database file #1: book.bib
-Warning--I didn't find a database entry for "Dimastrogiovanni:2018xnn"
 Warning--empty publisher in rog-will-2000
 You've used 3 entries,
             2188 wiz_defined-function locations,
-            537 strings with 3838 characters,
+            535 strings with 3790 characters,
 and the built_in function-call counts, 884 in all, are:
 = -- 93
 > -- 20
@@ -46,4 +45,4 @@ warning$ -- 1
 while$ -- 8
 width$ -- 4
 write$ -- 35
-(There were 2 warnings)
+(There was 1 warning)
