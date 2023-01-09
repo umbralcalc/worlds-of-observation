@@ -90,11 +90,11 @@
 
 \chapter*{Introduction}
 
-\emph{Diffusing ideas} records a journey of research exploration and software development over several years. It's really the output of many interrelated projects, focused on generalising the computational mathematics for the simulation, statistical inference, manipulation and automated control of stochastic phenomena as far as possible. As a consequence, the book accompanies a lot of new open-source scientific software which is written predominantly in the \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go} progamming languages. This software is all still very much in development. 
+Written for the mathsy programmer or computational scientist, \emph{Diffusing ideas} records a journey of research exploration and software development over several years. It's the output of many interrelated projects, focused on generalising the computational mathematics for the simulation, statistical inference, manipulation and automated control of stochastic phenomena as far as possible. As a consequence, the book accompanies a lot of new open-source scientific software written predominantly in the \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go} progamming languages. This software is still in development. 
 
-My main motivation for developing these new computational tools is to prepare a core collection of software modules to use as a foundation for developing new and more complex applications. I also hope that the resulting framework enables everyone to explore and study new phenomena both rigorously and efficiently, regardless of their scientific background.  
+My main motivation for developing these new computational tools is to prepare a core collection of modules to use as a foundation for developing new and more complex applications. I also hope that the resulting framework enables everyone to explore and study new phenomena both rigorously and efficiently, regardless of their scientific background.
 
-The need to properly test all this new software has also provided a wonderful excuse to study, play with and invent new derivatives of an extensive range of mathematical toy models. I've chosen these models based on my broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. The possible applications are endless! And as such, I've tried to write this book so that it reads like an adventure for the curious (and perhaps fairly mathematically-inclined) software developer more than a formal academic publication. I hope you, the reader, will find these mathematical model digressions interesting.
+The need to properly test all this new code has also provided a wonderful excuse to study, play with and invent new derivatives of an extensive range of mathematical toy models. I've chosen these models based on my broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. Mathematical formalism can obscure what a programmer must tell their machine to do, so, while I have tried to be ambitious as possible with the level of technical sophistication in these models, I've also tried to write most of the expressions in a way so as to make their intended computations as explicit as possible.\footnote{E.g., think matrix instead of operator.} 
 
 A quick note on the software; any software that I describe in this book (including the \href{https://github.com/umbralcalc/diffusing-ideas}{software which compiles the book itself}) will always be shared under a \href{https://opensource.org/licenses/MIT}{MIT License} in a public Git repository.\footnote{The repositories will always be somewhere on this list: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though I apologise in advance if I don't follow these up very quickly as all of this work has to be conducted independently in my free time outside of work hours.
 
@@ -133,20 +133,6 @@ X^{i}_{t+1} &= F^{i}_{t+1}(X',t) \,, \label{eq:x-step-def}
 where: $i$ is an index for the dimensions of the `state' space; $t$ is the current time index for either a discrete-time process or some discrete approximation to a continuous-time process; $X$ is the next version of $X'$ after one timestep (and hence one new row has been added); and $F^i_{t+1}(X',t)$ as the latest element of an arbitrary matrix-valued function. As we shall discuss shortly, $F^i_{t+1}(X',t)$ may represent not just operations on deterministic variables, but also on stochastic ones. There is also no requirement for the function to be continuous.
 
 So the basic computational idea here is to iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. Pretty simple! But why go to all this trouble of storing matrix inputs for previous values of the same process? For a large class of stochastic processes this memory of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process.
-
-Before progressing further, it will be helpful to also briefly think about constructing what we shall call `$V$ states' using the time difference in $X$ like so
-%%
-\begin{align}
-V^{i}_{t+1} &= X^{i}_{t+1} - X^{i}_{t} \label{eq:v-step-def}\,.
-\end{align}
-%%
-Given Eq.~(\ref{eq:v-step-def}), we can see that the following relation between $X$ and $V$ is also valid
-%%
-\begin{align}
-X^{i}_{t} &= X_{s}^{i} + \sum_{s'=s+1}^{t}V_{s'}^{i} \label{eq:x-implicit-solution} \,,
-\end{align}
-%%
-where we have defined $s<t$. The resemblance of the tuple $(X_t, V_t, t)$ to a formal `phase space' will be a useful observation to consider for many systems.
 
 So, now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, it is frequently possible to split $F$ up into deteministic (denoted $D$) and stochastic (denoted $S$) matrix-valued functions like so
 %%
@@ -234,6 +220,46 @@ where the stochastic rate ${\cal I}^i_{t}(N', \dots)$ now depends on the history
 \end{align}
 %%
 where $T^i_{t+1}(X')$ is a generator of the next state to occupy. This generator uses the current state transition probabilities (which are generally conditional on $X'$) at each new step.
+
+\section{\sffamily Analysis concepts}
+
+Before progressing further, it will be helpful to discuss some useful concepts that should help us analyse the system later on. This section may be of most interest to the more mathematically-interested readers but I'm going to stick with the linear algebra style of formalism in this section so that the computations will hopefully be clear to other programmers as well.
+
+Our general stochastic process, which we defined with Eq.~(\ref{eq:x-step-def}), also has a corresponding master equation~\cite{van1992stochastic} that describes the time evolution of its probability matrix elements
+%%
+\begin{align}
+P^i_{t+1}(x) &= \int_{\Omega (X')} {\cal D}{\sf P}(X') P^i_{t+1}(x\vert X') \label{eq:master-x-cont} \,,
+\end{align}
+%%
+where we are assuming the state space is continuous in each dimension. In the above relation $P^i_{t+1}(x)$ denotes the probability that $X^i_{t+1}=x$ and 
+%%
+\begin{align}
+{\cal D}{\sf P}(Y) &= \prod_{\forall i}\prod^t_{s'=s} {\rm d}y \, P(Y^i_{s'}=y) \,,
+\end{align}
+%%
+denotes the probability measure over the whole matrix of histories back to initial time step $s$. Using Eq.~(\ref{eq:x-step-def}) may also deduce that the conditional probability $P^i_{t+1}(x\vert X')=\delta [x-F^i_{t+1}(X',t)]$ where $\delta$ is a Dirac delta distribution.
+
+Note that the analog of Eq.~(\ref{eq:master-x-cont}) for discrete state spaces simply replaces the integral with a sum like so 
+%%
+\begin{align}
+P^i_{t+1}(x) &= \sum_{\Omega (X')} {\sf P}(X') P^i_{t+1}(x\vert X') \label{eq:master-x-disc} \,.
+\end{align}
+%%
+
+Another useful concept comes from constructing what we shall call `$V$ states' using the time difference in $X$ like so
+%%
+\begin{align}
+V^{i}_{t+1} &= X^{i}_{t+1} - X^{i}_{t} \label{eq:v-step-def}\,.
+\end{align}
+%%
+Given Eq.~(\ref{eq:v-step-def}), we can see that the following relation between $X$ and $V$ is also valid
+%%
+\begin{align}
+X^{i}_{t} &= X_{s}^{i} + \sum_{s'=s+1}^{t}V_{s'}^{i} \label{eq:x-implicit-solution} \,,
+\end{align}
+%%
+where we have defined $s<t$. The resemblance of the tuple $(X_t, V_t, t)$ to a formal `phase space' will be a useful observation to consider for many systems.
+
 
 \section{\sffamily Summary of desirable features}
 
