@@ -92,9 +92,9 @@
 
 Written for the mathsy programmer or computational scientist, \emph{Diffusing ideas} records a journey of research exploration and software development over several years. It's the output of many interrelated projects, focused on generalising the computational mathematics for the simulation, statistical inference, manipulation and automated control of stochastic phenomena as far as possible. As a consequence, the book accompanies a lot of new open-source scientific software written predominantly in the \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go} progamming languages. This software is still in development. 
 
-My main motivation for developing these new computational tools is to prepare a core collection of modules to use as a foundation for developing new and more complex applications. I also hope that the resulting framework enables everyone to explore and study new phenomena both rigorously and efficiently, regardless of their scientific background.
+My main motivation for developing these new computational tools is to prepare a core collection of modules to use as a foundation for developing new and more complex applications. I also hope that the resulting framework will enable anyone to explore and study new phenomena effectively, regardless of their scientific background.
 
-The need to properly test all this new code has also provided a wonderful excuse to study, play with and invent new derivatives of an extensive range of mathematical toy models. I've chosen these models based on my broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. Mathematical formalism can obscure what a programmer must tell their machine to do, so, while I have tried to be ambitious as possible with the level of technical sophistication in these models, I've also tried to write most of the expressions in a way so as to make their intended computations as explicit as possible.\footnote{E.g., think matrix instead of operator.} 
+The need to properly test all this new code has also provided a wonderful excuse to study and play with an extensive range of mathematical toy models. I've chosen these models based on my broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. However, it's often true that mathematical formalities can obscure the computations that a programmer must tell their machine to do. So, while I have tried to be as ambitious as possible with the level of technical sophistication in these models, I've also written most of the expressions in a way so as to make their intended computations as explicit as possible.\footnote{E.g., think matrix instead of operator.} 
 
 A quick note on the software; any software that I describe in this book (including the \href{https://github.com/umbralcalc/diffusing-ideas}{software which compiles the book itself}) will always be shared under a \href{https://opensource.org/licenses/MIT}{MIT License} in a public Git repository.\footnote{The repositories will always be somewhere on this list: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though I apologise in advance if I don't follow these up very quickly as all of this work has to be conducted independently in my free time outside of work hours.
 
@@ -223,26 +223,24 @@ where $T^i_{t+1}(X')$ is a generator of the next state to occupy. This generator
 
 \section{\sffamily Analysis concepts}
 
-Before progressing further, it will be helpful to discuss some useful concepts that should help us analyse the system later on. This section may be of most interest to the more mathematically-interested readers but I'm going to stick with the linear algebra style of formalism in this section so that the computations will hopefully be clear to other programmers as well.
-
-Our general stochastic process, which we defined with Eq.~(\ref{eq:x-step-def}), also has a corresponding master equation~\cite{van1992stochastic} that describes the time evolution of its probability matrix elements
+Before progressing further, it will be helpful to discuss some useful concepts that should help us analyse the system later on. The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit master equation~\cite{van1992stochastic} that describes the time evolution of the probability of $X$, which can be written as
 %%
 \begin{align}
-P^i_{t+1}(x) &= \int_{\Omega (X')} {\cal D}{\sf P}(X') P^i_{t+1}(x\vert X') \label{eq:master-x-cont} \,,
+p_{t+1}(X) &= \int_{\Omega_t (X')}{\rm d}X' p_{t}(X') p_{t+1}(X\vert X') \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where we are assuming the state space is continuous in each dimension. In the above relation $P^i_{t+1}(x)$ denotes the probability that $X^i_{t+1}=x$ and 
+where we are assuming the state space is continuous in each dimension. If we then define the probability matrix $P$, with elements $P^i_{t}(x)$ which denote the probability of $X^i_t=x$, the latest values of this matrix are updated by each new step in time according to
 %%
 \begin{align}
-{\cal D}{\sf P}(Y) &= \prod_{\forall i}\prod^t_{s'=s} {\rm d}y \, P(Y^i_{s'}=y) \,,
+P^i_{t+1}(x) &= \int_{\Omega_t (X')}{\rm d}X' p_{t}(X') \delta [x-F^i_{t+1}(X',t)] \label{eq:master-x-cont-update}\,,
 \end{align}
 %%
-denotes the probability measure over the whole matrix of histories back to initial time step $s$. Using Eq.~(\ref{eq:x-step-def}) may also deduce that the conditional probability $P^i_{t+1}(x\vert X')=\delta [x-F^i_{t+1}(X',t)]$ where $\delta$ is a Dirac delta distribution.
+where we have made explicit use of Eq.~(\ref{eq:x-step-def}) and a Dirac delta distribution $\delta$.
 
-Note that the analog of Eq.~(\ref{eq:master-x-cont}) for discrete state spaces simply replaces the integral with a sum like so 
+Note that an analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state spaces where we simply replace the integral with a sum, schematically like so 
 %%
 \begin{align}
-P^i_{t+1}(x) &= \sum_{\Omega (X')} {\sf P}(X') P^i_{t+1}(x\vert X') \label{eq:master-x-disc} \,.
+p_{t+1}(X) &= \sum_{\Omega_t (X')} p_t(X') p_{t+1}(X \vert X') \label{eq:master-x-disc} \,.
 \end{align}
 %%
 
