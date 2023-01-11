@@ -140,7 +140,7 @@ So, now that we've mathematically defined a really general notion of iterating t
 & F^{i}_{t+1}(X',t) = D^{i}_{t+1}(X',t) + S^{i}_{t+1}(X',t) \,.
 \end{align}
 %%
-When modelling continuous sample paths, it's also nearly always the case with mathematical models of real-world systems that the deterministic part will at least contain the term $D^{i}_{t+1}(X',t) = X^i_t$ because the overall system is a described as some stochastic differential equation. This is not a really requirement in our general formalism, however.
+In the case of stochastic processes with continuous sample paths, it's also nearly always the case with mathematical models of real-world systems that the deterministic part will at least contain the term $D^{i}_{t+1}(X',t) = X^i_t$ because the overall system is described by some stochastic differential equation. This is not a really requirement in our general formalism, however.
 
 What about the stochastic term? For example, if we wanted to consider a \emph{Wiener process noise}, we can define $W^i_{t}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
 %%
@@ -150,7 +150,7 @@ What about the stochastic term? For example, if we wanted to consider a \emph{Wi
 %%
 where one draws the increments $W^i_{t+1}-W^i_{t}$ from a normal distribution with a mean of $0$ and a variance equal to the step size in time (for the continuous process one is approximating). Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
 
-In another example, for \emph{Geometric Brownian motion noise} we would simply have
+In another example, to model \emph{Geometric Brownian motion noise} we would simply have to multiply $X^i_t$ to the Wiener process like so
 %%
 \begin{align}
 & S^{i}_{t+1}(X',t) = X^i_{t}(W^i_{t+1}-W^i_{t})\label{eq:gbm} \,.
@@ -158,10 +158,12 @@ In another example, for \emph{Geometric Brownian motion noise} we would simply h
 %%
 Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{t+1}(X',t) = (X^i_{t+1}+X^i_{t})(W^i_{t+1}-W^i_{t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}.
 
-And say, e.g., \emph{fractional Brownian motion noise}, where $B^i_{t}({H_i})$ is a sample from a fractional Brownian motion process with Hurst exponent $H_i$ for each of the state dimensions indexed by $i$, we simply substitute again
+Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion noise}, where $[B_{H}]_{t}$ is a sample from a fractional Brownian motion process with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process by first leveraging an extra dimension in our available state space within $X$ to simulate a standard Wiener process and then inserting this into the following computations
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = X^i_{t} + B^i_{t+1}({H_i})-B^i_{t}({H_i})\,.
+S^{0}_{t+1}(X',t) &= W_{t+1} - W_{t} \\
+S^{1}_{t+1}(X',t) &= [B_{H}]_{t+1}-[B_{H}]_{t} \\
+[B_{H}]_{t} &= \sum^t_{s'=s} (S^{0}_{t} - S^{0}_{t-s'}) \frac{(t-s')^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t}{s'}\bigg) \,.
 \end{align}
 %%
 
@@ -171,7 +173,7 @@ And say, e.g., \emph{fractional Brownian motion noise}, where $B^i_{t}({H_i})$ i
 & F^{i}_{t+1}(X',t) = X^i_{t} + g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots) \,,
 \end{align}
 %%
-where $g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots)$ is some continuous function of its arguments which can be expanded out with \href{https://en.wikipedia.org/wiki/It\%C3\%B4\%27s_lemma}{Itôs Lemma}.
+where $g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots)$ is some continuous function of its arguments which can be expanded out with the Itô Lemma.
 
 So far, we have only been discussing noises with continuous sample paths, but our formalism can also adapt to discontinuous sample paths as well. For instance, \emph{jump process noises} generally would take the form
 %%
@@ -221,26 +223,28 @@ where the stochastic rate ${\cal I}^i_{t}(N', \dots)$ now depends on the history
 %%
 where $T^i_{t+1}(X')$ is a generator of the next state to occupy. This generator uses the current state transition probabilities (which are generally conditional on $X'$) at each new step.
 
-\section{\sffamily Analysis concepts}
+\section{\sffamily Useful analysis concepts}
 
-Before progressing further, it will be helpful to discuss some useful concepts that should help us analyse the system later on. The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit master equation~\cite{van1992stochastic} that describes the time evolution of the probability of $X$, which can be written as
+Before progressing further, it will be helpful to discuss some useful concepts that should help us analyse the system later on. The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit \emph{master equation} associated to it which fully describes the time evolution of the probability of $X$. This can be written as
 %%
 \begin{align}
-p_{t+1}(X) &= \int_{\Omega_t (X')}{\rm d}X' p_{t}(X') p_{t+1}(X\vert X') \label{eq:master-x-cont} \,,
+p_{t+1}(X) &= \int_{\Omega_t}{\rm d}X' p_{t}(X') p_{t+1}(X\vert X',t) \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where we are assuming the state space is continuous in each dimension. If we then define the probability matrix $P$, with elements $P^i_{t}(x)$ which denote the probability of $X^i_t=x$, the latest values of this matrix are updated by each new step in time according to
+where we are assuming the state space is continuous in each dimension. But what is $\Omega_t$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
+
+Let us now define the probability matrix $P$, with $x$-dependent elements $P^i_{t}(x)$ which just mean the probability of $X^i_t=x$. One can deduce that the latest values of this matrix are updated by a step in time according to
 %%
 \begin{align}
-P^i_{t+1}(x) &= \int_{\Omega_t (X')}{\rm d}X' p_{t}(X') \delta [x-F^i_{t+1}(X',t)] \label{eq:master-x-cont-update}\,,
+P^i_{t+1}(x) &= \int_{\Omega_t}{\rm d}X' p_{t}(X') p_{t+1}(F^i_{t+1}|X',t) \delta (x-F^i_{t+1}) \label{eq:master-x-cont-update}\,,
 \end{align}
 %%
 where we have made explicit use of Eq.~(\ref{eq:x-step-def}) and a Dirac delta distribution $\delta$.
 
-Note that an analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state spaces where we simply replace the integral with a sum, schematically like so 
+Note that analogs of the expressions we have written above exist for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
 %%
 \begin{align}
-p_{t+1}(X) &= \sum_{\Omega_t (X')} p_t(X') p_{t+1}(X \vert X') \label{eq:master-x-disc} \,.
+p_{t+1}(X) &= \sum_{\Omega_t} p_t(X') p_{t+1}(X \vert X') \label{eq:master-x-disc} \,.
 \end{align}
 %%
 
