@@ -127,116 +127,115 @@ No quest would be complete without a guide, so to end this introduction, I think
 Before we dive into the software and some examples, we need to mathematically define the general computational approach that we're going to take in order to be able to describe as general a set of stochastic phenomena as possible. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
 %%
 \begin{align}
-X^{i}_{t+1} &= F^{i}_{t+1}(X',t) \,, \label{eq:x-step-def}
+X^{i}_{{\sf t}+1} &= F^{i}_{{\sf t}+1}(X',{\sf t}) \,, \label{eq:x-step-def}
 \end{align}
 %%
-where: $i$ is an index for the dimensions of the `state' space; $t$ is the current time index for either a discrete-time process or some discrete approximation to a continuous-time process; $X$ is the next version of $X'$ after one timestep (and hence one new row has been added); and $F^i_{t+1}(X',t)$ as the latest element of an arbitrary matrix-valued function. As we shall discuss shortly, $F^i_{t+1}(X',t)$ may represent not just operations on deterministic variables, but also on stochastic ones. There is also no requirement for the function to be continuous.
+where: $i$ is an index for the dimensions of the `state' space; ${\sf t}$ is the current time index for either a discrete-time process or some discrete approximation to a continuous-time process; $X$ is the next version of $X'$ after one timestep (and hence one new row has been added); and $F^i_{{\sf t}+1}(X',{\sf t})$ as the latest element of an arbitrary matrix-valued function. As we shall discuss shortly, $F^i_{{\sf t}+1}(X',{\sf t})$ may represent not just operations on deterministic variables, but also on stochastic ones. There is also no requirement for the function to be continuous.
 
 So the basic computational idea here is to iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. Pretty simple! But why go to all this trouble of storing matrix inputs for previous values of the same process? For a large class of stochastic processes this memory of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process.
 
 So, now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, it is frequently possible to split $F$ up into deteministic (denoted $D$) and stochastic (denoted $S$) matrix-valued functions like so
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = D^{i}_{t+1}(X',t) + S^{i}_{t+1}(X',t) \,.
+& F^{i}_{{\sf t}+1}(X',{\sf t}) = D^{i}_{{\sf t}+1}(X',{\sf t}) + S^{i}_{{\sf t}+1}(X',{\sf t}) \,.
 \end{align}
 %%
-In the case of stochastic processes with continuous sample paths, it's also nearly always the case with mathematical models of real-world systems that the deterministic part will at least contain the term $D^{i}_{t+1}(X',t) = X^i_t$ because the overall system is described by some stochastic differential equation. This is not a really requirement in our general formalism, however.
+In the case of stochastic processes with continuous sample paths, it's also nearly always the case with mathematical models of real-world systems that the deterministic part will at least contain the term $D^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t}$ because the overall system is described by some stochastic differential equation. This is not a really requirement in our general formalism, however.
 
-What about the stochastic term? For example, if we wanted to consider a \emph{Wiener process noise}, we can define $W^i_{t}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
+What about the stochastic term? For example, if we wanted to consider a \emph{Wiener process noise}, we can define $W^i_{{\sf t}}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
 %%
 \begin{align}
-& S^{i}_{t+1}(X',t) =  W^i_{t+1}-W^i_{t} \label{eq:wiener}\,,
+& S^{i}_{{\sf t}+1}(X',{\sf t}) =  W^i_{{\sf t}+1}-W^i_{\sf t} \label{eq:wiener}\,,
 \end{align}
 %%
-where one draws the increments $W^i_{t+1}-W^i_{t}$ from a normal distribution with a mean of $0$ and a variance equal to the step size in time (for the continuous process one is approximating). Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
+where one draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distribution with a mean of $0$ and a variance equal to the length of continuous time that the step corresponded to $\delta t({\sf t})$ --- which itself may vary with the timestep! Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
 
-In another example, to model \emph{Geometric Brownian motion noise} we would simply have to multiply $X^i_t$ to the Wiener process like so
+In another example, to model \emph{Geometric Brownian motion noise} we would simply have to multiply $X^i_{\sf t}$ to the Wiener process like so
 %%
 \begin{align}
-& S^{i}_{t+1}(X',t) = X^i_{t}(W^i_{t+1}-W^i_{t})\label{eq:gbm} \,.
+& S^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t}(W^i_{{\sf t}+1}-W^i_{\sf t})\label{eq:gbm} \,.
 \end{align}
 %%
-Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{t+1}(X',t) = (X^i_{t+1}+X^i_{t})(W^i_{t+1}-W^i_{t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}.
+Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{{\sf t}+1}(X',{\sf t}) = (X^i_{{\sf t}+1}+X^i_{\sf t})(W^i_{{\sf t}+1}-W^i_{\sf t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}.
 
-Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion noise}, where $[B_{H}]_{t}$ is a sample from a fractional Brownian motion process with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process by first leveraging an extra dimension in our available state space within $X$ to simulate a standard Wiener process and then inserting this into the following computations
+Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion noise}, where $[B_{H}]_{\sf t}$ is a sample from a fractional Brownian motion process with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process by first leveraging an extra dimension in the available state space within $X$ to simulate a standard Wiener process $S^{0}_{{\sf t}+1}(X',{\sf t}) = W_{{\sf t}+1} - W_{\sf t}$ and then inserting this into the following computation
 %%
 \begin{align}
-S^{0}_{t+1}(X',t) &= W_{t+1} - W_{t} \\
-S^{1}_{t+1}(X',t) &= [B_{H}]_{t+1}-[B_{H}]_{t} \\
-[B_{H}]_{t} &= \sum^t_{s'=s} (S^{0}_{t} - S^{0}_{t-s'}) \frac{(t-s')^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t}{s'}\bigg) \,.
+S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{(S^{0}_{{\sf t}+1} - S^{0}_{\sf t})}{\delta t({\sf t})}\int^{t+\delta t({\sf t})}_{t}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
 \end{align}
 %%
+we can reproduce the desired noise in the $i=1$ dimension of our state space. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). Also notice that we needed to make more explict use of the continuous time variable $t$ and the iterations we are making with it at each timestep $\delta t({\sf t})$.
 
 \emph{Generalised continuous noises} would take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = X^i_{t} + g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots) \,,
+& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + g^i_{{\sf t}+1}(X', W^i_{{\sf t}+1}-W^i_{\sf t}, \dots) \,,
 \end{align}
 %%
-where $g^i_{t+1}(X', W^i_{t+1}-W^i_t, \dots)$ is some continuous function of its arguments which can be expanded out with the Itô Lemma.
+where $g^i_{{\sf t}+1}(X', W^i_{{\sf t}+1}-W^i_{\sf t}, \dots)$ is some continuous function of its arguments which can be expanded out with the Itô Lemma.
 
 So far, we have only been discussing noises with continuous sample paths, but our formalism can also adapt to discontinuous sample paths as well. For instance, \emph{jump process noises} generally would take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t)= J^i_{t+1}(X', \dots )\,,
+& F^{i}_{{\sf t}+1}(X',{\sf t})= J^i_{{\sf t}+1}(X', \dots )\,,
 \end{align}
 %%
-where $J^i_{t+1}(X', \dots )$ are samples from some arbitrary jump process (e.g., compound Poisson) which could generally depend on a variety of inputs, including $X'$. 
+where $J^i_{{\sf t}+1}(X', \dots )$ are samples from some arbitrary jump process (e.g., compound Poisson) which could generally depend on a variety of inputs, including $X'$. 
 
 \emph{Poisson process noises} would generally take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = X^i_{t} + N^i_{t+1}({\lambda_i})-N^i_{t}({\lambda_i})\,,
+& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + N^i_{{\sf t}+1}({\lambda_i})-N^i_{\sf t}({\lambda_i})\,,
 \end{align}
 %%
-where $N^i_{t}({\lambda_i})$ is a sample from a Poisson process with rate $\lambda_i$ for each of the state dimensions indexed by $i$. Note that we may also allow for correlations between the noises in different dimensions.
+where $N^i_{\sf t}({\lambda_i})$ is a sample from a Poisson process with rate $\lambda_i$ for each of the state dimensions indexed by $i$. Note that we may also allow for correlations between the noises in different dimensions.
 
 \emph{Time-inhomogeneous Poisson process noises} would generally take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = X^i_{t} + N^i_{t+1}({\lambda^i_{t+1}})-N^i_{t}({\lambda^i_t}) \,,
+& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + N^i_{{\sf t}+1}({\lambda^i_{{\sf t}+1}})-N^i_{\sf t}({\lambda^i_{\sf t}}) \,,
 \end{align}
 %%
-where $\lambda^i_{t}$ is a deterministically-varying rate for each of the state dimensions indexed by $i$.
+where $\lambda^i_{\sf t}$ is a deterministically-varying rate for each of the state dimensions indexed by $i$.
 
 \emph{Cox (doubly-stochastic) process noises} would generally take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = X^i_{t} + N^i_{t+1}({\Lambda^i_{t+1}})-N^i_{t}({\Lambda^i_{t}}) \,,
+& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + N^i_{{\sf t}+1}({\Lambda^i_{{\sf t}+1}})-N^i_{\sf t}({\Lambda^i_{\sf t}}) \,,
 \end{align}
 %%
-where the rate $\Lambda^i_{t}$ is now a sample from some continuous-time stochastic process (in the positive-only domain) for each of the state dimensions indexed by $i$.
+where the rate $\Lambda^i_{\sf t}$ is now a sample from some continuous-time stochastic process (in the positive-only domain) for each of the state dimensions indexed by $i$.
 
 \emph{Self-exciting process noises} would generally take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = X^i_{t} + N^i_{t+1}[{\cal I}^i_{t+1}(N', \dots)]-N^i_{t}[{\cal I}^i_{t}(N'', \dots)]\,,
+& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + N^i_{{\sf t}+1}[{\cal I}^i_{{\sf t}+1}(N', \dots)]-N^i_{\sf t}[{\cal I}^i_{\sf t}(N'', \dots)]\,,
 \end{align}
 %%
-where the stochastic rate ${\cal I}^i_{t}(N', \dots)$ now depends on the history of $N'$ explicitly (amongst other potential inputs - see, e.g., \href{https://en.wikipedia.org/wiki/Hawkes_process}{Hawkes processes}) for each of the state dimensions indexed by $i$.
+where the stochastic rate ${\cal I}^i_{\sf t}(N', \dots)$ now depends on the history of $N'$ explicitly (amongst other potential inputs - see, e.g., \href{https://en.wikipedia.org/wiki/Hawkes_process}{Hawkes processes}) for each of the state dimensions indexed by $i$.
 
 \emph{Generalised probabilistic discrete state transitions} would take the form
 %%
 \begin{align}
-& F^{i}_{t+1}(X',t) = T^i_{t+1}(X')\,,
+& F^{i}_{{\sf t}+1}(X',{\sf t}) = T^i_{{\sf t}+1}(X')\,,
 \end{align}
 %%
-where $T^i_{t+1}(X')$ is a generator of the next state to occupy. This generator uses the current state transition probabilities (which are generally conditional on $X'$) at each new step.
+where $T^i_{{\sf t}+1}(X')$ is a generator of the next state to occupy. This generator uses the current state transition probabilities (which are generally conditional on $X'$) at each new step.
 
 \section{\sffamily Useful analysis concepts}
 
 Before progressing further, it will be helpful to discuss some useful concepts that should help us analyse the system later on. The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit \emph{master equation} associated to it which fully describes the time evolution of the probability of $X$. This can be written as
 %%
 \begin{align}
-p_{t+1}(X) &= \int_{\Omega_t}{\rm d}X' p_{t}(X') p_{t+1}(X\vert X',t) \label{eq:master-x-cont} \,,
+p_{{\sf t}+1}(X) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(X\vert X',{\sf t}) \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where we are assuming the state space is continuous in each dimension. But what is $\Omega_t$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
+where we are assuming the state space is continuous in each dimension. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
 
-Let us now define the probability matrix $P$, with $x$-dependent elements $P^i_{t}(x)$ which just mean the probability of $X^i_t=x$. One can deduce that the latest values of this matrix are updated by a step in time according to
+Let us now define the probability matrix $P$, with $x$-dependent elements $P^i_{\sf t}(x)$ which just mean the probability of $X^i_{\sf t}=x$. One can deduce that the latest values of this matrix are updated by a step in time according to
 %%
 \begin{align}
-P^i_{t+1}(x) &= \int_{\Omega_t}{\rm d}X' p_{t}(X') p_{t+1}(F^i_{t+1}|X',t) \delta (x-F^i_{t+1}) \label{eq:master-x-cont-update}\,,
+P^i_{{\sf t}+1}(x) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(F^i_{{\sf t}+1}|X',{\sf t}) \delta (x-F^i_{{\sf t}+1}) \label{eq:master-x-cont-update}\,,
 \end{align}
 %%
 where we have made explicit use of Eq.~(\ref{eq:x-step-def}) and a Dirac delta distribution $\delta$.
@@ -244,23 +243,23 @@ where we have made explicit use of Eq.~(\ref{eq:x-step-def}) and a Dirac delta d
 Note that analogs of the expressions we have written above exist for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
 %%
 \begin{align}
-p_{t+1}(X) &= \sum_{\Omega_t} p_t(X') p_{t+1}(X \vert X') \label{eq:master-x-disc} \,.
+p_{{\sf t}+1}(X) &= \sum_{\Omega_{\sf t}} p_{\sf t}(X') p_{{\sf t}+1}(X \vert X') \label{eq:master-x-disc} \,.
 \end{align}
 %%
 
 Another useful concept comes from constructing what we shall call `$V$ states' using the time difference in $X$ like so
 %%
 \begin{align}
-V^{i}_{t+1} &= X^{i}_{t+1} - X^{i}_{t} \label{eq:v-step-def}\,.
+V^{i}_{{\sf t}+1} &= X^{i}_{{\sf t}+1} - X^{i}_{\sf t} \label{eq:v-step-def}\,.
 \end{align}
 %%
 Given Eq.~(\ref{eq:v-step-def}), we can see that the following relation between $X$ and $V$ is also valid
 %%
 \begin{align}
-X^{i}_{t} &= X_{s}^{i} + \sum_{s'=s+1}^{t}V_{s'}^{i} \label{eq:x-implicit-solution} \,,
+X^{i}_{\sf t} &= X_{\sf s}^{i} + \sum_{{\sf s}'={\sf s}+1}^{\sf t}V_{{\sf s}'}^{i} \label{eq:x-implicit-solution} \,,
 \end{align}
 %%
-where we have defined $s<t$. The resemblance of the tuple $(X_t, V_t, t)$ to a formal `phase space' will be a useful observation to consider for many systems.
+where we have defined $s<t$. The resemblance of the tuple $(X_{\sf t}, V_{\sf t}, {\sf t})$ to a formal `phase space' will be a useful observation to consider for many systems.
 
 
 \section{\sffamily Summary of desirable features}
