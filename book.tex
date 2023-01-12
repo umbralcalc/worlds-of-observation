@@ -164,7 +164,7 @@ Let's now look at a more complicated type of noise. For example, \emph{fractiona
 S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{(S^{0}_{{\sf t}+1} - S^{0}_{\sf t})}{\delta t({\sf t})}\int^{t+\delta t({\sf t})}_{t}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
 \end{align}
 %%
-we can reproduce the desired noise in the $i=1$ dimension of our state space. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). Also notice that we needed to make more explict use of the continuous time variable $t$ and the iterations we are making with it at each timestep $\delta t({\sf t})$.
+we can reproduce the desired noise in the $i=1$ dimension of our state space. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). Also notice how we needed to make more explict use of the continuous time variable $t$ and the iterations we are making with it at each timestep $\delta t({\sf t})$; for more complex physical models and integrators, these distinct notions of `numerical timestep' and `iteration in continuous time' will crop up frequently.
 
 \emph{Generalised continuous noises} would take the form
 %%
