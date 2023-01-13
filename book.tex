@@ -158,21 +158,22 @@ In another example, to model \emph{Geometric Brownian motion noise} we would sim
 %%
 Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{{\sf t}+1}(X',{\sf t}) = (X^i_{{\sf t}+1}+X^i_{\sf t})(W^i_{{\sf t}+1}-W^i_{\sf t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}.
 
-Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion noise}, where $[B_{H}]_{\sf t}$ is a sample from a fractional Brownian motion process with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process by first leveraging an extra dimension in the available state space within $X$ to simulate a standard Wiener process $S^{0}_{{\sf t}+1}(X',{\sf t}) = W_{{\sf t}+1} - W_{\sf t}$ and then inserting this into the following computation
+Focusing on a single-dimension state space we can imagine even more general processes that are still Markovian, like
+%%
+\begin{align}
+S^0_{{\sf t}+1}(X',{\sf t}) &= g[W^0_{{\sf t}+1},t+\delta t({\sf t})]-g(W^0_{\sf t}, t) \\
+&= \bigg[ \frac{\partial g}{\partial t} + \frac{1}{2}\frac{\partial^2 g}{\partial x^2} \bigg] \delta t ({\sf t}) + \frac{\partial g}{\partial x} (W^0_{{\sf t}+1}-W^0_{\sf t}) \,,
+\end{align}
+%%
+where $g(x,t)$ is some continuous function of its arguments which has been expanded out with Itô's Lemma on the second line. Note that the computation above could be performed with numerical derivatives in principle if the function were extremely complicated.
+
+Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion noise}, where $[B_{H}]_{\sf t}$ is a sample from a fractional Brownian motion process with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process by first leveraging an extra dimension in the available state space within $X$ to simulate a standard Wiener process $S^{0}_{{\sf t}+1}(X',{\sf t}) = W_{{\sf t}+1} - W_{\sf t}$ and then by inserting this into the following computation
 %%
 \begin{align}
 S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{(S^{0}_{{\sf t}+1} - S^{0}_{\sf t})}{\delta t({\sf t})}\int^{t+\delta t({\sf t})}_{t}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
 \end{align}
 %%
-we can reproduce the desired noise in the $i=1$ dimension of our state space. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). Also notice how we needed to make more explict use of the continuous time variable $t$ and the iterations we are making with it at each timestep $\delta t({\sf t})$; for more complex physical models and integrators, these distinct notions of `numerical timestep' and `iteration in continuous time' will crop up frequently.
-
-\emph{Generalised continuous noises} would take the form
-%%
-\begin{align}
-& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + g^i_{{\sf t}+1}(X', W^i_{{\sf t}+1}-W^i_{\sf t}, \dots) \,,
-\end{align}
-%%
-where $g^i_{{\sf t}+1}(X', W^i_{{\sf t}+1}-W^i_{\sf t}, \dots)$ is some continuous function of its arguments which can be expanded out with the Itô Lemma.
+we are able to reproduce the desired noise in the $i=1$ dimension of our state space, i.e., $S^{1}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). Also notice how we needed to make more explict use of the continuous time variable $t$ and the iterations we are making with it at each timestep $\delta t({\sf t})$; for more complex physical models and integrators, these distinct notions of `numerical timestep' and `iteration in continuous time' will crop up frequently.
 
 So far, we have only been discussing noises with continuous sample paths, but our formalism can also adapt to discontinuous sample paths as well. For instance, \emph{jump process noises} generally would take the form
 %%
@@ -224,7 +225,7 @@ where $T^i_{{\sf t}+1}(X')$ is a generator of the next state to occupy. This gen
 
 \section{\sffamily Useful analysis concepts}
 
-Before progressing further, it will be helpful to discuss some useful concepts that should help us analyse the system later on. The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit \emph{master equation} associated to it which fully describes the time evolution of the probability of $X$. This can be written as
+Before progressing further, it will be helpful to discuss some useful concepts that should help us analyse the system later on. The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit \emph{master equation} associated to it which fully describes the time evolution of the \emph{probability density function} of $X$. This can be written as
 %%
 \begin{align}
 p_{{\sf t}+1}(X) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(X\vert X',{\sf t}) \label{eq:master-x-cont} \,,
@@ -232,20 +233,21 @@ p_{{\sf t}+1}(X) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(X
 %%
 where we are assuming the state space is continuous in each dimension. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
 
-Let us now define the probability matrix $P$, with $x$-dependent elements $P^i_{\sf t}(x)$ which just mean the probability of $X^i_{\sf t}=x$. One can deduce that the latest values of this matrix are updated by a step in time according to
+Let us now define the probability density matrix $P$, with $x$-dependent elements $P^i_{\sf t}(x)$ which just means the probability density of $X^i_{\sf t}=x$. One can deduce that the latest values of this matrix are updated by a step in time according to
 %%
 \begin{align}
 P^i_{{\sf t}+1}(x) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(F^i_{{\sf t}+1}|X',{\sf t}) \delta (x-F^i_{{\sf t}+1}) \label{eq:master-x-cont-update}\,,
 \end{align}
 %%
-where we have made explicit use of Eq.~(\ref{eq:x-step-def}) and a Dirac delta distribution $\delta$.
+where we have used Eq.~(\ref{eq:x-step-def}) and a Dirac delta distribution $\delta$.
 
-Note that analogs of the expressions we have written above exist for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
+Note that analogs of Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-update}) exist for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
 %%
 \begin{align}
-p_{{\sf t}+1}(X) &= \sum_{\Omega_{\sf t}} p_{\sf t}(X') p_{{\sf t}+1}(X \vert X') \label{eq:master-x-disc} \,.
+p_{{\sf t}+1}(X) &= \sum_{\Omega_{\sf t}} p_{\sf t}(X') p_{{\sf t}+1}(X \vert X') \label{eq:master-x-disc} \,,
 \end{align}
 %%
+where we note that the $p$'s all now refer to \emph{probability mass functions}.
 
 Another useful concept comes from constructing what we shall call `$V$ states' using the time difference in $X$ like so
 %%
@@ -256,10 +258,10 @@ V^{i}_{{\sf t}+1} &= X^{i}_{{\sf t}+1} - X^{i}_{\sf t} \label{eq:v-step-def}\,.
 Given Eq.~(\ref{eq:v-step-def}), we can see that the following relation between $X$ and $V$ is also valid
 %%
 \begin{align}
-X^{i}_{\sf t} &= X_{\sf s}^{i} + \sum_{{\sf s}'={\sf s}+1}^{\sf t}V_{{\sf s}'}^{i} \label{eq:x-implicit-solution} \,,
+X^{i}_{\sf t} &= X_{\sf s}^{i} + \sum_{{\sf t}'={\sf s}+1}^{\sf t}V_{{\sf t}'}^{i} \label{eq:x-implicit-solution} \,,
 \end{align}
 %%
-where we have defined $s<t$. The resemblance of the tuple $(X_{\sf t}, V_{\sf t}, {\sf t})$ to a formal `phase space' will be a useful observation to consider for many systems.
+where we have defined ${\sf s}<{\sf t}$. The resemblance of the tuple $(X_{\sf t}, V_{\sf t}, {\sf t})$ to a formal `phase space' will be a useful observation to consider for many systems.
 
 
 \section{\sffamily Summary of desirable features}
