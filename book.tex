@@ -150,7 +150,7 @@ What about the stochastic term? For example, if we wanted to consider a \emph{Wi
 %%
 where one draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distribution with a mean of $0$ and a variance equal to the length of continuous time that the step corresponded to $\delta t({\sf t})$ --- which itself may vary with the timestep! Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
 
-In another example, to model \emph{Geometric Brownian motion noise} we would simply have to multiply $X^i_{\sf t}$ to the Wiener process like so
+In another example, to model \emph{geometric Brownian motion noise} we would simply have to multiply $X^i_{\sf t}$ to the Wiener process like so
 %%
 \begin{align}
 & S^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t}(W^i_{{\sf t}+1}-W^i_{\sf t})\label{eq:gbm} \,.
