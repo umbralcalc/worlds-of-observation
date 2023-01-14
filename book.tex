@@ -134,6 +134,14 @@ where: $i$ is an index for the dimensions of the `state' space; ${\sf t}$ is the
 
 So the basic computational idea here is to iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. Pretty simple! But why go to all this trouble of storing matrix inputs for previous values of the same process? For a large class of stochastic processes this memory of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process.
 
+For more complex physical models and integrators, the distinct notions of `numerical timestep' and `total elapsed continuous time' will crop up quite frequently. Hence, before moving on further details, it will be important to define the total elapsed time variable $t({\sf t})$ for processes which are defined in continuous time. Assuming that we have already defined some function $\delta t({\sf t})$ which returns the specific change in continuous time that corresponds to the step ${\sf t}-1 \rightarrow {\sf t}$, we will always be able to compute the total elapsed time through the relation
+%%
+\begin{align}
+t({\sf t}) &= \sum^{{\sf t}}_{{\sf t}'=0}\delta t({\sf t}') \,.
+\end{align}
+%%
+This seems a lot of effort, no? Well it's important to remember that our steps in continuous time may not be constant, so by defining the $\delta t({\sf t})$ function and summing over it we can enable this flexibility in the computation.
+
 So, now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, it is frequently possible to split $F$ up into deteministic (denoted $D$) and stochastic (denoted $S$) matrix-valued functions like so
 %%
 \begin{align}
@@ -148,7 +156,7 @@ What about the stochastic term? For example, if we wanted to consider a \emph{Wi
 & S^{i}_{{\sf t}+1}(X',{\sf t}) =  W^i_{{\sf t}+1}-W^i_{\sf t} \label{eq:wiener}\,,
 \end{align}
 %%
-where one draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distribution with a mean of $0$ and a variance equal to the length of continuous time that the step corresponded to $\delta t({\sf t})$ --- which itself may vary with the timestep! Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
+where one draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distribution with a mean of $0$ and a variance equal to the length of continuous time that the step corresponded to $\delta t({\sf t}+1)$. Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
 
 In another example, to model \emph{geometric Brownian motion noise} we would simply have to multiply $X^i_{\sf t}$ to the Wiener process like so
 %%
@@ -161,24 +169,24 @@ Here we have implicitly adopted the Itô interpretation to describe this stochas
 We can imagine even more general processes that are still Markovian. One example of these in a single-dimension state space would be
 %%
 \begin{align}
-S^0_{{\sf t}+1}(X',{\sf t}) &= g[W^0_{{\sf t}+1},t+\delta t({\sf t})]-g(W^0_{\sf t}, t) \\
-&= \bigg[ \frac{\partial g}{\partial t} + \frac{1}{2}\frac{\partial^2 g}{\partial x^2} \bigg] \delta t ({\sf t}) + \frac{\partial g}{\partial x} (W^0_{{\sf t}+1}-W^0_{\sf t}) \,,
+S^0_{{\sf t}+1}(X',{\sf t}) &= g[W^0_{{\sf t}+1},t({\sf t}+1)]-g[W^0_{\sf t}, t({\sf t})] \\
+&= \bigg[ \frac{\partial g}{\partial t} + \frac{1}{2}\frac{\partial^2 g}{\partial x^2} \bigg] \delta t ({\sf t}+1) + \frac{\partial g}{\partial x} (W^0_{{\sf t}+1}-W^0_{\sf t}) \label{eq:general-wiener}\,,
 \end{align}
 %%
-where $g(x,t)$ is some continuous function of its arguments which has been expanded out with Itô's Lemma on the second line. Note that the computation above could be performed with numerical derivatives in principle if the function were extremely complicated.
+where $g(x,t)$ is some continuous function of its arguments which has been expanded out with Itô's Lemma on the second line. Note also that the computations in Eq.~(\ref{eq:general-wiener}) could be performed with numerical derivatives in principle if the function were extremely complicated.
 
 Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion noise}, where $[B_{H}]_{\sf t}$ is a sample from a fractional Brownian motion process with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process by first leveraging an extra dimension in the available state space within $X$ to simulate a standard Wiener process $S^{0}_{{\sf t}+1}(X',{\sf t}) = W_{{\sf t}+1} - W_{\sf t}$ and then by inserting this into the following computation
 %%
 \begin{align}
-S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{(S^{0}_{{\sf t}+1} - S^{0}_{\sf t})}{\delta t({\sf t})}\int^{t+\delta t({\sf t})}_{t}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
+S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{(S^{0}_{{\sf t}+1} - S^{0}_{\sf t})}{\delta t({\sf t}+1)}\int^{t({\sf t}+1)}_{t({\sf t})}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
 \end{align}
 %%
-we are able to reproduce the desired noise in the $i=1$ dimension of our state space, i.e., $S^{1}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). Also notice how we needed to make more explict use of the continuous time variable $t$ and the iterations we are making with it at each timestep $\delta t({\sf t})$; for more complex physical models and integrators, these distinct notions of `numerical timestep' and `iteration in continuous time' will crop up frequently.
+we are able to reproduce the desired noise in the $i=1$ dimension of our state space, i.e., $S^{1}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule).
 
-So far, we have only been discussing noises with continuous sample paths, but our formalism can also adapt to discontinuous sample paths as well. For instance, \emph{jump process noises} generally would take the form
+So far we have only been discussing noises with continuous sample paths, but we can easily adapt our computation to discontinuous sample paths as well. For instance, \emph{jump process noises} generally would take the form
 %%
 \begin{align}
-& F^{i}_{{\sf t}+1}(X',{\sf t})= J^i_{{\sf t}+1}(X', \dots )\,,
+& S^{i}_{{\sf t}+1}(X',{\sf t})= J^i_{{\sf t}+1}(X', \dots )\,,
 \end{align}
 %%
 where $J^i_{{\sf t}+1}(X', \dots )$ are samples from some arbitrary jump process (e.g., compound Poisson) which could generally depend on a variety of inputs, including $X'$. 
