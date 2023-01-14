@@ -12,7 +12,7 @@
 \makeatother
 
 \usepackage[utf8x]{inputenc}
-\usepackage{amsmath,mathtools}
+\usepackage{amsmath,mathtools,bbm}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
@@ -181,23 +181,15 @@ Let's now look at a more complicated type of noise. For example, \emph{fractiona
 S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{(S^{0}_{{\sf t}+1} - S^{0}_{\sf t})}{\delta t({\sf t}+1)}\int^{t({\sf t}+1)}_{t({\sf t})}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
 \end{align}
 %%
-we are able to reproduce the desired noise in the $i=1$ dimension of our state space, i.e., $S^{1}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule).
+we are able to reproduce the desired noise in the $i=1$ dimension of our state space, i.e., $S^{1}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). In the expression above, ${}_2F_1$ and $\Gamma$ are the ordinary hypergeometric and gamma functions, respectively.
 
-So far we have only been discussing noises with continuous sample paths, but we can easily adapt our computation to discontinuous sample paths as well. For instance, \emph{jump process noises} generally would take the form
+So far we have mostly been discussing noises with continuous sample paths, but we can easily adapt our computation to discontinuous sample paths as well. For instance, \emph{Poisson process noises} would generally take the form
 %%
 \begin{align}
-& S^{i}_{{\sf t}+1}(X',{\sf t})= J^i_{{\sf t}+1}(X', \dots )\,,
+S^{i}_{{\sf t}+1}(X',{\sf t}) &= [N_{\lambda}]^i_{{\sf t}+1}-[N_{\lambda}]^i_{\sf t}\,,
 \end{align}
 %%
-where $J^i_{{\sf t}+1}(X', \dots )$ are samples from some arbitrary jump process (e.g., compound Poisson) which could generally depend on a variety of inputs, including $X'$. 
-
-\emph{Poisson process noises} would generally take the form
-%%
-\begin{align}
-& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + N^i_{{\sf t}+1}({\lambda_i})-N^i_{\sf t}({\lambda_i})\,,
-\end{align}
-%%
-where $N^i_{\sf t}({\lambda_i})$ is a sample from a Poisson process with rate $\lambda_i$ for each of the state dimensions indexed by $i$. Note that we may also allow for correlations between the noises in different dimensions.
+where $[N_{\lambda}]^i_{\sf t}$ is a sample from a Poisson process with rate $\lambda$. One can think of this process as counting the number of events which have occured up to the given interval of time, where the intervals between each succesive event are exponentially distributed with mean $1/\lambda$. Such a simple counting process could be simulated by explicitly setting a newly-drawn exponential variate to the next continuous time jump ${\delta t}({\sf t}+1)$ and iterating the counter.
 
 \emph{Time-inhomogeneous Poisson process noises} would generally take the form
 %%
