@@ -191,13 +191,13 @@ S^{i}_{{\sf t}+1}(X',{\sf t}) &= [N_{\lambda}]^i_{{\sf t}+1}-[N_{\lambda}]^i_{\s
 %%
 where $[N_{\lambda}]^i_{\sf t}$ is a sample from a Poisson process with rate $\lambda$. One can think of this process as counting the number of events which have occured up to the given interval of time, where the intervals between each succesive event are exponentially distributed with mean $1/\lambda$. Such a simple counting process could be simulated by explicitly setting a newly-drawn exponential variate to the next continuous time jump ${\delta t}({\sf t}+1)$ and iterating the counter.
 
-\emph{Time-inhomogeneous Poisson process noises} would generally take the form
+But is varying the step size always possible? If we consider a \emph{time-inhomogeneous Poisson process noise}, which would generally take the form
 %%
 \begin{align}
-& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + N^i_{{\sf t}+1}({\lambda^i_{{\sf t}+1}})-N^i_{\sf t}({\lambda^i_{\sf t}}) \,,
+S^{i}_{{\sf t}+1}(X',{\sf t}) &= [N_{\lambda ({\sf t}+1)}]^i_{{\sf t}+1}-[N_{\lambda ({\sf t})}]^i_{\sf t}\,,
 \end{align}
 %%
-where $\lambda^i_{\sf t}$ is a deterministically-varying rate for each of the state dimensions indexed by $i$.
+the rate $\lambda ({\sf t})$ has become a deterministically-varying function in time.
 
 \emph{Cox (doubly-stochastic) process noises} would generally take the form
 %%
