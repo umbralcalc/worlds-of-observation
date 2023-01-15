@@ -153,10 +153,16 @@ In the case of stochastic processes with continuous sample paths, it's also near
 What about the stochastic term? For example, if we wanted to consider a \emph{Wiener process noise}, we can define $W^i_{{\sf t}}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
 %%
 \begin{align}
-& S^{i}_{{\sf t}+1}(X',{\sf t}) =  W^i_{{\sf t}+1}-W^i_{\sf t} \label{eq:wiener}\,,
+& S^{i}_{{\sf t}+1}(X',{\sf t}) =  W^i_{{\sf t}+1}-W^i_{\sf t} \label{eq:wiener}\,.
 \end{align}
 %%
-where one draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distribution with a mean of $0$ and a variance equal to the length of continuous time that the step corresponded to $\delta t({\sf t}+1)$. Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
+One draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distribution with a mean of $0$ and a variance equal to the length of continuous time that the step corresponded to $\delta t({\sf t}+1)$, i.e., the probability density of the increments is
+%%
+\begin{align}
+p(W^i_{{\sf t}+1}-W^i_{\sf t}=x) &= {\sf NormalPDF}[x;0,\delta t({\sf t}+1)] \,.
+\end{align}
+%%
+Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
 
 In another example, to model \emph{geometric Brownian motion noise} we would simply have to multiply $X^i_{\sf t}$ to the Wiener process like so
 %%
@@ -181,7 +187,7 @@ Let's now look at a more complicated type of noise. For example, \emph{fractiona
 S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{(S^{0}_{{\sf t}+1} - S^{0}_{\sf t})}{\delta t({\sf t}+1)}\int^{t({\sf t}+1)}_{t({\sf t})}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
 \end{align}
 %%
-we are able to reproduce the desired noise in the $i=1$ dimension of our state space, i.e., $S^{1}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). In the expression above, ${}_2F_1$ and $\Gamma$ are the ordinary hypergeometric and gamma functions, respectively.
+we are able to reproduce the desired noise in the $i=1$ dimension of our state space, i.e., $S^{1}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). In the expression above ${}_2F_1$ and $\Gamma$ are the ordinary hypergeometric and gamma functions, respectively.
 
 So far we have mostly been discussing noises with continuous sample paths, but we can easily adapt our computation to discontinuous sample paths as well. For instance, \emph{Poisson process noises} would generally take the form
 %%
@@ -189,15 +195,21 @@ So far we have mostly been discussing noises with continuous sample paths, but w
 S^{i}_{{\sf t}+1}(X',{\sf t}) &= [N_{\lambda}]^i_{{\sf t}+1}-[N_{\lambda}]^i_{\sf t}\,,
 \end{align}
 %%
-where $[N_{\lambda}]^i_{\sf t}$ is a sample from a Poisson process with rate $\lambda$. One can think of this process as counting the number of events which have occured up to the given interval of time, where the intervals between each succesive event are exponentially distributed with mean $1/\lambda$. Such a simple counting process could be simulated by explicitly setting a newly-drawn exponential variate to the next continuous time jump ${\delta t}({\sf t}+1)$ and iterating the counter.
+where $[N_{\lambda}]^i_{\sf t}$ is a sample from a Poisson process with rate $\lambda$. One can think of this process as counting the number of events which have occured up to the given interval of time, where the intervals between each succesive event are exponentially distributed with mean $1/\lambda$. Such a simple counting process could be simulated exactly by explicitly setting a newly-drawn exponential variate to the next continuous time jump ${\delta t}({\sf t}+1)$ and iterating the counter. Other exact methods exist to handle more complicated processes involving more than one type of `event', such as the Gillespie algorithm~\cite{gillespie1977exact} --- though these techniques are not always be applicable in every situation.
 
-But is varying the step size always possible? If we consider a \emph{time-inhomogeneous Poisson process noise}, which would generally take the form
+Is using step size variation always possible? If we consider a \emph{time-inhomogeneous Poisson process noise}, which would generally take the form
 %%
 \begin{align}
 S^{i}_{{\sf t}+1}(X',{\sf t}) &= [N_{\lambda ({\sf t}+1)}]^i_{{\sf t}+1}-[N_{\lambda ({\sf t})}]^i_{\sf t}\,,
 \end{align}
 %%
-the rate $\lambda ({\sf t})$ has become a deterministically-varying function in time.
+the rate $\lambda ({\sf t})$ has become a deterministically-varying function in time. In this instance, it likely not be accurate to simulate this process by drawing exponential intervals with a mean of $1/\lambda ({\sf t})$ because this mean could have changed by the end of the interval which was drawn. An alternative approach (which is more generally capable of simulating jump processes but is an approximation) first uses a small time interval $\tau$ such that the most likely thing to happen in this period is nothing, and then the probability of the event occuring is simply given by
+%%
+\begin{align}
+p({\sf event}) &= \frac{\lambda ({\sf t})}{\lambda ({\sf t}) + \frac{1}{\tau}}\,.
+\end{align}
+%%
+This idea can be applied to phenomena with an arbitrary number of events and works well as a generalised approach to event-based simulation, though its main limitation is worth remembering; in order to make the approximation good, $\tau$ often must be quite small and hence our simulator must churn through a lot of steps. From now on we'll refer to this well-known technique as the \emph{rejection method}.
 
 \emph{Cox (doubly-stochastic) process noises} would generally take the form
 %%

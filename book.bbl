@@ -19,4 +19,9 @@ L.~Rogers and D.~Williams, \emph{Diffusions, Markov Processes and Martingales
 L.~Decreusefond et~al., \emph{Stochastic analysis of the fractional brownian
   motion}, {\emph{Potential analysis} {\bf 10} (1999) 177--214}.
 
+\bibitem{gillespie1977exact}
+D.~T. Gillespie, \emph{Exact stochastic simulation of coupled chemical
+  reactions}, {\emph{The journal of physical chemistry} {\bf 81} (1977)
+  2340--2361}.
+
 \end{thebibliography}\endgroup
