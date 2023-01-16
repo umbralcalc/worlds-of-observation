@@ -132,7 +132,7 @@ X^{i}_{{\sf t}+1} &= F^{i}_{{\sf t}+1}(X',{\sf t}) \,, \label{eq:x-step-def}
 %%
 where: $i$ is an index for the dimensions of the `state' space; ${\sf t}$ is the current time index for either a discrete-time process or some discrete approximation to a continuous-time process; $X$ is the next version of $X'$ after one timestep (and hence one new row has been added); and $F^i_{{\sf t}+1}(X',{\sf t})$ as the latest element of an arbitrary matrix-valued function. As we shall discuss shortly, $F^i_{{\sf t}+1}(X',{\sf t})$ may represent not just operations on deterministic variables, but also on stochastic ones. There is also no requirement for the function to be continuous.
 
-So the basic computational idea here is to iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. Pretty simple! But why go to all this trouble of storing matrix inputs for previous values of the same process? For a large class of stochastic processes this memory of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process.
+So the basic computational idea here is to iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. Pretty simple! But why go to all this trouble of storing matrix inputs for previous values of the same process? It's true that this is mostly redundant for \emph{Markovian} phenomena, i.e., processes where their only memory of their history is the most recent value they took. However, for a large class of stochastic processes a full memory\footnote{Or memory at least within some window.} of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process as well.
 
 For more complex physical models and integrators, the distinct notions of `numerical timestep' and `total elapsed continuous time' will crop up quite frequently. Hence, before moving on further details, it will be important to define the total elapsed time variable $t({\sf t})$ for processes which are defined in continuous time. Assuming that we have already defined some function $\delta t({\sf t})$ which returns the specific change in continuous time that corresponds to the step ${\sf t}-1 \rightarrow {\sf t}$, we will always be able to compute the total elapsed time through the relation
 %%
@@ -211,21 +211,13 @@ p({\sf event}) &= \frac{\lambda ({\sf t})}{\lambda ({\sf t}) + \frac{1}{\tau}}\,
 %%
 This idea can be applied to phenomena with an arbitrary number of events and works well as a generalised approach to event-based simulation, though its main limitation is worth remembering; in order to make the approximation good, $\tau$ often must be quite small and hence our simulator must churn through a lot of steps. From now on we'll refer to this well-known technique as the \emph{rejection method}.
 
-\emph{Cox (doubly-stochastic) process noises} would generally take the form
+There are quite a few possible extensions to the simple Poisson process which introduce additional stochastic processes. \emph{Cox (doubly-stochastic) process noises}, for instance, are basically where we replace the time-dependent rate $\lambda ({\sf t})$ with independent samples from some probability distribution. In \emph{compound Poisson process noises}, the count values $[N_{\lambda}]^i_{\sf t}$ are replaced by independent samples $[J_{\lambda}]^i_{\sf t}$ from another probability distribution, i.e.,
 %%
 \begin{align}
-& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + N^i_{{\sf t}+1}({\Lambda^i_{{\sf t}+1}})-N^i_{\sf t}({\Lambda^i_{\sf t}}) \,,
+S^{i}_{{\sf t}+1}(X',{\sf t}) &= [J_{\lambda}]^i_{{\sf t}+1}-[J_{\lambda}]^i_{\sf t}\,,
 \end{align}
 %%
-where the rate $\Lambda^i_{\sf t}$ is now a sample from some continuous-time stochastic process (in the positive-only domain) for each of the state dimensions indexed by $i$.
-
-\emph{Self-exciting process noises} would generally take the form
-%%
-\begin{align}
-& F^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t} + N^i_{{\sf t}+1}[{\cal I}^i_{{\sf t}+1}(N', \dots)]-N^i_{\sf t}[{\cal I}^i_{\sf t}(N'', \dots)]\,,
-\end{align}
-%%
-where the stochastic rate ${\cal I}^i_{\sf t}(N', \dots)$ now depends on the history of $N'$ explicitly (amongst other potential inputs - see, e.g., \href{https://en.wikipedia.org/wiki/Hawkes_process}{Hawkes processes}) for each of the state dimensions indexed by $i$.
+where we note that this can also be time-inhomogenous so that the rate is $\lambda ({\sf t})$.
 
 \emph{Generalised probabilistic discrete state transitions} would take the form
 %%
@@ -234,6 +226,17 @@ where the stochastic rate ${\cal I}^i_{\sf t}(N', \dots)$ now depends on the his
 \end{align}
 %%
 where $T^i_{{\sf t}+1}(X')$ is a generator of the next state to occupy. This generator uses the current state transition probabilities (which are generally conditional on $X'$) at each new step.
+
+All of the examples we have discussed so far are Markovian. Given that we have explicitly constructed the formalism to handle non-Markovian phenomena as well, before ending this subsection, it would be worthwhile going through some simple examples of this kind of process too.
+
+\emph{Self-exciting process noises} would generally take the form
+%%
+\begin{align}
+& S^{i}_{{\sf t}+1}(X',{\sf t}) = N^i_{{\sf t}+1}[{\cal I}^i_{{\sf t}+1}(N', \dots)]-N^i_{\sf t}[{\cal I}^i_{\sf t}(N'', \dots)]\,,
+\end{align}
+%%
+where the stochastic rate ${\cal I}^i_{\sf t}(N', \dots)$ now depends on the history of $N'$ explicitly (amongst other potential inputs - see, e.g., \href{https://en.wikipedia.org/wiki/Hawkes_process}{Hawkes processes}) for each of the state dimensions indexed by $i$.
+
 
 \section{\sffamily Useful analysis concepts}
 
