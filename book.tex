@@ -153,7 +153,7 @@ In the case of stochastic processes with continuous sample paths, it's also near
 What about the stochastic term? For example, if we wanted to consider a \emph{Wiener process noise}, we can define $W^i_{{\sf t}}$ is a sample from a Wiener process for each of the state dimensions indexed by $i$ and our formalism becomes
 %%
 \begin{align}
-& S^{i}_{{\sf t}+1}(X',{\sf t}) =  W^i_{{\sf t}+1}-W^i_{\sf t} \label{eq:wiener}\,.
+& S^{i}_{{\sf t}+1}(X',{\sf t}) = W^i_{{\sf t}+1}-W^i_{\sf t} \label{eq:wiener}\,.
 \end{align}
 %%
 One draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distribution with a mean of $0$ and a variance equal to the length of continuous time that the step corresponded to $\delta t({\sf t}+1)$, i.e., the probability density of the increments is
@@ -181,13 +181,13 @@ S^0_{{\sf t}+1}(X',{\sf t}) &= g[W^0_{{\sf t}+1},t({\sf t}+1)]-g[W^0_{\sf t}, t(
 %%
 where $g(x,t)$ is some continuous function of its arguments which has been expanded out with Itô's Lemma on the second line. Note also that the computations in Eq.~(\ref{eq:general-wiener}) could be performed with numerical derivatives in principle if the function were extremely complicated.
 
-Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion noise}, where $[B_{H}]_{\sf t}$ is a sample from a fractional Brownian motion process with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process by first leveraging an extra dimension in the available state space within $X$ to simulate a standard Wiener process $S^{0}_{{\sf t}+1}(X',{\sf t}) = W_{{\sf t}+1} - W_{\sf t}$ and then by inserting this into the following computation
+Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion} $[B_{H}]_{\sf t}$ with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process in one of our state space dimensions by modifying a standard Wiener process like so
 %%
 \begin{align}
-S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{(S^{0}_{{\sf t}+1} - S^{0}_{\sf t})}{\delta t({\sf t}+1)}\int^{t({\sf t}+1)}_{t({\sf t})}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
+S^{0}_{{\sf t}+1}(X',{\sf t}) &= \frac{(W^0_{{\sf t}+1} - W^0_{\sf t})}{\delta t({\sf t}+1)}\int^{t({\sf t}+1)}_{t({\sf t})}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
 \end{align}
 %%
-we are able to reproduce the desired noise in the $i=1$ dimension of our state space, i.e., $S^{1}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). In the expression above ${}_2F_1$ and $\Gamma$ are the ordinary hypergeometric and gamma functions, respectively.
+where $S^{0}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}-[B_{H}]_{{\sf t}}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). In the expression above ${}_2F_1$ and $\Gamma$ are the ordinary hypergeometric and gamma functions, respectively.
 
 So far we have mostly been discussing noises with continuous sample paths, but we can easily adapt our computation to discontinuous sample paths as well. For instance, \emph{Poisson process noises} would generally take the form
 %%
@@ -226,15 +226,29 @@ S^{i}_{{\sf t}+1}(X',{\sf t}) &= [J_{\lambda}]^i_{{\sf t}+1}-[J_{\lambda}]^i_{\s
 %%
 Note that the rejection method of Eq.~(\ref{eq:rejection}) can be employed effectively to simulate any of these extensions as long as a sufficiently small $\tau$ is chosen.
 
-All of the examples we have discussed so far are Markovian. Given that we have explicitly constructed the formalism to handle non-Markovian phenomena as well, it would be worthwhile going through some simple examples of this kind of process too before ending this subsection.
-
-\emph{Self-exciting process noises} would generally take the form
+All of the examples we have discussed so far are Markovian. Given that we have explicitly constructed the formalism to handle non-Markovian phenomena as well, it would be worthwhile going some examples of this kind of process too. \emph{Self-exciting process noises} would generally take the form
 %%
 \begin{align}
-& S^{i}_{{\sf t}+1}(X',{\sf t}) = N^i_{{\sf t}+1}[{\cal I}^i_{{\sf t}+1}(N', \dots)]-N^i_{\sf t}[{\cal I}^i_{\sf t}(N'', \dots)]\,,
+S^{0}_{{\sf t}+1}(X',{\sf t}) &= {\cal I}_{{\sf t}+1} (X',{\sf t}) \\
+S^{1}_{{\sf t}+1}(X',{\sf t}) &= [N_{S^{0}_{{\sf t}+1}}]^i_{{\sf t}+1}-[N_{S^{0}_{{\sf t}}}]^i_{\sf t} \,,
 \end{align}
 %%
-where the stochastic rate ${\cal I}^i_{\sf t}(N', \dots)$ now depends on the history of $N'$ explicitly (amongst other potential inputs - see, e.g., \href{https://en.wikipedia.org/wiki/Hawkes_process}{Hawkes processes}) for each of the state dimensions indexed by $i$.
+where the stochastic rate ${\cal I}_{{\sf t}+1} (X',{\sf t})$ now depends on the history explicitly. Amongst other potential inputs we can see, e.g., Hawkes processes~\cite{hawkes1971spectra} as an example of above by substituting 
+%%
+\begin{align}
+{\cal I}_{{\sf t}+1} (X',{\sf t}) &= \mu + \sum^{{\sf t}}_{{\sf t}'=0}\gamma [t({\sf t})-t({\sf t}')](S^{1}_{{\sf t}'}-S^{1}_{{\sf t}'-1}) \,,
+\end{align}
+%%
+where $\gamma$ is the `exciting kernel' and $\mu$ is some constant background rate. 
+
+Note that this idea of integration kernels could also be applied back to our Wiener process. For example, another type of non-Markovian phenomenon that frequently arises across physical and life systems integrates the Wiener process history like so
+%%
+\begin{align}
+S^{0}_{{\sf t}+1}(X',{\sf t}) &= W^0_{{\sf t}+1}-W^0_{\sf t}\\
+S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{1}{T}\sum^{{\sf t}}_{{\sf t}'=0}e^{-\frac{t({\sf t})-t({\sf t}')}{T}} (S^{0}_{{\sf t}'}-S^{0}_{{\sf t}'-1}) \,,
+\end{align}
+%%
+where $T$ is some decay coefficient which quantifies the length of memory in continuous time.
 
 
 \section{\sffamily Useful analysis concepts}
