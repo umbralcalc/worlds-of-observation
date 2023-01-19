@@ -250,16 +250,26 @@ S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{1}{T}\sum^{{\sf t}}_{{\sf t}'=0}e^{-\frac
 %%
 where $T$ is some decay coefficient which quantifies the length of memory in continuous time.
 
+So we've introduced the basic elements of our computational formalism and demonstrated how flexible the approach can be in simulating just about any stochastic phenomenon imaginable. Before progressing to algorithm design, it will be helpful to discuss some useful concepts that should enable us analyse the system later on in the book.
 
 \section{\sffamily Useful analysis concepts}
 
-Before progressing further, it will be helpful to discuss some useful concepts that should help us analyse the system later on. The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit \emph{master equation} associated to it which fully describes the time evolution of the \emph{probability density function} of $X$. This can be written as
+The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit \emph{master equation} associated to it which fully describes the time evolution of the \emph{probability density function} of $X$. This can be written as
 %%
 \begin{align}
 p_{{\sf t}+1}(X) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(X\vert X',{\sf t}) \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where we are assuming the state space is continuous in each dimension. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
+where we are assuming the state space is continuous in each dimension. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. 
+
+Technically, our definitions of $X$ and $X'$ naturally specified them to have different shapes ($X$ should have one more row than $X'$ in finite time). However, if we slightly abuse this notation for a more compact expression, it's possible to do a kind of Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} of the master equation to obtain
+%%
+\begin{align}
+p_{{\sf t}+1}(X) &=  \sum^\infty_{n=0}\frac{(-1)^n}{n!}\frac{\partial^n}{\partial X^n}[\alpha_n (X)p_{{\sf t}+1}(X)] \label{eq:master-x-cont-kramers-moyal} \\
+\alpha_n(X) &= \int_{\Omega_{\sf t}}{\rm d}X'(X'-X)^np_{\sf t}(X'\vert X,{\sf t}+1) \,.
+\end{align}
+%%
+Note that in order to arrive at this expression we needed to use the equivalence of $p_{{\sf t}+1}(X\vert X',{\sf t})p_{\sf t}(X') = p_{\sf t}(X'\vert X,{\sf t}+1)p_{{\sf t}+1}(X)$ by Bayes' rule.
 
 Let us now define the probability density matrix $P$, with $x$-dependent elements $P^i_{\sf t}(x)$ which just means the probability density of $X^i_{\sf t}=x$. One can deduce that the latest values of this matrix are updated by a step in time according to
 %%

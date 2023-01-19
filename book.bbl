@@ -33,4 +33,13 @@ J.~Neyman and E.~L. Scott, \emph{Statistical approach to problems of
 A.~G. Hawkes, \emph{Spectra of some self-exciting and mutually exciting point
   processes}, {\emph{Biometrika} {\bf 58} (1971) 83--90}.
 
+\bibitem{kramers1940brownian}
+H.~A. Kramers, \emph{Brownian motion in a field of force and the diffusion
+  model of chemical reactions}, {\emph{Physica} {\bf 7} (1940) 284--304}.
+
+\bibitem{moyal1949stochastic}
+J.~Moyal, \emph{Stochastic processes and statistical physics}, {\emph{Journal
+  of the Royal Statistical Society. Series B (Methodological)} {\bf 11} (1949)
+  150--210}.
+
 \end{thebibliography}\endgroup
