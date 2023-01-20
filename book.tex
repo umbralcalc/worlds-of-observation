@@ -260,18 +260,9 @@ The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) al
 p_{{\sf t}+1}(X) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(X\vert X',{\sf t}) \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where we are assuming the state space is continuous in each dimension. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. 
+where we are assuming the state space is continuous in each dimension and $p_{{\sf t}+1}(X\vert X',{\sf t})$ is the conditional probability that next matrix will be $X$ given that the one in the previous timestep was $X'$. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
 
-Technically, our definitions of $X$ and $X'$ naturally specified them to have different shapes ($X$ should have one more row than $X'$ in finite time). However, if we slightly abuse this notation for a more compact expression, it's possible to do a kind of Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} of the master equation to obtain
-%%
-\begin{align}
-p_{{\sf t}+1}(X) &=  \sum^\infty_{n=0}\frac{(-1)^n}{n!}\frac{\partial^n}{\partial X^n}[\alpha_n (X)p_{{\sf t}+1}(X)] \label{eq:master-x-cont-kramers-moyal} \\
-\alpha_n(X) &= \int_{\Omega_{\sf t}}{\rm d}X'(X'-X)^np_{\sf t}(X'\vert X,{\sf t}+1) \,.
-\end{align}
-%%
-Note that in order to arrive at this expression we needed to use the equivalence of $p_{{\sf t}+1}(X\vert X',{\sf t})p_{\sf t}(X') = p_{\sf t}(X'\vert X,{\sf t}+1)p_{{\sf t}+1}(X)$ by Bayes' rule.
-
-Let us now define the probability density matrix $P$, with $x$-dependent elements $P^i_{\sf t}(x)$ which just means the probability density of $X^i_{\sf t}=x$. One can deduce that the latest values of this matrix are updated by a step in time according to
+Given that it's only the most recent row of $X$ that gets updated in this timestep, it can also be useful to define the probability density matrix $P$ which has $x$-dependent elements $P^i_{\sf t}(x)$ --- this just means the probability density of $X^i_{\sf t}=x$. One then finds that the latest values of this matrix are updated by a step in time according to
 %%
 \begin{align}
 P^i_{{\sf t}+1}(x) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(F^i_{{\sf t}+1}|X',{\sf t}) \delta (x-F^i_{{\sf t}+1}) \label{eq:master-x-cont-update}\,,
@@ -279,18 +270,25 @@ P^i_{{\sf t}+1}(x) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}
 %%
 where we have used Eq.~(\ref{eq:x-step-def}) and a Dirac delta distribution $\delta$.
 
-Note that analogs of Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-update}) exist for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
+Technically, our definitions of $X$ and $X'$ naturally specified them to have different shapes ($X$ should have one more row than $X'$ in finite time). However, if we slightly abuse this notation for a more compact expression, it's possible to do a kind of Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} of Eq.~(\ref{eq:master-x-cont}) to obtain
 %%
 \begin{align}
-p_{{\sf t}+1}(X) &= \sum_{\Omega_{\sf t}} p_{\sf t}(X') p_{{\sf t}+1}(X \vert X') \label{eq:master-x-disc} \,,
+p_{{\sf t}+1}(X) &=  p_{{\sf t}}(X') + \sum^\infty_{n=1}\frac{(-1)^n}{n!}\frac{\partial^n}{\partial X^n}[\alpha_n (X)p_{{\sf t}+1}(X)] \label{eq:master-x-cont-kramers-moyal} \\
+\alpha_n(X) &= \int_{\Omega_{\sf t}}{\rm d}X'(X'-X)^np_{\sf t}(X'\vert X,{\sf t}+1) \,,
 \end{align}
 %%
-where we note that the $p$'s all now refer to \emph{probability mass functions}.
+where $\frac{\partial^n}{\partial X^n}$ is the $n$-th order matrix derivative. Note that in order to arrive at this expression we needed to use the equivalence of $p_{{\sf t}+1}(X\vert X',{\sf t})p_{\sf t}(X') = p_{\sf t}(X'\vert X,{\sf t}+1)p_{{\sf t}+1}(X)$ by Bayes' rule. In words, $p_{\sf t}(X'\vert X,{\sf t}+1)$ is the conditional probability that $X'$ \emph{was} the previous matrix given that $X$ is the matrix in this timestep.
 
 Another useful concept comes from constructing what we shall call `$V$ states' using the time difference in $X$ like so
 %%
 \begin{align}
 V^{i}_{{\sf t}+1} &= X^{i}_{{\sf t}+1} - X^{i}_{\sf t} \label{eq:v-step-def}\,.
+\end{align}
+%%
+With another slight abuse of notation $V=X-X'$ and through Eq.~(\ref{eq:master-x-cont}), one also deduces that the probability density function for $V$ is
+%%
+\begin{align}
+p_{{\sf t}+1}(V) &= \int_{\Omega_{{\sf t}}}{\rm d}X'p_{{\sf t}+1}(V+X' \vert X', {\sf t})p_{\sf t}(X') \,.
 \end{align}
 %%
 Given Eq.~(\ref{eq:v-step-def}), we can see that the following relation between $X$ and $V$ is also valid
@@ -301,6 +299,13 @@ X^{i}_{\sf t} &= X_{\sf s}^{i} + \sum_{{\sf t}'={\sf s}+1}^{\sf t}V_{{\sf t}'}^{
 %%
 where we have defined ${\sf s}<{\sf t}$. The resemblance of the tuple $(X_{\sf t}, V_{\sf t}, {\sf t})$ to a formal `phase space' will be a useful observation to consider for many systems.
 
+Note that analogs of Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-update}) exist for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
+%%
+\begin{align}
+p_{{\sf t}+1}(X) &= \sum_{\Omega_{\sf t}} p_{\sf t}(X') p_{{\sf t}+1}(X \vert X') \label{eq:master-x-disc} \,,
+\end{align}
+%%
+where we note that the $p$'s in the expression above all now refer to \emph{probability mass functions}. In this case, for each state dimension we may also rephrase probabilities $p_{{\sf t}+1}(X)$ and $p_{{\sf t}}(X')$ as $p^j_{{\sf t}+1}$ and $p^j_{{\sf t}}$ where $j$ becomes an index for each allowable discrete state that $X$ and $X'$ could take. Using these probabilities themselves in place of the matrix elements, it's also possible to write some discrete state space problems in a continuous format.
 
 \section{\sffamily Summary of desirable features}
 
