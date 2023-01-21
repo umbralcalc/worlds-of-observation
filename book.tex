@@ -260,9 +260,15 @@ The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) al
 p_{{\sf t}+1}(X) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(X\vert X',{\sf t}) \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where we are assuming the state space is continuous in each dimension and $p_{{\sf t}+1}(X\vert X',{\sf t})$ is the conditional probability that next matrix will be $X$ given that the one in the previous timestep was $X'$. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
+where we are assuming the state space is continuous in each dimension and $p_{{\sf t}+1}(X\vert X',{\sf t})$ is the conditional probability that next matrix will be $X$ given that the one in the previous timestep was $X'$. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. For Markovian phenomena specifically, we note that Eq.~(\ref{eq:master-x-cont}) simplifies to
+%%
+\begin{align}
+p_{{\sf t}+1}(X_{{\sf t}+1}) &= \int_{\omega_{\sf t}}{\rm d}X_{{\sf t}} \,p_{\sf t}(X_{{\sf t}}) p_{{\sf t}+1}(X_{{\sf t}+1}\vert X_{{\sf t}},{\sf t}) \label{eq:master-x-cont-markov} \,,
+\end{align}
+%%
+where we have analogously defined $\omega_{{\sf t}}$ as the domain of $X_{{\sf t}}$ and, in this sense, $\omega_{{\sf t}}$ `exists within' $\Omega_{\sf t}$.
 
-Given that it's only the most recent row of $X$ that gets updated in this timestep, it can also be useful to define the probability density matrix $P$ which has $x$-dependent elements $P^i_{\sf t}(x)$ --- this just means the probability density of $X^i_{\sf t}=x$. One then finds that the latest values of this matrix are updated by a step in time according to
+Given that it's only the most recent row of $X$ that gets updated in this timestep, it could also be useful to define the probability density matrix $P$ which has $x$-dependent elements $P^i_{\sf t}(x)$ --- this just means the probability density of $X^i_{\sf t}=x$. Eq.~(\ref{eq:master-x-cont}) then tells us that the latest values of this matrix are updated by a step in time according to
 %%
 \begin{align}
 P^i_{{\sf t}+1}(x) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(F^i_{{\sf t}+1}|X',{\sf t}) \delta (x-F^i_{{\sf t}+1}) \label{eq:master-x-cont-update}\,,
@@ -279,25 +285,20 @@ p_{{\sf t}+1}(X) &=  p_{{\sf t}}(X') + \sum^\infty_{n=1}\frac{(-1)^n}{n!}\frac{\
 %%
 where $\frac{\partial^n}{\partial X^n}$ is the $n$-th order matrix derivative. Note that in order to arrive at this expression we needed to use the equivalence of $p_{{\sf t}+1}(X\vert X',{\sf t})p_{\sf t}(X') = p_{\sf t}(X'\vert X,{\sf t}+1)p_{{\sf t}+1}(X)$ by Bayes' rule. In words, $p_{\sf t}(X'\vert X,{\sf t}+1)$ is the conditional probability that $X'$ \emph{was} the previous matrix given that $X$ is the matrix in this timestep.
 
-Another useful concept comes from constructing what we shall call `$V$ states' using the time difference in $X$ like so
+Let's try this expansion out on a specific example. In a vector Gaussian process, the conditional probability of the next state given the value of all of the previous states can be written as 
 %%
 \begin{align}
-V^{i}_{{\sf t}+1} &= X^{i}_{{\sf t}+1} - X^{i}_{\sf t} \label{eq:v-step-def}\,.
+&p_{{\sf t}+1}(X_{{\sf t}+1}\vert X',{\sf t}) = \prod_{\forall X_{{\sf t}'}\in X'} (2\pi )^{-\frac{d}{2}}\vert K(\theta, X_{{\sf t}+1}, X_{{\sf t}'})\vert^{-\frac{1}{2}}{\rm exp}\Bigg[ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d\frac{f^i(X_{{\sf t}+1})f^j(X_{{\sf t}'})}{K^{ij}(\theta, X_{{\sf t}+1}, X_{{\sf t}'})}\Bigg] \,.
 \end{align}
 %%
-With another slight abuse of notation $V=X-X'$ and through Eq.~(\ref{eq:master-x-cont}), one also deduces that the probability density function for $V$ is
+
+In truth, the Kramers-Moyal expansion is probably most usefully employed in situations with Markovian phenomena --- otherwise, you might end up with a huge number of partial derivatives to calculate! In the Markovian case, the expansion naturally changes to
 %%
 \begin{align}
-p_{{\sf t}+1}(V) &= \int_{\Omega_{{\sf t}}}{\rm d}X'p_{{\sf t}+1}(V+X' \vert X', {\sf t})p_{\sf t}(X') \,.
+p_{{\sf t}+1}(X_{{\sf t}+1}) &=  p_{{\sf t}}(X_{{\sf t}}) + \sum^\infty_{n=1}\frac{(-1)^n}{n!}\sum_{i=1}^d\frac{\partial^n}{(\partial X^i_{{\sf t}+1})^n}[\alpha^i_n (X_{{\sf t}+1})p_{{\sf t}+1}(X_{{\sf t}+1})] \label{eq:markov-kramers-moyal} \\
+\alpha^i_n(X_{{\sf t}+1}) &= \int_{\omega_{\sf t}}{\rm d}X_{{\sf t}+1}(X^i_{{\sf t}}-X^i_{{\sf t}+1})^np_{\sf t}(X_{{\sf t}}\vert X_{{\sf t}+1},{\sf t}+1) \,.
 \end{align}
 %%
-Given Eq.~(\ref{eq:v-step-def}), we can see that the following relation between $X$ and $V$ is also valid
-%%
-\begin{align}
-X^{i}_{\sf t} &= X_{\sf s}^{i} + \sum_{{\sf t}'={\sf s}+1}^{\sf t}V_{{\sf t}'}^{i} \label{eq:x-implicit-solution} \,,
-\end{align}
-%%
-where we have defined ${\sf s}<{\sf t}$. The resemblance of the tuple $(X_{\sf t}, V_{\sf t}, {\sf t})$ to a formal `phase space' will be a useful observation to consider for many systems.
 
 Note that analogs of Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-update}) exist for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
 %%
