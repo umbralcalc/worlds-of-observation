@@ -279,8 +279,8 @@ where we have used Eq.~(\ref{eq:x-step-def}) and a Dirac delta distribution $\de
 The matrix notation in Eq.~(\ref{eq:master-x-cont}) can hide some staggering complexity. To try and understand this a little, we can do a kind of generalised Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} of it like this
 %%
 \begin{align}
-p_{{\sf t}+1}(X_{{\sf t}+1}) &= p_{{\sf t}}(X_{{\sf t}}) - \sum_{i=1}^d\frac{\partial}{\partial X^i_{{\sf t}+1}}[\alpha^i_1 (X_{{\sf t}+1})p_{{\sf t}+1}(X_{{\sf t}+1})] \nonumber \\
-& \qquad + \sum_{i=1}^d\sum_{j=1}^d\frac{\partial}{\partial X^i_{{\sf t}+1}}\frac{\partial}{\partial X^j_{{\sf t}+1}}[\alpha^{ij}_2 (X_{{\sf t}+1})p_{{\sf t}+1}(X_{{\sf t}+1})] + \dots \label{eq:master-x-cont-kramers-moyal} \\
+p_{{\sf t}+1}(X_{{\sf t}+1}) &= p_{{\sf t}}(X')-\sum_{i=1}^d\frac{\partial}{\partial X^i_{{\sf t}+1}}[\alpha^i_1 (X_{{\sf t}+1})p_{{\sf t}+1}(X_{{\sf t}+1})] \nonumber \\
+& \qquad + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d\frac{\partial}{\partial X^i_{{\sf t}+1}}\frac{\partial}{\partial X^j_{{\sf t}+1}}[\alpha^{ij}_2 (X_{{\sf t}+1})p_{{\sf t}+1}(X_{{\sf t}+1})] + \dots \label{eq:master-x-cont-kramers-moyal} \\
 \alpha^i_1(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\int_{\omega_{\sf t}'} {\rm d}X_{{\sf t}'}(X^i_{{\sf t}'}-X^i_{{\sf t}+1})p_{\sf t}(X_{{\sf t}'}\vert X_{{\sf t}+1},{\sf t}+1) \\
 \alpha^{ij}_2(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\int_{\omega_{\sf t}'} {\rm d}X_{{\sf t}'}\int_{\omega_{\sf t}''} {\rm d}X_{{\sf t}''}(X^i_{{\sf t}'}-X^i_{{\sf t}+1})(X^j_{{\sf t}''}-X^j_{{\sf t}+1})p_{\sf t}(X_{{\sf t}'}, X_{{\sf t}''}\vert X_{{\sf t}+1},{\sf t}+1) \,,
 \end{align}
@@ -292,8 +292,8 @@ So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very co
 What would happen if we tried to approximate the conditional probabilities in $\alpha_1$ and $\alpha_2$ with some simpler, time-dependent functions? For example, let's make the following assumptions
 %%
 \begin{align}
-\alpha^i_1(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\tilde{X}^j_{{\sf t}'}M^{ij}(\theta,{\sf t}', {\sf t}+1)-X^i_{{\sf t}+1} \\
-\alpha^{ij}_2(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}(X^i_{{\sf t}'}-X^i_{{\sf t}+1})(X^j_{{\sf t}''}-X^j_{{\sf t}+1})K^{ij}(\theta, {\sf t}+1, {\sf t}') \,.
+\alpha^i_1(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum_{j=1}^d\tilde{X}^j_{{\sf t}'}M^{ij}(\theta,{\sf t}', {\sf t}+1)-X^i_{{\sf t}+1} \\
+\alpha^{ij}_2(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\sum_{k=1}^d\sum_{\ell =1}^d(X^k_{{\sf t}'}-X^k_{{\sf t}+1})(X^\ell_{{\sf t}''}-X^\ell_{{\sf t}+1})K^{ijk\ell}(\theta, {\sf t}', {\sf t}'',{\sf t}+1) \,.
 \end{align}
 %%
 
