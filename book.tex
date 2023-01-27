@@ -307,16 +307,16 @@ where $K(\theta, {\sf t}+1, {\sf t}')$ is a covariance kernel matrix which depen
 If we were to now insert these probabilities into Eq.~(\ref{eq:master-x-cont-kramers-moyal}), after some further mathematical manipulations we would eventually find that
 %%
 \begin{align}
-\alpha^i_1(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum^d_{j=1}\sum^d_{k=1}\frac{X^k_{{\sf t}+1}K^{ij}(\theta, {\sf t}', {\sf t}')}{K^{jk}(\theta, {\sf t}', {\sf t}+1)} - X^i_{{\sf t}+1} \\
-\alpha^{ij}_2(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum^d_{k=1}\sum^d_{\ell =1}\,,
+{\cal K}^{ij}({\sf t}', {\sf t}+1) &= \sum^d_{k=1}\frac{K^{ik}(\theta, {\sf t}', {\sf t}')}{K^{kj}(\theta, {\sf t}', {\sf t}+1)} \\
+\alpha^i_1(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum^d_{j=1}X^j_{{\sf t}+1}{\cal K}^{ij}({\sf t}', {\sf t}+1) - X^i_{{\sf t}+1} \\
+\alpha^{ij}_2(X_{{\sf t}+1}) &= X^i_{{\sf t}+1}X^j_{{\sf t}+1} - \sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\sum^d_{k=1}X^k_{{\sf t}+1}\big[{\cal K}^{ik}({\sf t}', {\sf t}+1) + {\cal K}^{jk}({\sf t}'', {\sf t}+1)\big] \nonumber \\
+&-\sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\sum^d_{\ell =1}\sum^d_{k=1}X^\ell_{{\sf t}+1}\big[ {\cal K}^{\ell k}({\sf t}'', {\sf t}+1){\cal K}^{ik}({\sf t}', {\sf t}'') + {\cal K}^{\ell k}({\sf t}', {\sf t}+1){\cal K}^{jk}({\sf t}'', {\sf t}') \big] \nonumber \\
+&+\sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\sum^d_{\ell =1}\sum^d_{k=1}\big[ X^{\ell}_{{\sf t}+1}X^k_{{\sf t}+1}{\cal K}^{i\ell}({\sf t}', {\sf t}+1){\cal K}^{jk}({\sf t}'', {\sf t}+1) + X^i_{{\sf t}'}X^k_{{\sf t}'}{\cal K}^{jk}({\sf t}'', {\sf t}') \big] \,.
 \end{align}
 %%
 where we have assumed that ${\sf t}'' > {\sf t}'$.
 
-$${\rm exp}\bigg\{ -\frac{1}{2}\bigg[ X_{{\sf t}'}- \bigg(K^{-1}(\theta, {\sf t}', {\sf t}'')X_{{\sf t}''} + K^{-1}(\theta, {\sf t}', {\sf t}+1)X_{{\sf t}+1}\bigg)K(\theta, {\sf t}', {\sf t}') \bigg]K^{-1}(\theta, {\sf t}', {\sf t}')-\frac{1}{2}\frac{X^i_{{\sf t}''}X^j_{{\sf t}''}}{K^{ij}(\theta, {\sf t}'', {\sf t}'')}-\frac{1}{2}\frac{X^i_{{\sf t}'}X^j_{{\sf t}+1}}{K^{ij}(\theta, {\sf t}', {\sf t}+1)}-\frac{1}{2}\frac{X^i_{{\sf t}'}X^j_{{\sf t}''}}{K^{ij}(\theta, {\sf t}', {\sf t}'')}-\frac{1}{2}\frac{X^i_{{\sf t}''}X^j_{{\sf t}+1}}{K^{ij}(\theta, {\sf t}'', {\sf t}+1)}\bigg\}$$
-
-
-This example was just for illustration rather than using the Gaussian process for what it's intended for. However, it did highlight that the Kramers-Moyal-like expansion we wrote above is probably most usefully employed in situations with Markovian phenomena (where the expansion is more usually applied).
+This example was just for illustration rather than for thinking about actually using the Gaussian process. However, it did highlight that the Kramers-Moyal-like expansion we wrote above is probably most usefully employed in situations with Markovian phenomena (where the expansion is more usually applied).
 
 Note that analogs of Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-update}) exist for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
 %%
