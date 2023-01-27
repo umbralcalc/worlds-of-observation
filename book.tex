@@ -80,7 +80,7 @@
 
 \definecolor{gray75}{gray}{0.75}
 
-\title{\Huge \bfseries\sffamily Diffusing ideas}
+\title{\Huge \bfseries\sffamily Diffusing Ideas}
 \subtitle{\Large \bfseries\sffamily \color{gray75} Software, noise and building mathematical toys}
 \author{\bfseries\sffamily Robert J. Hardwick}
 \date{\today}
@@ -90,7 +90,7 @@
 
 \chapter*{Introduction}
 
-\emph{Diffusing ideas} is a book of research exploration and software development which I have written for the interest of mathematically-inclined programmers and computational scientists. It's the output of many interrelated projects over several years which have sought to generalise the computational mathematics of simulating, statistically inferring, manipulating and automatically controlling stochastic phenomena as far as possible. 
+\emph{Diffusing Ideas} is a book of research exploration and software development which I have written for the interest of mathematically-inclined programmers and computational scientists. It's the output of many interrelated projects over several years which have sought to generalise the computational mathematics of simulating, statistically inferring, manipulating and automatically controlling stochastic phenomena as far as possible. 
 
 The book accompanies a lot of new open-source scientific software, written predominantly in \href{https://www.python.org/}{Python} and \href{https://go.dev/}{Go}. A major motivation for creating these new tools is to prepare a foundation of code from which to develop new and more complex applications. I also hope that the resulting framework will enable anyone to explore and study new phenomena effectively, regardless of their scientific background.
 
@@ -279,15 +279,23 @@ where we have used Eq.~(\ref{eq:x-step-def}) and a Dirac delta distribution $\de
 The matrix notation in Eq.~(\ref{eq:master-x-cont}) can hide some staggering complexity. To try and understand this a little, we can do a kind of generalised Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} of it like this
 %%
 \begin{align}
-p_{{\sf t}+1}(X_{{\sf t}+1}) &= p_{{\sf t}}(X') - \sum_{i=1}^d\frac{\partial}{\partial X^i_{{\sf t}+1}}[\alpha^i_1 (X_{{\sf t}+1})p_{{\sf t}+1}(X_{{\sf t}+1})] \nonumber \\
+p_{{\sf t}+1}(X_{{\sf t}+1}) &= p_{{\sf t}}(X_{{\sf t}}) - \sum_{i=1}^d\frac{\partial}{\partial X^i_{{\sf t}+1}}[\alpha^i_1 (X_{{\sf t}+1})p_{{\sf t}+1}(X_{{\sf t}+1})] \nonumber \\
 & \qquad + \sum_{i=1}^d\sum_{j=1}^d\frac{\partial}{\partial X^i_{{\sf t}+1}}\frac{\partial}{\partial X^j_{{\sf t}+1}}[\alpha^{ij}_2 (X_{{\sf t}+1})p_{{\sf t}+1}(X_{{\sf t}+1})] + \dots \label{eq:master-x-cont-kramers-moyal} \\
-\alpha_1(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\int_{\omega_{\sf t}'} {\rm d}X_{{\sf t}'}(X_{{\sf t}'}-X_{{\sf t}+1})p_{\sf t}(X_{{\sf t}'}\vert X_{{\sf t}+1},{\sf t}+1) \\
-\alpha_2(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\int_{\omega_{\sf t}'} {\rm d}X_{{\sf t}'}\int_{\omega_{\sf t}''} {\rm d}X_{{\sf t}''}(X_{{\sf t}'}-X_{{\sf t}+1})(X_{{\sf t}''}-X_{{\sf t}+1})p_{\sf t}(X_{{\sf t}'}, X_{{\sf t}''}\vert X_{{\sf t}+1},{\sf t}+1) \,,
+\alpha^i_1(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\int_{\omega_{\sf t}'} {\rm d}X_{{\sf t}'}(X^i_{{\sf t}'}-X^i_{{\sf t}+1})p_{\sf t}(X_{{\sf t}'}\vert X_{{\sf t}+1},{\sf t}+1) \\
+\alpha^{ij}_2(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\int_{\omega_{\sf t}'} {\rm d}X_{{\sf t}'}\int_{\omega_{\sf t}''} {\rm d}X_{{\sf t}''}(X^i_{{\sf t}'}-X^i_{{\sf t}+1})(X^j_{{\sf t}''}-X^j_{{\sf t}+1})p_{\sf t}(X_{{\sf t}'}, X_{{\sf t}''}\vert X_{{\sf t}+1},{\sf t}+1) \,,
 \end{align}
 %%
-where the state space is assumed to be $d$-dimensional. Note that in order to arrive at this expression, we needed to use the equivalence of $p_{{\sf t}+1}(X_{{\sf t}+1}\vert X',{\sf t})p_{\sf t}(X') = p_{\sf t}(X'\vert X_{{\sf t}+1},{\sf t}+1)p_{{\sf t}+1}(X_{{\sf t}+1})$ by Bayes' rule. In words, $p_{\sf t}(X'\vert X_{{\sf t}+1},{\sf t}+1)$ is the conditional probability that $X'$ \emph{was} the previous matrix given that $X_{{\sf t}+1}$ \emph{is} the new matrix row in this latest timestep. 
+where the state space is assumed to be $d$-dimensional. Note that in order to arrive at this expression, we needed to use the equivalence of $p_{{\sf t}+1}(X_{{\sf t}+1}\vert X',{\sf t})p_{\sf t}(X') = p_{\sf t}(X'\vert X_{{\sf t}+1},{\sf t}+1)p_{{\sf t}+1}(X_{{\sf t}+1})$ by Bayes' rule. In words, $p_{\sf t}(X'\vert X_{{\sf t}+1},{\sf t}+1)$ is the conditional probability that $X'$ \emph{was} the previous matrix given that $X_{{\sf t}+1}$ \emph{is} the new matrix row in this latest timestep.
 
 So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very complicated calculation. Truncating Eq.~(\ref{eq:master-x-cont-kramers-moyal}) up to second order, this equation tells us that there can be first and second derivatives contributing to the flow of probability to each element of $X_{{\sf t}+1}$ for every element of the matrix $X'$, i.e., the whole history of the process. It's easy to show that this more general expansion naturally simplifies into the more usually applied Kramers-Moyal expansion when considering a Markovian process --- you just remove the sums in the expressions for $\alpha_1$ and $\alpha_2$ and replace ${\sf t}'$ and ${\sf t}''$ both for ${\sf t}$ everywhere.
+
+What would happen if we tried to approximate the conditional probabilities in $\alpha_1$ and $\alpha_2$ with some simpler, time-dependent functions? For example, let's make the following assumptions
+%%
+\begin{align}
+\alpha^i_1(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\tilde{X}^j_{{\sf t}'}M^{ij}(\theta,{\sf t}', {\sf t}+1)-X^i_{{\sf t}+1} \\
+\alpha^{ij}_2(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}(X^i_{{\sf t}'}-X^i_{{\sf t}+1})(X^j_{{\sf t}''}-X^j_{{\sf t}+1})K^{ij}(\theta, {\sf t}+1, {\sf t}') \,.
+\end{align}
+%%
 
 Let's try out the more general expansion on a specific example. In a vector Gaussian process,\footnote{This process is very familiar in machine learning and can be a powerful tool to learn non-linear functions through deviations from the expected value.} the conditional probability of the next state given the value of all of the previous states can be written as 
 %%
@@ -296,25 +304,7 @@ p_{{\sf t}+1}(X_{{\sf t}+1}\vert X',{\sf t}) &= \prod_{{\sf t}'=0}^{{\sf t}+1}{\
 &= \prod_{{\sf t}'=0}^{{\sf t}+1} (2\pi )^{-\frac{d}{2}}\vert K(\theta,{\sf t}+1, {\sf t}')\vert^{-\frac{1}{2}}{\rm exp}\Bigg[ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d\frac{X^i_{{\sf t}+1}X^j_{{\sf t}'}}{K^{ij}(\theta, {\sf t}+1, {\sf t}')}\Bigg] \label{eq:gaussian-proc-cond-p}\,,
 \end{align}
 %%
-where $K(\theta, {\sf t}+1, {\sf t}')$ is a covariance kernel matrix which depends on the timesteps of the two compared states and also on the hyperparameters $\theta$. We write $\vert K(\theta, {\sf t}+1, {\sf t}') \vert$ meaning its determinant. Given the pairwise symmetry of Eq.~(\ref{eq:gaussian-proc-cond-p}), we can also identify the conditional probabilities which appear in $\alpha_1$ and $\alpha_2$ of Eq.~(\ref{eq:master-x-cont-kramers-moyal}) as 
-%%
-\begin{align}
-&p_{\sf t}(X_{{\sf t}'}\vert X_{{\sf t}+1},{\sf t}+1) = {\sf GPPDF}[X_{{\sf t}'};X_{{\sf t}'},{\sf t}',\theta]{\sf GPPDF}[X_{{\sf t}'};X_{{\sf t}+1},{\sf t}+1,\theta] \\
-&p_{\sf t}(X_{{\sf t}'}, X_{{\sf t}''}\vert X_{{\sf t}+1},{\sf t}+1) = {\sf GPPDF}[X_{{\sf t}'};X_{{\sf t}'},{\sf t}',\theta]{\sf GPPDF}[X_{{\sf t}''};X_{{\sf t}''},{\sf t}'',\theta] \nonumber \\
-& \qquad \times {\sf GPPDF}[X_{{\sf t}'};X_{{\sf t}+1},{\sf t}+1,\theta]{\sf GPPDF}[X_{{\sf t}'};X_{{\sf t}''},{\sf t}'',\theta] {\sf GPPDF}[X_{{\sf t}''};X_{{\sf t}+1},{\sf t}+1,\theta]\,.
-\end{align}
-%%
-If we were to now insert these probabilities into Eq.~(\ref{eq:master-x-cont-kramers-moyal}), after some further mathematical manipulations we would eventually find that
-%%
-\begin{align}
-{\cal K}^{ij}({\sf t}', {\sf t}+1) &= \sum^d_{k=1}\frac{K^{ik}(\theta, {\sf t}', {\sf t}')}{K^{kj}(\theta, {\sf t}', {\sf t}+1)} \\
-\alpha^i_1(X_{{\sf t}+1}) &= \sum_{{\sf t}'=0}^{\sf t}\sum^d_{j=1}X^j_{{\sf t}+1}{\cal K}^{ij}({\sf t}', {\sf t}+1) - X^i_{{\sf t}+1} \\
-\alpha^{ij}_2(X_{{\sf t}+1}) &= X^i_{{\sf t}+1}X^j_{{\sf t}+1} - \sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\sum^d_{k=1}X^k_{{\sf t}+1}\big[{\cal K}^{ik}({\sf t}', {\sf t}+1) + {\cal K}^{jk}({\sf t}'', {\sf t}+1)\big] \nonumber \\
-&-\sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\sum^d_{\ell =1}\sum^d_{k=1}X^\ell_{{\sf t}+1}\big[ {\cal K}^{\ell k}({\sf t}'', {\sf t}+1){\cal K}^{ik}({\sf t}', {\sf t}'') + {\cal K}^{\ell k}({\sf t}', {\sf t}+1){\cal K}^{jk}({\sf t}'', {\sf t}') \big] \nonumber \\
-&+\sum_{{\sf t}'=0}^{\sf t}\sum_{{\sf t}''=0}^{\sf t}\sum^d_{\ell =1}\sum^d_{k=1}\big[ X^{\ell}_{{\sf t}+1}X^k_{{\sf t}+1}{\cal K}^{i\ell}({\sf t}', {\sf t}+1){\cal K}^{jk}({\sf t}'', {\sf t}+1) + X^i_{{\sf t}'}X^k_{{\sf t}'}{\cal K}^{jk}({\sf t}'', {\sf t}') \big] \,.
-\end{align}
-%%
-where we have assumed that ${\sf t}'' > {\sf t}'$.
+where $K(\theta, {\sf t}+1, {\sf t}')$ is a covariance kernel matrix which depends on the timesteps of the two compared states and also on the hyperparameters $\theta$. We write $\vert K(\theta, {\sf t}+1, {\sf t}') \vert$ meaning its determinant.
 
 This example was just for illustration rather than for thinking about actually using the Gaussian process. However, it did highlight that the Kramers-Moyal-like expansion we wrote above is probably most usefully employed in situations with Markovian phenomena (where the expansion is more usually applied).
 
