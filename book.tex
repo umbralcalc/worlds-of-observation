@@ -257,39 +257,25 @@ So we've introduced the basic elements of our computational formalism and demons
 The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit \emph{master equation} associated to it which fully describes the time evolution of the \emph{probability density function} of the most recent matrix row $X_{{\sf t}+1}$. This can be written as
 %%
 \begin{align}
-p_{{\sf t}+1}(X_{{\sf t}+1}) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}+1}(X_{{\sf t}+1}\vert X',{\sf t}) \label{eq:master-x-cont} \,,
+p_{{\sf t}+1}(X_{{\sf t}+1}) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}}(X_{{\sf t}+1}\vert X') \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where we are assuming the state space is continuous in each dimension and $p_{{\sf t}+1}(X_{{\sf t}+1}\vert X',{\sf t})$ is the conditional probability that next matrix row will be $X_{{\sf t}+1}$ given that the whole matrix in the previous timestep was $X'$. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. A related equation to Eq.~(\ref{eq:master-x-cont}) is one which is conditional on the state matrix two steps ago, i.e., if the process follows $X''\rightarrow X' \rightarrow X$, we're talking about $X''$. This equation will be very useful later, and we'll write it as
+where we are assuming the state space is continuous in each dimension and $p_{{\sf t}}(X_{{\sf t}+1}\vert X')$ is the conditional probability that next matrix row will be $X_{{\sf t}+1}$ given that the whole matrix in the previous timestep was $X'$. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. For Markovian phenomena specifically, note that Eq.~(\ref{eq:master-x-cont}) simplifies back to a full master equation again (without conditions) which looks like this
 %%
 \begin{align}
-p_{{\sf t}+1}(X_{{\sf t}+1}\vert X'') &= \int_{\omega_{\sf t}}{\rm d}X_{{\sf t}} \,p_{\sf t}(X_{{\sf t}}\vert X'') p_{{\sf t}+1}(X_{{\sf t}+1}\vert X'',X_{{\sf t}},{\sf t}) \label{eq:master-x-cont-conditional} \,.
+p_{{\sf t}+1}(X_{{\sf t}+1}) &= \int_{\omega_{\sf t}}{\rm d}X_{{\sf t}} \,p_{\sf t}(X_{{\sf t}}) p_{{\sf t}}(X_{{\sf t}+1}\vert X_{{\sf t}}) \label{eq:master-x-cont-markov} \,,
 \end{align}
 %%
+where $X_{{\sf t}+1}$ and $X_{\sf t}$ are referring to the next and previous rows of $X$, respectively. In Eq.~(\ref{eq:master-x-cont-markov}) we've also analogously defined $\omega_{{\sf t}}$ as the domain of $X_{{\sf t}}$ and, in this sense, $\omega_{{\sf t}}$ `exists within' $\Omega_{\sf t}$. The meaning of this is generally much clearer with a specific model in mind.
 
-For Markovian phenomena specifically, note that Eq.~(\ref{eq:master-x-cont-conditional}) simplifies back to a full master equation again (without conditions) which looks like this
+The matrix notation in Eq.~(\ref{eq:master-x-cont}) can hide some staggering complexity. To try and understand this a little, we can do a kind of Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} of the conditional probability $p_{{\sf t}}(X_{{\sf t}+1}\vert X')$ which looks like this
 %%
 \begin{align}
-p_{{\sf t}+1}(X_{{\sf t}+1}) &= \int_{\omega_{\sf t}}{\rm d}X_{{\sf t}} \,p_{\sf t}(X_{{\sf t}}) p_{{\sf t}+1}(X_{{\sf t}+1}\vert X_{{\sf t}},{\sf t}) \label{eq:master-x-cont-markov} \,,
+p_{{\sf t}}(X_{{\sf t}+1}\vert X') &= p_{{\sf t}}(X_{{\sf t}}\vert X')-\sum_{i=1}^d(X^i_{{\sf t}}-X^i_{{\sf t}+1})\frac{\partial}{\partial X^i_{{\sf t}+1}}p_{{\sf t}}(X_{{\sf t}+1}\vert X') \nonumber \\
+& \qquad + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d(X^i_{{\sf t}}-X^i_{{\sf t}+1})(X^j_{{\sf t}}-X^j_{{\sf t}+1})\frac{\partial}{\partial X^i_{{\sf t}+1}}\frac{\partial}{\partial X^j_{{\sf t}+1}}p_{{\sf t}}(X_{{\sf t}+1}\vert X') + \dots \label{eq:master-x-cont-kramers-moyal} \,,
 \end{align}
 %%
-where $X_{{\sf t}+1}$ and $X_{\sf t}$ are referring to the next and previous rows of $X$, respectively. In Eqs.~(\ref{eq:master-x-cont-conditional}) and~(\ref{eq:master-x-cont-markov}) we've also analogously defined $\omega_{{\sf t}}$ as the domain of $X_{{\sf t}}$ and, in this sense, $\omega_{{\sf t}}$ `exists within' $\Omega_{\sf t}$. The meaning of this is generally much clearer with a specific model in mind.
-
-The matrix notation in Eq.~(\ref{eq:master-x-cont}) can hide some staggering complexity. To try and understand this a little, we can do a kind of generalised Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} of Eq.~(\ref{eq:master-x-cont-conditional}) like this
-%%
-\begin{align}
-p_{{\sf t}+1}(X_{{\sf t}+1}\vert X'') &= p_{{\sf t}}(X_{{\sf t}}\vert X'')-\sum_{i=1}^d\frac{\partial}{\partial X^i_{{\sf t}+1}}[\alpha^i_1 (X_{{\sf t}+1}, X'')p_{{\sf t}+1}(X_{{\sf t}+1}\vert X'')] \nonumber \\
-& \qquad + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d\frac{\partial}{\partial X^i_{{\sf t}+1}}\frac{\partial}{\partial X^j_{{\sf t}+1}}[\alpha^{ij}_2 (X_{{\sf t}+1}, X'')p_{{\sf t}+1}(X_{{\sf t}+1}\vert X'')] + \dots \label{eq:master-x-cont-kramers-moyal} \,,
-\end{align}
-%%
-in which we have assumed that the state space is $d$-dimensional. In this expansion we needed to define some new functions which are dependent on $X_{{\sf t}+1}$ and $X''$. The first two of these are vector and matrix-valued, respectively, and their elements can be computed from the following integrals
-%%
-\begin{align}
-\alpha^i_1(X_{{\sf t}+1}, X'') &=\int_{\omega_{\sf t}} {\rm d}X_{{\sf t}}(X^i_{{\sf t}}-X^i_{{\sf t}+1})p_{\sf t}(X_{{\sf t}}\vert X'', X_{{\sf t}+1},{\sf t}+1) \\
-\alpha^{ij}_2(X_{{\sf t}+1}, X'') &= \int_{\omega_{\sf t}} {\rm d}X_{{\sf t}}(X^i_{{\sf t}}-X^i_{{\sf t}+1})(X^j_{{\sf t}}-X^j_{{\sf t}+1})p_{\sf t}(X_{{\sf t}}\vert X'', X_{{\sf t}+1}, {\sf t}+1) \,.
-\end{align}
-%%
-In words, $p_{\sf t}(X_{\sf t}\vert X'', X_{{\sf t}+1},{\sf t}+1)$ is the conditional probability that $X_{\sf t}$ \emph{was} the previous matrix row given both $X''$ and that $X_{{\sf t}+1}$ \emph{is} the new matrix row in this latest timestep.
+in which we have assumed that the state space is $d$-dimensional.
 
 So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very complicated calculation. Truncating Eq.~(\ref{eq:master-x-cont-kramers-moyal}) up to second order, this equation tells us that there can be first and second derivatives contributing to the flow of probability to each element of $X_{{\sf t}+1}$ which depend on every element of $X_{{\sf t}}$ and the matrix $X''$, i.e., the whole history of the process which would be stored in $X'$. It's easy to show that this more general expansion naturally simplifies into the more usually applied Kramers-Moyal expansion when considering a Markovian process --- you just remove conditionality on $X''$ everywhere.
 
