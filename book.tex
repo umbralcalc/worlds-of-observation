@@ -156,10 +156,10 @@ What about the stochastic term? For example, if we wanted to consider a \emph{Wi
 & S^{i}_{{\sf t}+1}(X',{\sf t}) = W^i_{{\sf t}+1}-W^i_{\sf t} \label{eq:wiener}\,.
 \end{align}
 %%
-One draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distribution with a mean of $0$ and a variance equal to the length of continuous time that the step corresponded to $\delta t({\sf t}+1)$, i.e., the probability density of the increments is
+One draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distribution with a mean of $0$ and a variance equal to the length of continuous time that the step corresponded to $\delta t({\sf t}+1)$, i.e., the probability density $P^i_{{\sf t}+1}(x)$ of the increments $x^i=W^i_{{\sf t}+1}-W^i_{\sf t}$ is
 %%
 \begin{align}
-p(W^i_{{\sf t}+1}-W^i_{\sf t}=x) &= {\sf NormalPDF}[x;0,\delta t({\sf t}+1)] \,.
+P^i_{{\sf t}+1}(x) &= {\sf NormalPDF}[x^i;0,\delta t({\sf t}+1)] \,.
 \end{align}
 %%
 Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
@@ -254,51 +254,68 @@ So we've introduced the basic elements of our computational formalism and demons
 
 \section{\sffamily Useful analysis concepts}
 
-The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit \emph{master equation} associated to it which fully describes the time evolution of the \emph{probability density function} of the most recent matrix row $X_{{\sf t}+1}$. This can be written as
+The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) also has an implicit \emph{master equation} associated to it which fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x)$ of the most recent matrix row $x=X_{{\sf t}+1}$ at time ${\sf t}$. This can be written as
 %%
 \begin{align}
-p_{{\sf t}+1}(X_{{\sf t}+1}) &= \int_{\Omega_{\sf t}}{\rm d}X' p_{\sf t}(X') p_{{\sf t}}(X_{{\sf t}+1}\vert X') \label{eq:master-x-cont} \,,
+P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x') P_{{\sf t}'}(x\vert x') \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where we are assuming the state space is continuous in each dimension and $p_{{\sf t}}(X_{{\sf t}+1}\vert X')$ is the conditional probability that next matrix row will be $X_{{\sf t}+1}$ given that the whole matrix in the previous timestep was $X'$. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. For Markovian phenomena specifically, note that Eq.~(\ref{eq:master-x-cont}) simplifies back to a full master equation again (without conditions) which looks like this
+where we are assuming the state space is continuous in each dimension and $P_{{\sf t}'}(x\vert x')$ is the conditional probability that next matrix row will be $x=X_{{\sf t}+1}$ given that the row in one of the previous timesteps ${\sf t}'$ was $x'=X_{{\sf t}'}$. The factor of $1/{\sf t}$ is a normalisation factor after having applied the sum over ${\sf t}'$. Note that, if the process is defined over continuous time, we would need to replace 
 %%
 \begin{align}
-p_{{\sf t}+1}(X_{{\sf t}+1}) &= \int_{\omega_{\sf t}}{\rm d}X_{{\sf t}} \,p_{\sf t}(X_{{\sf t}}) p_{{\sf t}}(X_{{\sf t}+1}\vert X_{{\sf t}}) \label{eq:master-x-cont-markov} \,,
+\frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} \rightarrow \frac{1}{t({\sf t})}\sum_{{\sf t}'=0}^{{\sf t}}\delta t({\sf t}') \,.
 \end{align}
-%%
-where $X_{{\sf t}+1}$ and $X_{\sf t}$ are referring to the next and previous rows of $X$, respectively. In Eq.~(\ref{eq:master-x-cont-markov}) we've also analogously defined $\omega_{{\sf t}}$ as the domain of $X_{{\sf t}}$ and, in this sense, $\omega_{{\sf t}}$ `exists within' $\Omega_{\sf t}$. The meaning of this is generally much clearer with a specific model in mind.
+%% 
+But what is $\omega_{\sf t}$? You can think of this as just the domain of possible $x'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
 
-The matrix notation in Eq.~(\ref{eq:master-x-cont}) can hide some staggering complexity. To try and understand this a little, we can do a kind of Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} of the conditional probability $p_{{\sf t}}(X_{{\sf t}+1}\vert X')$ which looks like this
+The matrix notation in Eq.~(\ref{eq:master-x-cont}) can hide some staggering complexity. To try and understand this a little, we can do a kind of Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} to approximate it like this
 %%
 \begin{align}
-p_{{\sf t}}(X_{{\sf t}+1}\vert X') &= p_{{\sf t}}(X_{{\sf t}}\vert X')-\sum_{i=1}^d(X^i_{{\sf t}}-X^i_{{\sf t}+1})\frac{\partial}{\partial X^i_{{\sf t}+1}}p_{{\sf t}}(X_{{\sf t}+1}\vert X') \nonumber \\
-& \qquad + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d(X^i_{{\sf t}}-X^i_{{\sf t}+1})(X^j_{{\sf t}}-X^j_{{\sf t}+1})\frac{\partial}{\partial X^i_{{\sf t}+1}}\frac{\partial}{\partial X^j_{{\sf t}+1}}p_{{\sf t}}(X_{{\sf t}+1}\vert X') + \dots \label{eq:master-x-cont-kramers-moyal} \,,
+&P_{{\sf t}+1}(x) \simeq \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\bigg\{ P_{{\sf t}'}(x)-\sum_{i=1}^d\frac{\partial}{\partial x^i}\big[ \alpha^i_{{\sf t}'}(x)P_{{\sf t}'}(x)\big] + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d\frac{\partial^2}{\partial x^i\partial x^j}\big[ \beta^{ij}_{{\sf t}'}(x)P_{{\sf t}'}(x)\big]\bigg\} \label{eq:master-x-cont-kramers-moyal} \,,
 \end{align}
 %%
-in which we have assumed that the state space is $d$-dimensional.
-
-So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very complicated calculation. Truncating Eq.~(\ref{eq:master-x-cont-kramers-moyal}) up to second order, this equation tells us that there can be first and second derivatives contributing to the flow of probability to each element of $X_{{\sf t}+1}$ which depend on every element of $X_{{\sf t}}$ and the matrix $X''$, i.e., the whole history of the process which would be stored in $X'$. It's easy to show that this more general expansion naturally simplifies into the more usually applied Kramers-Moyal expansion when considering a Markovian process --- you just remove conditionality on $X''$ everywhere.
-
-What would happen if we tried to approximate the conditional probability used in $\alpha_1$ and $\alpha_2$ with a simpler, time-dependent function? For example, let's make the following assumptions
+in which we have assumed that the state space is $d$-dimensional. In this expansion, we also needed to define these new integrals
 %%
 \begin{align}
-\alpha^i_1(X_{{\sf t}+1}, X'') &=\int_{\omega_{\sf t}} {\rm d}X_{{\sf t}}(X^i_{{\sf t}}-X^i_{{\sf t}+1})p_{\sf t}(X_{{\sf t}}\vert X'', X_{{\sf t}+1},{\sf t}+1) \\
-\alpha^{ij}_2(X_{{\sf t}+1}, X'') &= \int_{\omega_{\sf t}} {\rm d}X_{{\sf t}}(X^i_{{\sf t}}-X^i_{{\sf t}+1})(X^j_{{\sf t}}-X^j_{{\sf t}+1})p_{\sf t}(X_{{\sf t}}\vert X'', X_{{\sf t}+1}, {\sf t}+1) \,.
+\alpha^i_{{\sf t}'}(x) &=\int_{\omega_{{\sf t}'}} {\rm d}x'(x'-x)^iP_{{\sf t}'}(x'\vert x) \\
+\beta^{ij}_{{\sf t}'}(x) &= \int_{\omega_{{\sf t}'}} {\rm d}x'(x'-x)^i(x'-x)^jP_{{\sf t}'}(x'\vert x) \,.
 \end{align}
 %%
+So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very complicated calculation. Eq.~(\ref{eq:master-x-cont-kramers-moyal}) tells us that there can be first and second derivatives contributing to the flow of probability to each element of the row $x=X_{{\sf t}+1}$ which depend on every element of the matrix $X'$. 
 
-Let's try out the more general expansion on a specific example. In a vector Gaussian process,\footnote{This process is very familiar in machine learning and can be a powerful tool to learn non-linear functions through deviations from the expected value.} the conditional probability of the next state given the value of all of the previous states can be written as 
+For Markovian phenomena, note that Eq.~(\ref{eq:master-x-cont}) simplifies to
 %%
 \begin{align}
-p_{{\sf t}+1}(X_{{\sf t}+1}\vert X',{\sf t}) &= \prod_{{\sf t}'=0}^{{\sf t}+1}{\sf GPPDF}[X_{{\sf t}+1};X_{{\sf t}'},{\sf t}',\theta] \\
-&= \prod_{{\sf t}'=0}^{{\sf t}+1} (2\pi )^{-\frac{d}{2}}\vert K(\theta,{\sf t}+1, {\sf t}')\vert^{-\frac{1}{2}}{\rm exp}\Bigg[ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d\frac{X^i_{{\sf t}+1}X^j_{{\sf t}'}}{K^{ij}(\theta, {\sf t}+1, {\sf t}')}\Bigg] \label{eq:gaussian-proc-cond-p}\,,
+P_{{\sf t}+1}(x) &= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x') P_{{\sf t}}(x\vert x') \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
-where $K(\theta, {\sf t}+1, {\sf t}')$ is a covariance kernel matrix which depends on the timesteps of the two compared states and also on the hyperparameters $\theta$. We write $\vert K(\theta, {\sf t}+1, {\sf t}') \vert$ meaning its determinant.
+It's also easy to show that Eq.~(\ref{eq:master-x-cont-kramers-moyal}) naturally simplifies into the more usually applied Kramers-Moyal expansion when considering a Markovian process --- you just remove the sum over ${\sf t}'$ and the $1/{\sf t}$ normalisation factor.
 
-This example was just for illustration rather than for thinking about actually using the Gaussian process. However, it did highlight that the Kramers-Moyal-like expansion we wrote above is probably most usefully employed in situations with Markovian phenomena (where the expansion is more usually applied).
+What would happen if we tried to approximate $\alpha$ and $\beta$ with simpler, time-dependent functions? For example, let's make the following assumptions
+%%
+\begin{align}
+\alpha^i_{{\sf t}'}(x) &= M^i({\sf t}')-x^i \\
+\beta^{ij}_{{\sf t}'}(x) &= K^{ij}(\theta, {\sf t}+1, {\sf t}') \,,
+\end{align}
+%%
+where $M({\sf t}')$ is an arbitrary vector-valued function of timestep ${\sf t}'$ and $K(\theta, {\sf t}+1, {\sf t}')$ is a covariance kernel matrix which depends on ${\sf t}'$, the next timestep ${\sf t}+1$ and also on a set of hyperparameters $\theta$. If we also assume stationarity of $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for any ${\sf t}'$ and ${\sf t}''$ such that
+%%
+\begin{align}
+P_{{\sf t}+1}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} P_{{\sf t}'}(x) \,,
+\end{align}
+%%
+and plug both this and the time-dependent functions back into Eq.~(\ref{eq:master-x-cont-kramers-moyal}), we can solve the equation to obtain the probability density for a vector Gaussian process\footnote{This process is very familiar in machine learning and can be a powerful tool to learn non-linear functions through deviations from the expected value.}
+%%
+\begin{align}
+P_{{\sf t}'}(x) &= {\sf GaussianProcessPDF}[x;{\sf t}+1,{\sf t}',\theta] \\
+&= (2\pi )^{-\frac{d}{2}}\vert K(\theta,{\sf t}+1, {\sf t}')\vert^{-\frac{1}{2}}{\rm exp}\Bigg[ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d\frac{X^i_{{\sf t}+1}X^j_{{\sf t}'}}{K^{ij}(\theta, {\sf t}+1, {\sf t}')}\Bigg] \label{eq:gaussian-proc-cond-p}\,.
+\end{align}
+%%
+Note that I write $\vert K(\theta, {\sf t}+1, {\sf t}') \vert$ meaning the determinant of the matrix.
 
-Note that analogs of Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-update}) exist for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
+This example was just for illustration rather than for thinking about actually using the Gaussian process.
+
+Note that an analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
 %%
 \begin{align}
 p_{{\sf t}+1}(X) &= \sum_{\Omega_{\sf t}} p_{\sf t}(X') p_{{\sf t}+1}(X \vert X') \label{eq:master-x-disc} \,,
