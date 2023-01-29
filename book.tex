@@ -281,7 +281,7 @@ in which we have assumed that the state space is $d$-dimensional. In this expans
 \beta^{ij}_{{\sf t}'}(x) &= \int_{\omega_{{\sf t}'}} {\rm d}x'(x'-x)^i(x'-x)^jP_{{\sf t}'}(x'\vert x) \,.
 \end{align}
 %%
-So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very complicated calculation. Eq.~(\ref{eq:master-x-cont-kramers-moyal}) tells us that there can be first and second derivatives contributing to the flow of probability to each element of the row $x=X_{{\sf t}+1}$ which depend on every element of the matrix $X'$. 
+So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very complicated calculation. Eq.~(\ref{eq:master-x-cont-kramers-moyal}) tells us that there can be first and second derivatives contributing to the flow of probability to each element of the row $x=X_{{\sf t}+1}$ which depend on every element of the matrix $X'$. \textcolor{red}{Introduce the probability current here to help the description.}
 
 For Markovian phenomena, note that Eq.~(\ref{eq:master-x-cont}) simplifies to
 %%
@@ -311,7 +311,7 @@ P_{{\sf t}'}(x) &= {\sf GaussianProcessPDF}[x;{\sf t}+1,{\sf t}',\theta] \\
 &= (2\pi )^{-\frac{d}{2}}\vert K(\theta,{\sf t}+1, {\sf t}')\vert^{-\frac{1}{2}}{\rm exp}\Bigg[ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d\frac{X^i_{{\sf t}+1}X^j_{{\sf t}'}}{K^{ij}(\theta, {\sf t}+1, {\sf t}')}\Bigg] \label{eq:gaussian-proc-cond-p}\,.
 \end{align}
 %%
-Note that I write $\vert K(\theta, {\sf t}+1, {\sf t}') \vert$ meaning the determinant of the matrix. \textcolor{red}{Double-check the probability current is zero and introduce the idea of probability currents.}
+Note that I write $\vert K(\theta, {\sf t}+1, {\sf t}') \vert$ meaning the determinant of the matrix. \textcolor{red}{Point out that the probability current is zero.}
 
 This example was just for illustration rather than for thinking about actually using the Gaussian process.
 
