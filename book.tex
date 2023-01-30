@@ -310,13 +310,25 @@ What would happen if we tried to approximate $\alpha$ and $\beta$ with simpler, 
 \beta^{ij}_{({\sf t}+1){\sf t}'}(x) &= K^{ij}(\theta, {\sf t}+1, {\sf t}') \,,
 \end{align}
 %%
-where $M({\sf t}')$ is an arbitrary matrix-valued function of timestep ${\sf t}'$ and $K(\theta, {\sf t}+1, {\sf t}')$ is a covariance kernel matrix which depends on ${\sf t}+1$, ${\sf t}'$ and a set of hyperparameters $\theta$. If we also assume stationarity of $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for any ${\sf t}'$ and ${\sf t}''$ such that
+where $M({\sf t}')$ is an arbitrary matrix-valued function of timestep ${\sf t}'$ and $K(\theta, {\sf t}+1, {\sf t}')$ is a covariance kernel matrix which depends on ${\sf t}+1$, ${\sf t}'$ and a set of hyperparameters $\theta$. 
+
+\textcolor{red}{Don't need stationarity, just need to write out the terms of $$P_{{\sf t}+1}(x)-P_{{\sf t}}(x)$$ and solve the equation - should be minuses in the expression from which the conditionals can be derived!!!}
+
+
+If we now also assume both stationarity of $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for any ${\sf t}'$ and ${\sf t}''$ such that
 %%
 \begin{align}
 P_{{\sf t}+1}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} P_{{\sf t}'}(x) \,,
 \end{align}
 %%
-and plug both this and the time-dependent functions back into Eq.~(\ref{eq:master-x-cont-kramers-moyal}), we can solve the equation to obtain the probability density for a vector Gaussian process\footnote{This process is very familiar in machine learning and can be a powerful tool to learn non-linear functions through deviations from the expected value.} \textcolor{red}{Everything is fine up to here --- need to find a way to derive the conditional probability.}
+and a vanishing probability current ($J^i_{{\sf t}'}=0$ for all ${\sf t}'$ and $i$), we can solve Eq.~(\ref{eq:master-x-cont-kramers-moyal}) to obtain
+%%
+\begin{align}
+P_{{\sf t}'}(x) &= \frac{{\rm exp}\bigg\{ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d[x-M_{{\sf t}+1}({\sf t}')]^i[K^{-1}(\theta, {\sf t}+1, {\sf t}')]^{ij}[x-M_{{\sf t}+1}({\sf t}')]^j\bigg\}}{(2\pi )^{\frac{d}{2}}\vert K(\theta,{\sf t}+1, {\sf t}')\vert^{\frac{1}{2}}} \label{eq:stat-sol-kramers-moyal}\,.
+\end{align}
+%%
+
+for a vector Gaussian process\footnote{This process is very familiar in machine learning and can be a powerful tool to learn non-linear functions through deviations from the expected value.} \textcolor{red}{Everything is fine up to here --- need to find a way to derive the conditional probability.}
 %%
 \begin{align}
 P_{{\sf t}'}(x) &= {\sf GaussianProcessPDF}[x;{\sf t}+1,{\sf t}',\theta] \nonumber \\
