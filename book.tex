@@ -337,7 +337,14 @@ Note that an analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state sp
 P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t}\sum_{\omega_{{\sf t}'}} P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x \vert x') \label{eq:master-x-disc} \,,
 \end{align}
 %%
-where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}.
+where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}. In the case where $x$ is just a vector of binary `on' or `off' states, we can simplify this even further to 
+%%
+\begin{align}
+P^i_{{\sf t}+1} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{{\sf t}'} P^{ij}_{({\sf t}+1){\sf t}'} \label{eq:master-x-disc-binary} \,,
+\end{align}
+%% 
+where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `on').
+
 
 \section{\sffamily Summary of desirable features}
 
