@@ -282,62 +282,54 @@ in which we have assumed that the state space is $d$-dimensional. In this expans
 \beta^{ij}_{({\sf t}+1){\sf t}'}(x) &= \int_{\omega_{{\sf t}'}} {\rm d}x'(x'-x)^i(x'-x)^jP_{({\sf t}+1){\sf t}'}(x'\vert x) \,.
 \end{align}
 %%
-So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very complicated calculation. Truncating just up to second order, Eq.~(\ref{eq:master-x-cont-kramers-moyal}) tells us that there can be first and second derivatives contributing to the flow of probability to each element of the row $x=X_{{\sf t}+1}$ which depend on every element of the matrix $X'$. The probability does indeed \emph{flow}, in fact. We can define a quantity known as the `probability current' $J$ to illustrate this through the continuity relation
+So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very complicated calculation. Truncating just up to second order, Eq.~(\ref{eq:master-x-cont-kramers-moyal}) tells us that there can be first and second derivatives contributing to the flow of probability to each element of the row $x=X_{{\sf t}+1}$ which depend on every element of the matrix $X'$. The probability does indeed \emph{flow}, in fact. We can define a quantity known as the `probability current' $J_{({\sf t}+1){\sf t}'}(x)$ from ${\sf t}'$ to $({\sf t}+1)$ which illustrates this through the following continuity relation
 %%
 \begin{align}
-P_{{\sf t}+1}(x) - \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}P_{{\sf t}'}(x) = -\sum_{i=1}^d\frac{\partial}{\partial x^i}J^i_{{\sf t}+1}\,.
+P_{{\sf t}+1}(x) - \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}P_{{\sf t}'}(x) = - \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}J^i_{({\sf t}+1){\sf t}'}(x) \,.
 \end{align}
 %%
 By inspection of Eq.~(\ref{eq:master-x-cont-kramers-moyal}) we can therefore also deduce that
 %%
 \begin{align}
-J^i_{{\sf t}+1} = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} \alpha^i_{({\sf t}+1){\sf t}'}(x)P_{{\sf t}'}(x) - \frac{1}{2{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\sum_{j=1}^d\frac{\partial}{\partial x^j}\big[ \beta^{ij}_{({\sf t}+1){\sf t}'}(x)P_{{\sf t}'}(x)\big] + \dots \,.
+J^i_{({\sf t}+1){\sf t}'}(x) &= \alpha^i_{({\sf t}+1){\sf t}'}(x)P_{{\sf t}'}(x) - \frac{1}{2}\sum_{j=1}^d\frac{\partial}{\partial x^j}\big[ \beta^{ij}_{({\sf t}+1){\sf t}'}(x)P_{{\sf t}'}(x)\big] + \dots \,.
 \end{align}
 %%
 
-For Markovian phenomena, note that Eq.~(\ref{eq:master-x-cont}) simplifies to
+What would happen if we tried to approximate $\alpha$ and $\beta$ with simpler, time-dependent functions? For example, let's make the following assumptions
+%%
+\begin{align}
+\alpha^i_{({\sf t}+1){\sf t}'}(x) &= f^i({\sf t}')-x^i \\
+\beta^{ij}_{({\sf t}+1){\sf t}'}(x) &= \Sigma^{ij}(\theta, {\sf t}') \,,
+\end{align}
+%%
+where $f({\sf t}')$ is an arbitrary vector-valued function of the timestep and $\Sigma (\theta ,{\sf t}')$ is an arbitrary covariance matrix which depends on both the timestep and a set of hyperparameters $\theta$. If we now also assume stationarity of $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for any ${\sf t}'$ and ${\sf t}''$ such that
+%%
+\begin{align}
+P_{{\sf t}+1}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} P_{{\sf t}'}(x) \,,
+\end{align}
+%%
+we can solve Eq.~(\ref{eq:master-x-cont-kramers-moyal}) to obtain the following stationary solution
+%%
+\begin{align}
+P_{{\sf t}'}(x) &= (2\pi )^{-\frac{d}{2}}\vert \Sigma(\theta, {\sf t}')\vert^{-\frac{1}{2}}{\rm exp}\bigg\{ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d[x-f({\sf t}')]^i[\Sigma^{-1}(\theta, {\sf t}')]^{ij}[x-f({\sf t}')]^j\bigg\}\label{eq:stat-sol-kramers-moyal}\,.
+\end{align}
+%%
+Note that this solution also required the restriction of probability flow between timesteps such that $J_{({\sf t}+1){\sf t}'}(x)$ uniquely vanishes for each and every ${\sf t}'$. I also write $\vert \Sigma (\theta, {\sf t}') \vert$ meaning the determinant of the matrix and $\Sigma^{-1}(\theta,{\sf t}')$ meaning its inverse. As a final step, we can use Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:stat-sol-kramers-moyal}) together to figure out what the conditional probability looks like
+%%
+\begin{align}
+P_{({\sf t}+1){\sf t}'}(x\vert x') &= \frac{{\rm exp}\bigg\{ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d[x-f({\sf t}+1)]^i[K^{-1}(\theta, {\sf t}+1, {\sf t}')]^{ij}[x'-f({\sf t}')]^j\bigg\}}{(2\pi )^{\frac{d}{2}}\vert K(\theta, {\sf t}+1, {\sf t}')\vert^{\frac{1}{2}}} \label{eq:gaussian-proc-cond-p} \\
+K^{ij}(\theta, {\sf t}+1, {\sf t}') &= \frac{1}{2}\sum_{k=1}^d\big[ \Sigma^{\frac{1}{2}}(\theta, {\sf t}+1)\big]^{ik}\big[ \Sigma^{\frac{1}{2}}(\theta, {\sf t}')\big]^{kj} \,,
+\end{align}
+%%
+which is the familiar conditional probability for a kind of vector Gaussian process.\footnote{This process is very familiar in machine learning and can be a powerful tool to learn non-linear functions through deviations from the expected value.}
+
+For Markovian phenomena, we can see that Eq.~(\ref{eq:master-x-cont}) no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
 \begin{align}
 P_{{\sf t}+1}(x) &= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x') P_{({\sf t}+1){\sf t}}(x\vert x') \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
 It's also easy to show that Eq.~(\ref{eq:master-x-cont-kramers-moyal}) naturally simplifies into the more usually applied Kramers-Moyal expansion when considering a Markovian process --- you just remove the sum over ${\sf t}'$ and the $1/{\sf t}$ normalisation factor.
-
-What would happen if we tried to approximate $\alpha$ and $\beta$ with simpler, time-dependent functions? For example, let's make the following assumptions
-%%
-\begin{align}
-\alpha^i_{({\sf t}+1){\sf t}'}(x) &= M^i_{{\sf t}+1}({\sf t}')-x^i \\
-\beta^{ij}_{({\sf t}+1){\sf t}'}(x) &= K^{ij}(\theta, {\sf t}+1, {\sf t}') \,,
-\end{align}
-%%
-where $M({\sf t}')$ is an arbitrary matrix-valued function of timestep ${\sf t}'$ and $K(\theta, {\sf t}+1, {\sf t}')$ is a covariance kernel matrix which depends on ${\sf t}+1$, ${\sf t}'$ and a set of hyperparameters $\theta$. 
-
-\textcolor{red}{Don't need stationarity, just need to write out the terms of $$P_{{\sf t}+1}(x)-P_{{\sf t}}(x)$$ and solve the equation - should be minuses in the expression from which the conditionals can be derived!!!}
-
-
-If we now also assume both stationarity of $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for any ${\sf t}'$ and ${\sf t}''$ such that
-%%
-\begin{align}
-P_{{\sf t}+1}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} P_{{\sf t}'}(x) \,,
-\end{align}
-%%
-and a vanishing probability current ($J^i_{{\sf t}'}=0$ for all ${\sf t}'$ and $i$), we can solve Eq.~(\ref{eq:master-x-cont-kramers-moyal}) to obtain
-%%
-\begin{align}
-P_{{\sf t}'}(x) &= \frac{{\rm exp}\bigg\{ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d[x-M_{{\sf t}+1}({\sf t}')]^i[K^{-1}(\theta, {\sf t}+1, {\sf t}')]^{ij}[x-M_{{\sf t}+1}({\sf t}')]^j\bigg\}}{(2\pi )^{\frac{d}{2}}\vert K(\theta,{\sf t}+1, {\sf t}')\vert^{\frac{1}{2}}} \label{eq:stat-sol-kramers-moyal}\,.
-\end{align}
-%%
-
-for a vector Gaussian process\footnote{This process is very familiar in machine learning and can be a powerful tool to learn non-linear functions through deviations from the expected value.} \textcolor{red}{Everything is fine up to here --- need to find a way to derive the conditional probability.}
-%%
-\begin{align}
-P_{{\sf t}'}(x) &= {\sf GaussianProcessPDF}[x;{\sf t}+1,{\sf t}',\theta] \nonumber \\
-&= \frac{{\rm exp}\bigg\{ -\frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d[X_{{\sf t}+1}-M({\sf t}+1)]^i[K^{-1}(\theta, {\sf t}+1, {\sf t}')]^{ij}[X_{{\sf t}'}-M({\sf t}')]^j\bigg\}}{(2\pi )^{\frac{d}{2}}\vert K(\theta,{\sf t}+1, {\sf t}')\vert^{\frac{1}{2}}} \label{eq:gaussian-proc-cond-p}\,.
-\end{align}
-%%
-Note that I write $\vert K(\theta, {\sf t}+1, {\sf t}') \vert$ meaning the determinant of the matrix and $K^{-1}(\theta, {\sf t}+1, {\sf t}')$ meaning its inverse.
-
-This example was just for illustration rather than for thinking about actually using the Gaussian process.
 
 Note that an analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state spaces as well. In the case of Eq.~(\ref{eq:master-x-cont}), for instance, we would simply replace the integral with a sum and the schematic would look something like this
 %%
