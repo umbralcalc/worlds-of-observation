@@ -1,4 +1,4 @@
-\providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{1}
+\providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{10}
 
 \bibitem{van1992stochastic}
 N.~G. Van~Kampen, \emph{Stochastic processes in physics and chemistry}, vol.~1.
@@ -41,5 +41,9 @@ H.~A. Kramers, \emph{Brownian motion in a field of force and the diffusion
 J.~Moyal, \emph{Stochastic processes and statistical physics}, {\emph{Journal
   of the Royal Statistical Society. Series B (Methodological)} {\bf 11} (1949)
   150--210}.
+
+\bibitem{murphy2012machine}
+K.~P. Murphy, \emph{Machine learning: a probabilistic perspective}.
+\newblock MIT press, 2012.
 
 \end{thebibliography}\endgroup
