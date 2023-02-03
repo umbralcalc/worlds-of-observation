@@ -124,7 +124,7 @@ No quest would be complete without a guide, so to end this introduction, I think
 
 \section{\sffamily Computational formalism}
 
-Before we dive into the software and some examples, we need to mathematically define the general computational approach that we're going to take in order to be able to describe as general a set of stochastic phenomena as possible. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
+Before we dive into software design of the stochadex, we need to mathematically define the general computational approach that we're going to take in order to be able to describe as general a set of stochastic phenomena as possible. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
 %%
 \begin{align}
 X^{i}_{{\sf t}+1} &= F^{i}_{{\sf t}+1}(X',{\sf t}) \,, \label{eq:x-step-def}
@@ -377,6 +377,8 @@ P^i_{{\sf t}+1} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{
 where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$.
 
 \section{\sffamily Summary of desirable features}
+
+So we've proposed a computational formalism and done a bit of analysis on it to demonstrate that it can cope with a variety of different stochastic phenomena. Now I think we're ready to summarise what we want the stochadex software package to be able to do.
 
 \begin{itemize}
 \item{using the learnings from the previous sections looking at specific example processes}
