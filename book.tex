@@ -378,10 +378,18 @@ where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `
 
 \section{\sffamily Summary of desirable features}
 
-So we've proposed a computational formalism and done a bit of analysis on it to demonstrate that it can cope with a variety of different stochastic phenomena. Now I think we're ready to summarise what we want the stochadex software package to be able to do.
+So I've proposed a computational formalism and done a bit of analysis on it to demonstrate that it can cope with a variety of different stochastic phenomena. Now I think we're ready to summarise what we want the stochadex software package to be able to do. 
 
 \begin{itemize}
-\item{using the learnings from the previous sections looking at specific example processes}
+\item{Directly configurable for a range of known examples and also extensible such that the configurations are continually increasing in applicability.}
+\end{itemize}
+
+\section{\sffamily Software design choices}
+
+\begin{itemize}
+\item{In order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history.}
+\item{multithreading should be used for state partitioning}
+\item{multiprocessing should be used for independent ensembles}
 \item{above formalism is so general that it can do anything - so while it shall serve as a useful guide and reference point, it would be good here to go through more of the specific desirable components we want to have access to in the software itself}
 \item{it might not always be convenient to have the windowed histories stored as S but some other varying quantity which can be used to construct S? take fractional brownian motion as an example of this! hence, need to provide more possible input histories into S}
 \item{want the timestep to have either exponentially-sampled lengths or fixed lengths in time}
@@ -391,8 +399,6 @@ So we've proposed a computational formalism and done a bit of analysis on it to 
 \item{configurable setup of simulations with just yamls + a single .go file defining the terms}
 \end{itemize}
 
-\section{\sffamily Software design choices}
-
 Ideally, the stochadex sampler should be designed to try and maintain a balance between performance and flexibility of utilisation.
 
 \begin{figure}[h]
@@ -401,6 +407,13 @@ Ideally, the stochadex sampler should be designed to try and maintain a balance 
 \caption{Write software design diagrams}
 \label{fig:loop-design}
 \end{figure}
+
+
+\section{\sffamily Statistical performance analysis}
+
+\begin{itemize}
+\item{Erlang distribution-based statistical performance analysis.}
+\end{itemize}
 
 
 \chapter{\sffamily Simulating a financial market}
