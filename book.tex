@@ -144,7 +144,7 @@ The basic computational idea here is illustrated in Fig.~\ref{fig:fundamental-lo
 For more complex physical models and integrators, the distinct notions of `numerical timestep' and `total elapsed continuous time' will crop up quite frequently. Hence, before moving on further details, it will be important to define the total elapsed time variable $t({\sf t})$ for processes which are defined in continuous time. Assuming that we have already defined some function $\delta t({\sf t})$ which returns the specific change in continuous time that corresponds to the step ${\sf t}-1 \rightarrow {\sf t}$, we will always be able to compute the total elapsed time through the relation
 %%
 \begin{align}
-t({\sf t}) &= \sum^{{\sf t}}_{{\sf t}'=0}\delta t({\sf t}') \,.
+t({\sf t}) &= \sum^{{\sf t}}_{{\sf t}'=0}\delta t({\sf t}') \label{eq:t-steps-sum} \,.
 \end{align}
 %%
 This seems a lot of effort, no? Well it's important to remember that our steps in continuous time may not be constant, so by defining the $\delta t({\sf t})$ function and summing over it we can enable this flexibility in the computation.
@@ -287,7 +287,7 @@ But what is $\omega_{\sf t}$? You can think of this as just the domain of possib
 What if we wanted the joint distribution of both rows $P_{({\sf t}+1){\sf t}'}(x,x')$? One way to obtain this would be to extend Eq.~(\ref{eq:master-x-cont}) such that both matrix rows are marginalised over separately like so
 %%
 \begin{align}
-&P_{({\sf t}+1){\sf t}'}(x,x') = \frac{1}{{\sf t}({\sf t}'-1)}\sum_{{\sf t}''=0}^{{\sf t}}\sum_{{\sf t}'''=0}^{{\sf t}'-1}\int_{\omega_{{\sf t}''}}{\rm d}x''\int_{\omega_{{\sf t}'''}}{\rm d}x''' P_{{\sf t}''{\sf t}'''}(x'', x''') P_{({\sf t}+1){\sf t}''}(x\vert x'')P_{{\sf t}'{\sf t}'''}(x'\vert x''') \label{eq:joint-master-x-cont} \,.
+&P_{({\sf t}+1){\sf t}'}(x,x') = \frac{1}{({\sf t}'-1){\sf t}}\sum_{{\sf t}''=0}^{{\sf t}}\sum_{{\sf t}'''=0}^{{\sf t}'-1}\int_{\omega_{{\sf t}''}}{\rm d}x''\int_{\omega_{{\sf t}'''}}{\rm d}x''' P_{{\sf t}''{\sf t}'''}(x'', x''') P_{({\sf t}+1){\sf t}''}(x\vert x'')P_{{\sf t}'{\sf t}'''}(x'\vert x''') \label{eq:joint-master-x-cont} \,.
 \end{align}
 %%
 Given Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:joint-master-x-cont}) it's also possible to work out what the conditional probabilities would look like using the simple relation
@@ -376,15 +376,21 @@ P^i_{{\sf t}+1} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{
 %% 
 where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$.
 
-\section{\sffamily Summary of desirable features}
+\section{\sffamily Data types and desirable features}
 
-So I've proposed a computational formalism and done a bit of analysis on it to demonstrate that it can cope with a variety of different stochastic phenomena. Now I think we're ready to summarise what we want the stochadex software package to be able to do. 
+So I've proposed a computational formalism and done a bit of analysis on it to demonstrate that it can cope with a variety of different stochastic phenomena. Now I think we're ready to summarise what we want the stochadex software package to be able to do. If we begin with the obvious first set of criteria; we want to be able to freely configure the iteration function $F$ of Eq.~(\ref{eq:x-step-def}) and the timestep function $t$ of Eq.~(\ref{eq:t-steps-sum}) so that any process we want can be described. In addition, once someone has configured the stochadex in some new way, ideally we would then be able to recall this past configuration very easily in the future but with new parameters set, if desired.
 
-\begin{itemize}
-\item{Directly configurable for a range of known examples and also extensible such that the configurations are continually increasing in applicability.}
-\end{itemize}
+The state history matrix $X$ should also be configurable in terms of its number of rows (the `state width') and its number of columns (the `state history depth'). 
 
-\section{\sffamily Software design choices}
+\begin{figure}[h]
+\centering
+\includegraphics[width=15cm]{images/stochadex-data-types.drawio.png}
+\caption{A relational summary of the core data types in the stochadex.}
+\label{fig:data-types-design}
+\end{figure}
+
+
+\section{\sffamily Algorithm design}
 
 \begin{itemize}
 \item{In order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history.}
@@ -406,14 +412,6 @@ Ideally, the stochadex sampler should be designed to try and maintain a balance 
 \includegraphics[width=15cm]{images/stochadex-loop.drawio.png}
 \caption{Write software design diagrams}
 \label{fig:loop-design}
-\end{figure}
-
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=15cm]{images/stochadex-data-types.drawio.png}
-\caption{Write software design diagrams}
-\label{fig:data-types-design}
 \end{figure}
 
 
