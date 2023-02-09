@@ -124,7 +124,7 @@ No quest would be complete without a guide, so to end this introduction, I think
 
 \section{\sffamily Computational formalism}
 
-Before we dive into software design of the stochadex, we need to mathematically define the general computational approach that we're going to take in order to be able to describe as general a set of stochastic phenomena as possible. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
+Before we dive into software design of the stochadex, we need to mathematically define the general computational approach that we're going to take. Because the language of stochastic processes is primarily mathematics, I'd argue this step is essential in enabling us to describe as general a set of phenomena as possible. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
 %%
 \begin{align}
 X^{i}_{{\sf t}+1} &= F^{i}_{{\sf t}+1}(X',{\sf t}) \,, \label{eq:x-step-def}
