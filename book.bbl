@@ -1,5 +1,19 @@
 \providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{10}
 
+\bibitem{golang}
+``The go programming language.'' \url{https://go.dev/}.
+
+\bibitem{pythonlang}
+``The python programming language.'' \url{https://www.python.org/}.
+
+\bibitem{diffusingideasbookgithub}
+``The diffusing ideas github repository.''
+  \url{https://github.com/umbralcalc/diffusing-ideas}.
+
+\bibitem{mitlicense}
+``Open source initiative: Mit license.''
+  \url{https://opensource.org/licenses/MIT}.
+
 \bibitem{van1992stochastic}
 N.~G. Van~Kampen, \emph{Stochastic processes in physics and chemistry}, vol.~1.
 \newblock Elsevier, 1992.
@@ -45,6 +59,9 @@ J.~Moyal, \emph{Stochastic processes and statistical physics}, {\emph{Journal
 \bibitem{murphy2012machine}
 K.~P. Murphy, \emph{Machine learning: a probabilistic perspective}.
 \newblock MIT press, 2012.
+
+\bibitem{goroutines}
+``A tour of go: Goroutines.'' \url{https://go.dev/tour/concurrency/1}.
 
 \bibitem{ye2015equation}
 H.~Ye, R.~J. Beamish, S.~M. Glaser, S.~C. Grant, C.-h. Hsieh, L.~J. Richards
