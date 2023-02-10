@@ -46,4 +46,14 @@ J.~Moyal, \emph{Stochastic processes and statistical physics}, {\emph{Journal
 K.~P. Murphy, \emph{Machine learning: a probabilistic perspective}.
 \newblock MIT press, 2012.
 
+\bibitem{ye2015equation}
+H.~Ye, R.~J. Beamish, S.~M. Glaser, S.~C. Grant, C.-h. Hsieh, L.~J. Richards
+  et~al., \emph{Equation-free mechanistic ecosystem forecasting using empirical
+  dynamic modeling}, {\emph{Proceedings of the National Academy of Sciences}
+  {\bf 112} (2015) E1569--E1576}.
+
+\bibitem{envagency2015}
+``Electrofishing to assess a river's health.''
+  \url{https://environmentagency.blog.gov.uk/2015/10/29/electrofishing-to-assess-a-rivers-health/}.
+
 \end{thebibliography}\endgroup
