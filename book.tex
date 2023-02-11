@@ -348,7 +348,7 @@ I actually hid a little bit of the detail in that last step; the solution also r
 \begin{figure}[h]
 \centering
 \includegraphics[width=8cm]{images/gp-like-diag.drawio.png}
-\caption{Graph representation of Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}).}
+\caption{Graph representation of the generative process implied by Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}).}
 \label{fig:stat-sol-kramers-moyal-cond}
 \end{figure}
 
@@ -359,9 +359,7 @@ P_{({\sf t}+1){\sf t}'}(x\vert x') &\propto {\rm exp}\bigg\{ -\frac{1}{2}\sum^d_
 & \qquad \qquad + \sum^d_{i=1}\sum^d_{j=1}\big[ x-f({\sf t}+1)\big]^i [K^{-1}(\theta , {\sf t}+1,{\sf t}')]^{ij}\big[ x'-f({\sf t}')\big]^j  \bigg\} \label{eq:stat-sol-kramers-moyal-cond}\,,
 \end{align}
 %%
-where $K(\theta , {\sf t}+1,{\sf t}')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}(\theta , {\sf t}+1,{\sf t}')$ denotes taking its inverse. For a bit more visual intuition, I've illustrated what this conditional probability computation looks like in Fig~\ref{fig:stat-sol-kramers-moyal-cond}.
-
-Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version is a \emph{generative} model for a future $x$ value, in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though.
+where $K(\theta , {\sf t}+1,{\sf t}')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}(\theta , {\sf t}+1,{\sf t}')$ denotes taking its inverse. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which I've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though.
 
 What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
