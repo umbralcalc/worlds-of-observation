@@ -4,45 +4,45 @@ The top-level auxiliary file: book.aux
 The style file: JHEP.bst
 Database file #1: book.bib
 Warning--empty publisher in rog-will-2000
-You've used 17 entries,
+You've used 18 entries,
             2188 wiz_defined-function locations,
-            615 strings with 5733 characters,
-and the built_in function-call counts, 4215 in all, are:
-= -- 451
-> -- 101
+            619 strings with 5830 characters,
+and the built_in function-call counts, 4364 in all, are:
+= -- 464
+> -- 106
 < -- 0
-+ -- 37
-- -- 20
-* -- 245
-:= -- 541
-add.period$ -- 22
-call.type$ -- 17
++ -- 39
+- -- 21
+* -- 249
+:= -- 561
+add.period$ -- 24
+call.type$ -- 18
 change.case$ -- 14
 chr.to.int$ -- 0
-cite$ -- 18
-duplicate$ -- 209
-empty$ -- 467
-format.name$ -- 20
-if$ -- 1110
+cite$ -- 19
+duplicate$ -- 219
+empty$ -- 488
+format.name$ -- 21
+if$ -- 1149
 int.to.chr$ -- 0
-int.to.str$ -- 17
-missing$ -- 35
-newline$ -- 59
-num.names$ -- 11
-pop$ -- 105
+int.to.str$ -- 18
+missing$ -- 37
+newline$ -- 63
+num.names$ -- 12
+pop$ -- 112
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 148
+skip$ -- 150
 stack$ -- 0
 substring$ -- 279
-swap$ -- 81
+swap$ -- 82
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 1
-while$ -- 37
-width$ -- 19
-write$ -- 150
+while$ -- 38
+width$ -- 20
+write$ -- 159
 (There was 1 warning)

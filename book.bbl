@@ -60,6 +60,10 @@ J.~Moyal, \emph{Stochastic processes and statistical physics}, {\emph{Journal
 K.~P. Murphy, \emph{Machine learning: a probabilistic perspective}.
 \newblock MIT press, 2012.
 
+\bibitem{brandwood2012fourier}
+D.~Brandwood, \emph{Fourier transforms in radar and signal processing}.
+\newblock Artech House, 2012.
+
 \bibitem{goroutines}
 ``A tour of go: Goroutines.'' \url{https://go.dev/tour/concurrency/1}.
 
