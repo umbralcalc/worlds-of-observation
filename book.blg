@@ -3,37 +3,36 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: book.aux
 The style file: JHEP.bst
 Database file #1: book.bib
-Warning--empty publisher in rog-will-2000
-You've used 18 entries,
+You've used 21 entries,
             2188 wiz_defined-function locations,
-            619 strings with 5830 characters,
-and the built_in function-call counts, 4364 in all, are:
-= -- 464
-> -- 106
+            630 strings with 6333 characters,
+and the built_in function-call counts, 4684 in all, are:
+= -- 492
+> -- 109
 < -- 0
-+ -- 39
++ -- 42
 - -- 21
-* -- 249
-:= -- 561
-add.period$ -- 24
-call.type$ -- 18
-change.case$ -- 14
+* -- 256
+:= -- 589
+add.period$ -- 27
+call.type$ -- 21
+change.case$ -- 17
 chr.to.int$ -- 0
-cite$ -- 19
-duplicate$ -- 219
-empty$ -- 488
+cite$ -- 21
+duplicate$ -- 234
+empty$ -- 548
 format.name$ -- 21
-if$ -- 1149
+if$ -- 1243
 int.to.chr$ -- 0
-int.to.str$ -- 18
+int.to.str$ -- 21
 missing$ -- 37
-newline$ -- 63
+newline$ -- 72
 num.names$ -- 12
-pop$ -- 112
+pop$ -- 141
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 150
+skip$ -- 159
 stack$ -- 0
 substring$ -- 279
 swap$ -- 82
@@ -41,8 +40,7 @@ text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 1
+warning$ -- 0
 while$ -- 38
-width$ -- 20
-write$ -- 159
-(There was 1 warning)
+width$ -- 23
+write$ -- 178

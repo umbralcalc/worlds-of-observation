@@ -1,17 +1,17 @@
 \providecommand{\href}[2]{#2}\begingroup\raggedright\begin{thebibliography}{10}
 
 \bibitem{golang}
-``The go programming language.'' \url{https://go.dev/}.
+``{The Go Programming Language}.'' \url{https://go.dev/}.
 
 \bibitem{pythonlang}
-``The python programming language.'' \url{https://www.python.org/}.
+``{The Python Programming Language}.'' \url{https://www.python.org/}.
 
 \bibitem{diffusingideasbookgithub}
-``The diffusing ideas github repository.''
+``{The Diffusing Ideas GitHub Repository}.''
   \url{https://github.com/umbralcalc/diffusing-ideas}.
 
 \bibitem{mitlicense}
-``Open source initiative: Mit license.''
+``{Open Source Initiative: MIT License}.''
   \url{https://opensource.org/licenses/MIT}.
 
 \bibitem{van1992stochastic}
@@ -26,7 +26,7 @@ H.~Risken, \emph{Fokker-planck equation},  in \emph{The Fokker-Planck
 \bibitem{rog-will-2000}
 L.~Rogers and D.~Williams, \emph{Diffusions, Markov Processes and Martingales
   2: Ito Calculus}, vol.~1, pp.~xiv+480.
-\newblock 04, 2000.
+\newblock Cambridge University Press, 04, 2000.
 \newblock 10.1017/CBO9781107590120.
 
 \bibitem{decreusefond1999stochastic}
@@ -64,8 +64,22 @@ K.~P. Murphy, \emph{Machine learning: a probabilistic perspective}.
 D.~Brandwood, \emph{Fourier transforms in radar and signal processing}.
 \newblock Artech House, 2012.
 
+\bibitem{simpy}
+``{SimPy: a process-based discrete-event simulation framework}.''
+  \url{https://gitlab.com/team-simpy/simpy/}.
+
+\bibitem{stospa}
+``{StoSpa: A C++ package for running stochastic simulations to generate sample
+  paths for reaction-diffusion master equation}.''
+  \url{https://github.com/BartoszBartmanski/StoSpa}.
+
+\bibitem{flamegpu}
+``{FLAME GPU: A GPU accelerated agent-based simulation library for domain
+  independent complex systems simulation}.''
+  \url{https://github.com/FLAMEGPU/FLAMEGPU2/}.
+
 \bibitem{goroutines}
-``A tour of go: Goroutines.'' \url{https://go.dev/tour/concurrency/1}.
+``{A Tour of Go: Goroutines}.'' \url{https://go.dev/tour/concurrency/1}.
 
 \bibitem{ye2015equation}
 H.~Ye, R.~J. Beamish, S.~M. Glaser, S.~C. Grant, C.-h. Hsieh, L.~J. Richards
