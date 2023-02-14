@@ -415,14 +415,14 @@ For convenience, it seems sensible to also make the outputs from stochadex runs 
 
 In summary, I've put together a schematic of data types and their relationships in Fig.~\ref{fig:data-types-design}. In this diagram there is some indication of the data type that I propose to store each piece information in (in Go syntax), and the diagram as a whole should serve as a useful guide to the basic structure of configuration files for the stochadex.
 
-It's clear that in order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history. But let's return to the point I made earlier about how the performance of such an algorithm will depend on how large the state history matrix $X$ needs to be in order to fully describe the desired system. The key bit of the algorithm design that isn't so straightforward is how to sucessfully split this state history up into separate partitions in memory while still enabling them to communicate effectively with each other. Other generalised simulation frameworks --- such as SimPy~\cite{simpy}, StoSpa~\cite{stospa} and FLAME GPU~\cite{flamegpu} --- have all approached this problem in different ways, and with different software architectures.
+It's clear that in order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history. But let's now return to the point I made earlier about how the performance of such an algorithm will depend on the size of the state history matrix $X$. The key bit of the algorithm design that isn't so straightforward is: how do we sucessfully split this state history up into separate partitions in memory while still enabling them to communicate effectively with each other? Other generalised simulation frameworks --- such as SimPy~\cite{simpy}, StoSpa~\cite{stospa} and FLAME GPU~\cite{flamegpu} --- have all approached this problem in different ways, and with different software architectures. 
 
-In Fig.~\ref{fig:loop-design} I've illustrated what a loop involving two separate state paritions looks like in the stochadex simulator. Each parition is handled by concurrently running execution threads of the same process, while a separate process is used to handle the outputs from the algorithm. While this diagram illustrates only a single use for multiple processes, it's obviously true that we may run many of these whole diagrams at once on a multicore machine to generate a batch of independent ensembles if necessary.
+In Fig.~\ref{fig:loop-design} I've illustrated what a loop involving two separate state partitions looks like in the stochadex simulator. Each parition is handled by concurrently running execution threads of the same process, while a separate process is used to handle the outputs from the algorithm. While this diagram illustrates only a single use for multiple processes, it's obviously true that we may run many of these whole diagrams at once on a multicore machine to generate a batch of independent ensembles if necessary.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=15cm]{images/stochadex-loop.drawio.png}
-\caption{Write software design diagrams}
+\caption{A loop of the stochadex simulation algorithm with two state partitions.}
 \label{fig:loop-design}
 \end{figure}
 
