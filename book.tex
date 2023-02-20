@@ -124,7 +124,7 @@ No quest would be complete without a guide, so I think this introduction should 
 
 \section{\sffamily Computational formalism}
 
-Before we dive into software design of the stochadex, we need to mathematically define the general computational approach that we're going to take. Because the language of stochastic processes is primarily mathematics, I'd argue this step is essential in enabling us to describe as general a set of phenomena as possible. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
+Before we dive into software design of the stochadex, we need to mathematically define the general computational approach that we're going to take. Because the language of stochastic processes is primarily mathematics, I'd argue this step is essential in enabling a really general description. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
 %%
 \begin{align}
 X^{i}_{{\sf t}+1} &= F^{i}_{{\sf t}+1}(X',{\sf t}) \,, \label{eq:x-step-def}
@@ -499,7 +499,7 @@ Now that the design of the algorithm and its basic data types have been outlined
 
 \section{\sffamily A large-scale Lotka-Volterra model}
 
-Inspired by the empirical dynamical modelling approach to sockeye salmon in~\cite{ye2015equation}, but also desiring a generative model which has some link to the classic causal models promoted by mathematical ecology; the goal here is to create and calibrate a stochastic model which predicts the fish counts, weights, lengths and ages for each species in each area based on the past system states. To do this, we will combine some well-known models from mathematical ecology with supervised learning.
+Inspired by the empirical dynamical modelling approach to sockeye salmon in Ref.~\cite{ye2015equation}, but also desiring a generative model which has some link to the classic causal models promoted by mathematical ecology; the goal here is to create and calibrate a stochastic model which predicts the fish counts, weights, lengths and ages for each species in each area based on the past system states. To do this, we will combine some well-known models from mathematical ecology with supervised learning.
 
 The one-step master equation for the proposed stochastic simulation is given implictly by
 
@@ -522,7 +522,7 @@ The famous Lotka-Volterra system, with some modficiations for fishing and a larg
 
 where: $\Lambda_{i}(n_{i}) = \tilde{\Lambda_{i}}n_{i}e^{-\lambda_i(n_{i}-1)}$ is the density-dependent birth rate; $\mu_{i}$ is the species death rate; $\alpha_{i}$ is the increase in the baseline birth rate per fish caused by the increase in prey population; $\beta_{i}$ is the rate per fish of predation of the species; and $\gamma_{i}$ accounts for the rate of recreational fishing per fish of the species. To approach the present data-driven simulation problem, we're going to generalise this model by training ${\cal T}^{+}_{i}(\dots, n_i, \dots, {\sf f}, t)$ and ${\cal T}^{-}_{i}(\dots, n_i, \dots, {\sf f}, t)$ directly from the data and generated features.
 
-Look into the likelihood from, e.g., an electrofishing survey such as in~\cite{envagency2015}...
+Look into the likelihood from, e.g., an electrofishing survey such as in Ref.~\cite{envagency2015}...
 
 \begin{align}
 {\sf Likelihood} &= \sum_{{\sf data}}{\rm NB}\big[{\sf data};w_{i,{\sf survey}}\langle n_i(t_{{\sf data}})\rangle,k_{i,{\sf survey}}\big] \,,

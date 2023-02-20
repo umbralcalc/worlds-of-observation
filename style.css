@@ -1,0 +1,76 @@
+@font-face {
+    font-family: ComputerModernRoman;
+    src: url("cmunrm.ttf");
+}
+
+@font-face {
+    font-family: ComputerModernBold;
+    src: url("cmunsx.ttf");
+}
+
+body {
+    font-family: ComputerModernRoman;
+    color: black;
+    margin-top: 100px;
+    margin-bottom: 100px;
+    margin-right: 250px;
+    margin-left: 250px;
+    font-size: 18px;
+}
+
+h1, h2, h3, .author {
+    font-family: ComputerModernBold;
+    color: black;
+}
+
+strong {
+    font-family: ComputerModernBold;
+    color: black;
+    text-align: justify;
+}
+
+p {
+    text-align: justify;
+}
+
+.title {
+    text-align: center;
+}
+
+.subtitle {
+    color: grey;
+    text-align: center;
+}
+
+.author {
+    text-align: center;
+}
+
+
+a:link {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+a:active {
+    text-decoration: none;
+}
+  
+img {
+    display: block;
+    margin: 0 auto;
+    width: 40%;
+}
+
+figcaption {
+    display: block;
+    margin: 0 auto;
+    width: 40%;
+}
