@@ -168,9 +168,9 @@ where: $i$ is an index for the dimensions of the `state' space; ${\sf t}$ is the
 The basic computational idea here is illustrated in Fig.~\ref{fig:fundamental-loop}; we iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. In Go you could easily write something with the same idea in it, and the code would probably look like this.
 
 \begin{lstlisting}[language=Go]
-type StateElement float64
-var StateVector   []*StateElement
-var StateHistory  []*StateVector
+type StateElement  float64
+var  StateVector   []*StateElement
+var  StateHistory  []*StateVector
 
 // iterate the state history forward in time by one step
 func IterationFormula(stateHistory *StateHistory) *StateVector {
