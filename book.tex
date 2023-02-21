@@ -41,13 +41,14 @@
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{cadmiumorange}{rgb}{0.93, 0.53, 0.18}
 
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},   
     commentstyle=\color{codegreen},
     keywordstyle=\color{codepurple},
     numberstyle=\tiny\color{codegray},
-    stringstyle=\color{orange},
+    stringstyle=\color{cadmiumorange},
     basicstyle=\ttfamily\footnotesize,
     breakatwhitespace=false,         
     breaklines=true,                 
@@ -168,12 +169,15 @@ where: $i$ is an index for the dimensions of the `state' space; ${\sf t}$ is the
 The basic computational idea here is illustrated in Fig.~\ref{fig:fundamental-loop}; we iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. In Go you could easily write something with the same idea in it, and the code would probably look like this.
 
 \begin{lstlisting}[language=Go]
-type StateElement  float64
-var  StateVector   []*StateElement
-var  StateHistory  []*StateVector
+type StateElement float64
+type StateVector  []StateElement
+type StateHistory []StateVector
 
 // iterate the state history forward in time by one step
-func IterationFormula(stateHistory *StateHistory) *StateVector {
+func IterationFormula(
+    stateHistory StateHistory, 
+    timeStepNumber TimeStepNumber,
+) StateVector {
     for t, stateVector := range stateHistory {
         for i, stateElement := range stateVector {
             // do something
@@ -194,27 +198,27 @@ t({\sf t}) &= \sum^{{\sf t}}_{{\sf t}'=0}\delta t({\sf t}') \label{eq:t-steps-su
 This seems a lot of effort, no? Well it's important to remember that our steps in continuous time may not be constant, so by defining the $\delta t({\sf t})$ function and summing over it we can enable this flexibility in the computation. In case the summation notation is no fun for programmers; in Go we're implicitly doing this.
 
 \begin{lstlisting}[language=Go]
-  type TimeStepNumber   int
-  
-  // both below are in some unit, e.g., seconds
-  type TimeIncrement    float64
-  type TotalElapsedTime float64
-  
-  // get the next increment from this step number forward
-  func TimeIncrementFunction(timeStepNumber TimeStepNumber) TimeIncrement {
-      // compute the next increment
-      return nextTimeIncrement
-  }
+type TimeStepNumber int
 
-  // compute the total time elapsed up to the input step number
-  func TotalTimeElapsedFunction(timeStepNumber TimeStepNumber) TotalElapsedTime {
-      totalElapsedTime := 0.0
-      for t := 0; t < timeStepNumber; t++ {
-          totalElapsedTime += TimeIncrementFunction(t)
-      }
-      return totalElapsedTime
-  }
-  \end{lstlisting}
+// both below are in some unit, e.g., seconds
+type TimeIncrement    float64
+type TotalElapsedTime float64
+
+// get the next increment from this step number forward
+func TimeIncrementFunction(timeStepNumber TimeStepNumber) TimeIncrement {
+    // compute the next increment
+    return nextTimeIncrement
+}
+
+// compute the total time elapsed up to the input step number
+func TotalTimeElapsedFunction(timeStepNumber TimeStepNumber) TotalElapsedTime {
+    totalElapsedTime := 0.0
+    for t := 0; t < timeStepNumber; t++ {
+        totalElapsedTime += TimeIncrementFunction(t)
+    }
+    return totalElapsedTime
+}
+\end{lstlisting}
 
 So, now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, it is frequently possible to split $F$ up into deteministic (denoted $D$) and stochastic (denoted $S$) matrix-valued functions like so
 %%
@@ -236,7 +240,45 @@ One draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distributio
 P^i_{{\sf t}+1}(x) &= {\sf NormalPDF}[x^i;0,\delta t({\sf t}+1)] \,.
 \end{align}
 %%
-Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension.
+Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension. In Go, the Wiener process can be represented within our formalism like this.
+
+\begin{lstlisting}[language=Go]
+import (
+    "math"
+    "math/rand"
+)
+
+type TimeStepNumber int
+
+type StateElement float64
+type StateVector  []StateElement
+type StateHistory []StateVector
+
+// generate a new Wiener process sample for a state element
+func NewWienerProcessSample(timeStepNumber TimeStepNumber) StateElement {
+    // use the time increment function we defined earlier
+    timeIncrement := TimeIncrementFunction(timeStepNumber)
+    // multiply by the square-root here as 
+    // it is proportional to the standard deviation
+    value := math.Sqrt(timeIncrement) * rand.NormFloat64()
+    return StateElement(value)
+}
+
+// iterate the state history forward in time by one step
+func IterationFormula(
+    stateHistory StateHistory, 
+    timeStepNumber TimeStepNumber,
+) StateVector {
+    stateVector := stateHistory[0]
+    newestStateVector := make(StateVector, 0)
+    // note that we don't care about the history in this case = Markovian
+    for _ = range stateVector {
+        sample := NewWienerProcessSample(timeStepNumber)
+        newestStateVector = append(newestStateVector, sample)
+    }
+    return newestStateVector
+}
+\end{lstlisting}
 
 In another example, to model \emph{geometric Brownian motion noise} we would simply have to multiply $X^i_{\sf t}$ to the Wiener process like so
 %%
