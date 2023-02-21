@@ -16,6 +16,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{listings}
 \usepackage{appendix}
 \usepackage{enumitem}
 \usepackage{bm}
@@ -35,6 +36,31 @@
             linkcolor=blue,
             urlcolor=blue,
             citecolor=blue]{hyperref}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{orange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
 
 \sloppy
 \usepackage{tikz, lipsum}% http://ctan.org/pkg/{pgf,lipsum}
@@ -139,7 +165,25 @@ where: $i$ is an index for the dimensions of the `state' space; ${\sf t}$ is the
 \label{fig:fundamental-loop}
 \end{figure}
 
-The basic computational idea here is illustrated in Fig.~\ref{fig:fundamental-loop}; we iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. Pretty simple! But why go to all this trouble of storing matrix inputs for previous values of the same process? It's true that this is mostly redundant for \emph{Markovian} phenomena, i.e., processes where their only memory of their history is the most recent value they took. However, for a large class of stochastic processes a full memory\footnote{Or memory at least within some window.} of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process as well.
+The basic computational idea here is illustrated in Fig.~\ref{fig:fundamental-loop}; we iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. In Go you could easily write something with the same idea in it, and the code would probably look like this.
+
+\begin{lstlisting}[language=Go]
+type StateElement float64
+var StateVector   []*StateElement
+var StateHistory  []*StateVector
+
+// iterate the state history forward in time by one step
+func IterationFormula(stateHistory *StateHistory) *StateVector {
+    for t, stateVector := range stateHistory {
+        for i, stateElement := range stateVector {
+            // do something
+        }
+    }
+    return newestStateVector
+}
+\end{lstlisting}
+
+Pretty simple! But why go to all this trouble of storing matrix inputs for previous values of the same process? It's true that this is mostly redundant for \emph{Markovian} phenomena, i.e., processes where their only memory of their history is the most recent value they took. However, for a large class of stochastic processes a full memory\footnote{Or memory at least within some window.} of past values is essential to consistently construct the sample paths moving forward. This is true in particular for \emph{non-Markovian} phenomena, where the latest values don't just depend on the immediately previous ones but can depend on values which occured much earlier in the process as well.
 
 For more complex physical models and integrators, the distinct notions of `numerical timestep' and `total elapsed continuous time' will crop up quite frequently. Hence, before moving on further details, it will be important to define the total elapsed time variable $t({\sf t})$ for processes which are defined in continuous time. Assuming that we have already defined some function $\delta t({\sf t})$ which returns the specific change in continuous time that corresponds to the step ${\sf t}-1 \rightarrow {\sf t}$, we will always be able to compute the total elapsed time through the relation
 %%
@@ -147,7 +191,30 @@ For more complex physical models and integrators, the distinct notions of `numer
 t({\sf t}) &= \sum^{{\sf t}}_{{\sf t}'=0}\delta t({\sf t}') \label{eq:t-steps-sum} \,.
 \end{align}
 %%
-This seems a lot of effort, no? Well it's important to remember that our steps in continuous time may not be constant, so by defining the $\delta t({\sf t})$ function and summing over it we can enable this flexibility in the computation.
+This seems a lot of effort, no? Well it's important to remember that our steps in continuous time may not be constant, so by defining the $\delta t({\sf t})$ function and summing over it we can enable this flexibility in the computation. In case the summation notation is no fun for programmers; in Go we're implicitly doing this.
+
+\begin{lstlisting}[language=Go]
+  type TimeStepNumber   int
+  
+  // both below are in some unit, e.g., seconds
+  type TimeIncrement    float64
+  type TotalElapsedTime float64
+  
+  // get the next increment from this step number forward
+  func TimeIncrementFunction(timeStepNumber TimeStepNumber) TimeIncrement {
+      // compute the next increment
+      return nextTimeIncrement
+  }
+
+  // compute the total time elapsed up to the input step number
+  func TotalTimeElapsedFunction(timeStepNumber TimeStepNumber) TotalElapsedTime {
+      totalElapsedTime := 0.0
+      for t := 0; t < timeStepNumber; t++ {
+          totalElapsedTime += TimeIncrementFunction(t)
+      }
+      return totalElapsedTime
+  }
+  \end{lstlisting}
 
 So, now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, it is frequently possible to split $F$ up into deteministic (denoted $D$) and stochastic (denoted $S$) matrix-valued functions like so
 %%
