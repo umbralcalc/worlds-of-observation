@@ -254,8 +254,8 @@ type StateElement float64
 type StateVector  []StateElement
 type StateHistory []StateVector
 
-// generate a new Wiener process sample for a state element
-func NewWienerProcessSample(timeStepNumber TimeStepNumber) StateElement {
+// generate a new Wiener process increment for a state element
+func NewWienerProcessIncrement(timeStepNumber TimeStepNumber) StateElement {
     // use the time increment function we defined earlier
     timeIncrement := TimeIncrementFunction(timeStepNumber)
     // multiply by the square-root here as 
@@ -264,19 +264,20 @@ func NewWienerProcessSample(timeStepNumber TimeStepNumber) StateElement {
     return StateElement(value)
 }
 
-// iterate the state history forward in time by one step
-func IterationFormula(
+// returns the state vector from the S(X',t) function we defined 
+// in the main text above
+func SFunction(
     stateHistory StateHistory, 
     timeStepNumber TimeStepNumber,
 ) StateVector {
     stateVector := stateHistory[0]
-    newestStateVector := make(StateVector, 0)
+    sFunctionValue := make(StateVector, 0)
     // note that we don't care about the history in this case = Markovian
     for _ = range stateVector {
-        sample := NewWienerProcessSample(timeStepNumber)
-        newestStateVector = append(newestStateVector, sample)
+        increment := NewWienerProcessIncrement(timeStepNumber)
+        sFunctionValue = append(sFunctionValue, increment)
     }
-    return newestStateVector
+    return sFunctionValue
 }
 \end{lstlisting}
 
@@ -286,16 +287,58 @@ In another example, to model \emph{geometric Brownian motion noise} we would sim
 & S^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t}(W^i_{{\sf t}+1}-W^i_{\sf t})\label{eq:gbm} \,.
 \end{align}
 %%
-Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{{\sf t}+1}(X',{\sf t}) = (X^i_{{\sf t}+1}+X^i_{\sf t})(W^i_{{\sf t}+1}-W^i_{\sf t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}.
+Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{{\sf t}+1}(X',{\sf t}) = (X^i_{{\sf t}+1}+X^i_{\sf t})(W^i_{{\sf t}+1}-W^i_{\sf t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}. The Go code for any of these should hoepfully be fairly straightforward to deduce based on the lines I've already written above.
 
-We can imagine even more general processes that are still Markovian. One example of these in a single-dimension state space would be
+We can imagine even more general processes that are still Markovian. One example of these in a single-dimension state space would be to define the noise through some general function of the Wiener process like so
 %%
 \begin{align}
 S^0_{{\sf t}+1}(X',{\sf t}) &= g[W^0_{{\sf t}+1},t({\sf t}+1)]-g[W^0_{\sf t}, t({\sf t})] \\
 &= \bigg[ \frac{\partial g}{\partial t} + \frac{1}{2}\frac{\partial^2 g}{\partial x^2} \bigg] \delta t ({\sf t}+1) + \frac{\partial g}{\partial x} (W^0_{{\sf t}+1}-W^0_{\sf t}) \label{eq:general-wiener}\,,
 \end{align}
 %%
-where $g(x,t)$ is some continuous function of its arguments which has been expanded out with Itô's Lemma on the second line. Note also that the computations in Eq.~(\ref{eq:general-wiener}) could be performed with numerical derivatives in principle if the function were extremely complicated.
+where $g(x,t)$ is some continuous function of its arguments which has been expanded out with Itô's Lemma on the second line. Note also that the computations in Eq.~(\ref{eq:general-wiener}) could be performed with numerical derivatives in principle, even if the function were extremely complicated. This is unlikely to be the best way to describe the process of interest, however, the mathematical expressions above can still be made a bit more meaningful to the programmer in this way. The code would probably look something like this.
+
+\begin{lstlisting}[language=Go]
+// some function
+func G(wienerProcessSample float64, timeStepNumber TimeStepNumber) float64 {
+    // return something
+}
+
+// discretely represents the dg/dt expression in the equation above
+func DgDt(
+    newWienerProcessSample float64, 
+    previousWienerProcessSample float64,
+    timeStepNumber TimeStepNumber,
+) float64 {
+    return (G(newWienerProcessSample, timeStepNumber) - 
+        G(previousWienerProcessSample, timeStepNumber)) / 
+        TimeIncrementFunction(timeStepNumber)
+}
+
+// discretely represents the dg/dx expression in the equation above
+func DgDx(
+    newWienerProcessSample float64, 
+    previousWienerProcessSample float64,
+    timeStepNumber TimeStepNumber,
+) float64 {
+    return (G(newWienerProcessSample, timeStepNumber) - 
+        G(previousWienerProcessSample, timeStepNumber)) / 
+        (newWienerProcessSample - previousWienerProcessSample)
+}
+
+// discretely represents the d^2g/dx^2 expression in the equation above
+func D2gDx2(
+    // newDgDx and previousDgDx could be passed in here
+    newWienerProcessSample float64, 
+    previousWienerProcessSample float64,
+    timeStepNumber TimeStepNumber,
+) float64 {
+    // newDgDx and previousDgDx are the result of applying the function 
+    // for dg/dx defined above on two different timesteps
+    return (newDgDx - previousDgDx) / 
+        (newWienerProcessSample - previousWienerProcessSample)
+}
+\end{lstlisting}
 
 Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion} $[B_{H}]_{\sf t}$ with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process in one of our state space dimensions by modifying a standard Wiener process like so
 %%
