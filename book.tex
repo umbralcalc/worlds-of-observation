@@ -121,7 +121,7 @@
 
 The book accompanies a lot of new open-source scientific software written predominantly in Go~\cite{golang}, with a little Python~\cite{pythonlang} to top it off. A major motivation for creating these new tools is to prepare a foundation of code from which to develop new and more complex applications. I also hope that the resulting framework will enable anyone to explore and study new phenomena effectively, regardless of their scientific background.
 
-The need to properly test all this software has also provided a wonderful excuse to study and play with an extensive range of mathematical toy models. I've chosen these models based on a fairly broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. However, I've often found that mathematical formalities can obscure the computations that a programmer must implement. So, while I've tried to be as ambitious as possible with the level of technical sophistication in these models, I've also tried to write the expressions in a computer-friendly way where feasible.\footnote{For example, thinking more in terms of `matrices' and less about `operators'.}
+The need to properly test all this software has also provided a wonderful excuse to study and play with an extensive range of mathematical toy models. I've chosen these models based on a fairly broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. However, I've often found that mathematical formalities can obscure the computations that a programmer must implement. So, while I've tried to be as ambitious as possible with the level of technical sophistication in these models, I've also tried to write the expressions in a computer-friendly way where feasible\footnote{For example, I'll typically be thinking more in terms of `matrices' and less about `operators'.} and added code snippets throughout.
 
 A quick note on the code: any software that I describe in this book (including the software which compiles the book itself~\cite{diffusingideasbookgithub}) will always be shared under a MIT License~\cite{mitlicense} in a public Git repository.\footnote{The repositories will always be somewhere on this list: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though I apologise in advance if I don't follow these up very quickly as all of this work has to be conducted independently in free time, outside of work hours.
 
@@ -248,12 +248,6 @@ import (
     "math/rand"
 )
 
-type TimeStepNumber int
-
-type StateElement float64
-type StateVector  []StateElement
-type StateHistory []StateVector
-
 // generate a new Wiener process increment for a state element
 func NewWienerProcessIncrement(timeStepNumber TimeStepNumber) StateElement {
     // use the time increment function we defined earlier
@@ -312,7 +306,7 @@ func DgDt(
 ) float64 {
     return (G(newWienerProcessSample, timeStepNumber) - 
         G(previousWienerProcessSample, timeStepNumber)) / 
-        TimeIncrementFunction(timeStepNumber)
+        float64(TimeIncrementFunction(timeStepNumber))
 }
 
 // discretely represents the dg/dx expression in the equation above
@@ -343,10 +337,45 @@ func D2gDx2(
 Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion} $[B_{H}]_{\sf t}$ with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process in one of our state space dimensions by modifying a standard Wiener process like so
 %%
 \begin{align}
-S^{0}_{{\sf t}+1}(X',{\sf t}) &= \frac{(W^0_{{\sf t}+1} - W^0_{\sf t})}{\delta t({\sf t}+1)}\int^{t({\sf t}+1)}_{t({\sf t})}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
+S^{0}_{{\sf t}+1}(X',{\sf t}) &= \frac{(W^0_{{\sf t}+1} - W^0_{\sf t})}{\delta t({\sf t})}\int^{t({\sf t}+1)}_{t({\sf t})}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
 \end{align}
 %%
-where $S^{0}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}-[B_{H}]_{{\sf t}}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). In the expression above ${}_2F_1$ and $\Gamma$ are the ordinary hypergeometric and gamma functions, respectively.
+where $S^{0}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}-[B_{H}]_{{\sf t}}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). In the expression above ${}_2F_1$ and $\Gamma$ are the ordinary hypergeometric and gamma functions, respectively. A discretised form of this integral is written below in Go to try and disentangle some of the complexity in the expression.
+
+\begin{lstlisting}[language=Go]
+import "scientificgo.org/special"
+
+type HurstExponent float64
+
+// computes the integral term in the fractional Brownian motion process
+// defined above using some scientific libraries
+func ComputeTheIntegral(
+	currentTime TotalElapsedTime,
+	nextTime TotalElapsedTime,
+	hurstExponent HurstExponent,
+	numberOfIntegrationSteps int,
+) float64 {
+	currentT := float64(currentTime)
+	nextT := float64(nextTime)
+	integralStepSize := nextT - currentT/float64(numberOfIntegrationSteps)
+	h := float64(hurstExponent)
+	a := []float64{h - 0.5, 0.5 - h}
+	b := []float64{h + 0.5}
+	integralValue := 0.0
+	// implements the trapezium rule in a loop over the steps
+	// between the current and the next point in time
+	for t := 0; t < numberOfIntegrationSteps; t++ {
+		t1 := currentT + float64(t)*integralStepSize
+		t2 := t1 + integralStepSize
+		functionValue1 := (math.Pow(t1-currentT, h-0.5) / math.Gamma(h+0.5)) *
+			special.HypPFQ(a, b, 1.0-t1/currentT)
+		functionValue2 := (math.Pow(t2-currentT, h-0.5) / math.Gamma(h+0.5)) *
+			special.HypPFQ(a, b, 1.0-t2/currentT)
+		integralValue += 0.5 * (functionValue1 + functionValue2) * integralStepSize
+	}
+	return integralValue
+}
+\end{lstlisting}
 
 So far we have mostly been discussing noises with continuous sample paths, but we can easily adapt our computation to discontinuous sample paths as well. For instance, \emph{Poisson process noises} would generally take the form
 %%
