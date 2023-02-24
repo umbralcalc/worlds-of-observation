@@ -19,10 +19,22 @@ type TotalElapsedTime float64
 
 type HurstExponent float64
 
+type SmallTimeInterval float64
+
 // get the next increment from this step number forward
-func TimeIncrementFunction(timeStepNumber TimeStepNumber) TimeIncrement {
-	// compute the next increment
+func TimeIncrementFunction(
+	timeStepNumber TimeStepNumber,
+) TimeIncrement {
+    // compute the next increment
 	return nextTimeIncrement
+}
+
+// get the next increment from this step number forward
+func ExpDistributedTimeIncrementFunction(
+	smallTimeInterval SmallTimeInterval,
+) TimeIncrement {
+    nextTimeIncrement := float64(smallTimeInterval) * rand.ExpFloat64()
+	return TimeIncrement(nextTimeIncrement)
 }
 
 // compute the total time elapsed up to the input step number
@@ -113,9 +125,33 @@ func ComputeTheIntegral(
 	return integralValue
 }
 
+// returns the time-inhomogeneous Poisson process S(X',t) term 
+func SFunctionInhomogeneousPoissonProcess(
+	stateHistory StateHistory,
+	timeStepNumber TimeStepNumber,
+) StateVector {
+    var smallTimeInterval SmallTimeInterval
+
+	// notice how the noise is also Markovian here too
+	sFunctionValue := make(StateVector, 0)
+	for element = range stateVector {
+		timeIncrement := ExpDistributedTimeIncrementFunction(smallTimeInterval)
+		// specify an arbitrary function of time for the event rate here
+		eventRateLambda := EventRateLambdaFunction(timeStepNumber)
+		element := StateElement(0.0)
+		prob := eventRateLambda / 
+		    (eventRateLambda + 1.0/float64(timeIncrement))
+		if rand.Float64() < prob {
+		    element = StateElement(1.0)
+		}
+		sFunctionValue = append(sFunctionValue, element)
+	}
+	return sFunctionValue
+}
+
 // returns the state vector from the S(X',t) function we defined
 // in the main text above
-func SFunction(
+func SFunctionWienerProcess(
 	stateHistory StateHistory,
 	timeStepNumber TimeStepNumber,
 ) StateVector {
@@ -134,3 +170,4 @@ func SFunction(
 	}
 	return sFunctionValue
 }
+

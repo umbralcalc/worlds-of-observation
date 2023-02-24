@@ -1,0 +1,39 @@
+// some function
+func G(wienerProcessSample float64, timeStepNumber TimeStepNumber) float64 {
+    // return something
+}
+
+// discretely represents the dg/dt expression in the equation above
+func DgDt(
+    newWienerProcessSample float64,
+    previousWienerProcessSample float64,
+    timeStepNumber TimeStepNumber,
+) float64 {
+    return (G(newWienerProcessSample, timeStepNumber) -
+        G(previousWienerProcessSample, timeStepNumber)) /
+        float64(TimeIncrementFunction(timeStepNumber))
+}
+
+// discretely represents the dg/dx expression in the equation above
+func DgDx(
+    newWienerProcessSample float64,
+    previousWienerProcessSample float64,
+    timeStepNumber TimeStepNumber,
+) float64 {
+    return (G(newWienerProcessSample, timeStepNumber) -
+        G(previousWienerProcessSample, timeStepNumber)) /
+        (newWienerProcessSample - previousWienerProcessSample)
+}
+
+// discretely represents the d^2g/dx^2 expression in the equation above
+func D2gDx2(
+    // newDgDx and previousDgDx could be passed in here
+    newWienerProcessSample float64,
+    previousWienerProcessSample float64,
+    timeStepNumber TimeStepNumber,
+) float64 {
+    // newDgDx and previousDgDx are the result of applying the function
+    // for dg/dx defined above on two different timesteps
+    return (newDgDx - previousDgDx) /
+        (newWienerProcessSample - previousWienerProcessSample)
+}
