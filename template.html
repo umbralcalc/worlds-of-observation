@@ -30,16 +30,13 @@ $endfor$
 <div class="w3-top">
   <div class="w3-bar w3-light-grey w3-card w3-left-align w3-large">
     <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-light-grey" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
-    <a href="#" class="w3-bar-item w3-button w3-padding-large w3-white">Home</a>
-    <a href="https://github.com/umbralcalc/diffusing-ideas/raw/main/book.pdf" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Download The Book PDF</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding-large w3-white"><font color="grey">Home</font></a>
+    <a href="https://github.com/umbralcalc/diffusing-ideas/raw/main/book.pdf" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white"><font color="grey">Download The PDF</font></a>
   </div>
 
   <!-- Navbar on small screens -->
   <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large">
-    <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 1</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 2</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 3</a>
-    <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 4</a>
+    <a href="#" class="w3-bar-item w3-button w3-padding-large">Download The PDF</a>
   </div>
 </div>
 
@@ -63,16 +60,12 @@ $if(toc)$
 $if(toc-title)$
 <h2 id="$idprefix$toc-title">$toc-title$</h2>
 $endif$
-$table-of-contents$
 </nav>
 $endif$
 $body$
 $for(include-after)$
 $include-after$
 $endfor$
-<div class="w3-container w3-black w3-center w3-opacity w3-padding-64">
-  <h1 class="w3-margin w3-xlarge">Quote of the day: live life</h1>
-</div>
 <script>
 // Used to toggle the menu on small screens when clicking on the menu button
 function myFunction() {
@@ -82,6 +75,21 @@ function myFunction() {
   } else { 
     x.className = x.className.replace(" w3-show", "");
   }
+}
+</script>
+<script>
+var spans = document.getElementsByTagName('span');
+var l = spans.length;
+for (var i=0;i<l;i++) {
+  var spanClass = spans[i].getAttribute("class");
+  if ( spanClass === "math inline" ) {
+    console.log(spans[i].innerText) 
+    let labels = spans[i].innerText.match(/\label{(.*?)}/);
+    if (labels) {
+      var label = labels[1];
+      spans[i].innerText = spans[i].innerText.substring(0, spans[i].innerText.length - 2) + label + "\]"
+    }
+  } 
 }
 </script>
 </body>
