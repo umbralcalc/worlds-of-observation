@@ -7,4 +7,5 @@ pandoc book.tex \
 --template template \
 -o index.html \
 --csl ieee.csl \
---bibliography book.bib
+--bibliography book.bib;
+python3 tidy_html.py
