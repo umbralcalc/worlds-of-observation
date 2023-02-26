@@ -1,0 +1,9 @@
+repos:
+- repo: local
+  hooks:
+    - id: generate-html
+      name: generate-html
+      entry: generate_html.sh
+      language: script
+      types: [bash]
+      pass_filenames: false
