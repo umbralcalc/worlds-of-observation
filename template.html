@@ -11,7 +11,6 @@ $endif$
 $if(keywords)$
   <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$" />
 $endif$
-  <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
   <style>
     $styles.html()$
   </style>
@@ -55,13 +54,6 @@ $if(date)$
 $endif$
 </header>
 $endif$
-$if(toc)$
-<nav id="$idprefix$TOC" role="doc-toc">
-$if(toc-title)$
-<h2 id="$idprefix$toc-title">$toc-title$</h2>
-$endif$
-</nav>
-$endif$
 $body$
 $for(include-after)$
 $include-after$
@@ -75,21 +67,6 @@ function myFunction() {
   } else { 
     x.className = x.className.replace(" w3-show", "");
   }
-}
-</script>
-<script>
-var spans = document.getElementsByTagName('span');
-var l = spans.length;
-for (var i=0;i<l;i++) {
-  var spanClass = spans[i].getAttribute("class");
-  if ( spanClass === "math inline" ) {
-    console.log(spans[i].innerText) 
-    let labels = spans[i].innerText.match(/\label{(.*?)}/);
-    if (labels) {
-      var label = labels[1];
-      spans[i].innerText = spans[i].innerText.substring(0, spans[i].innerText.length - 2) + label + "\]"
-    }
-  } 
 }
 </script>
 </body>

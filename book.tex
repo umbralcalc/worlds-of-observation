@@ -103,7 +103,9 @@
 
 \makeatletter\@addtoreset{chapter}{part}\makeatother%
 
-\renewcommand\contentsname{}
+\renewcommand{\cfttoctitlefont}{\hfill\Huge\bfseries\sffamily}
+
+\renewcommand\contentsname{Table of contents}
 
 \definecolor{gray75}{gray}{0.75}
 
@@ -154,10 +156,7 @@ No quest would be complete without a guide, so I think this introduction should 
 \item[{\bfseries\sffamily Part 4.}]{How do we then optimise the answer to {\bfseries\sffamily Part 3} to achieve a specified control objective?} 
 \end{enumerate}
 
-
-
-\chapter*{Table of contents}
-\vspace*{-3cm}
+\newpage \ \newpage
 {\sffamily \tableofcontents}
 \mainmatter
 

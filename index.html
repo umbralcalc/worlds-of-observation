@@ -5,7 +5,6 @@
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="Robert J. Hardwick" />
-  <title>Diffusing Ideas</title>
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -125,7 +124,6 @@ The code to compile this book is open source and can be found in this repository
 <li><p><span>How do we simulate a general set of control policies to interact with the answer to <span><strong>Part 1</strong></span>?</span></p></li>
 <li><p><span>How do we then optimise the answer to <span><strong>Part 3</strong></span> to achieve a specified control objective?</span></p></li>
 </ol>
-<h2 class="unnumbered" id="table-of-contents">Table of contents</h2>
 <h1 id="part-1.-how-do-we-simulate-a-general-set-of-stochastic-phenomena">Part 1. <span> How do we simulate a general set of stochastic phenomena?</span></h1>
 <h2 id="building-a-generalised-simulator">Building a generalised simulator</h2>
 <p><span><strong>Concept.</strong></span> To design and build a generalised simulation engine that is able to generate samples from a ‘Pokédex’ of possible stochastic processes that a researcher might encounter. A ‘Pokédex’ here is just my fanciful description for a very general class of multidimensional stochastic processes that pop up everywhere in taming the mathematical wilds of real-world phenomena, and which also leads to a name for the software itself: the ‘stochadex’. With such a thing pre-built and self-contained, it can become the basis upon which to build generalised software solutions for a lot of different problems. For the mathematically-inclined, this chapter will require the introduction of a new formalism which we shall refer back to throughout the book. For the programmers, the public Git repository for the code that is described in this chapter can be found here: <a href="https://github.com/umbralcalc/stochadex">https://github.com/umbralcalc/stochadex</a>.</p>
@@ -557,21 +555,6 @@ function myFunction() {
   } else { 
     x.className = x.className.replace(" w3-show", "");
   }
-}
-</script>
-<script>
-var spans = document.getElementsByTagName('span');
-var l = spans.length;
-for (var i=0;i<l;i++) {
-  var spanClass = spans[i].getAttribute("class");
-  if ( spanClass === "math inline" ) {
-    console.log(spans[i].innerText) 
-    let labels = spans[i].innerText.match(/\label{(.*?)}/);
-    if (labels) {
-      var label = labels[1];
-      spans[i].innerText = spans[i].innerText.substring(0, spans[i].innerText.length - 2) + label + "\]"
-    }
-  } 
 }
 </script>
 </body>
