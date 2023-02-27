@@ -120,25 +120,6 @@
     </strong>
    </p>
   </header>
-  <hr/>
-  <hr/>
-  <p>
-   <br/>
-   <span>
-    <strong>
-     Diffusing Ideas
-    </strong>
-   </span>
-   <br/>
-   <span>
-    <strong>
-     Software, noise and building mathematical toys
-     <br/>
-    </strong>
-   </span>
-  </p>
-  <hr/>
-  <hr/>
   <p>
    <br/>
    <span>
@@ -319,7 +300,7 @@ X^{i}_{{\sf t}+1} &amp;= F^{i}_{{\sf t}+1}(X',{\sf t}) \,, \label{eq:x-step-def}
    <img alt="" id="fig:fundamental-loop" src="images/fundamental-loop.drawio.png" style="width:10cm"/>
    <figcaption>
     Graph representation of Eq. (
-    <a data-reference="eq:x-step-def" data-reference-type="ref" href="#eq:x-step-def">
+    <a data-reference="1" data-reference-type="ref" href="#1">
      1
     </a>
     ).
@@ -555,7 +536,7 @@ S^0_{{\sf t}+1}(X',{\sf t}) &amp;= g[W^0_{{\sf t}+1},t({\sf t}+1)]-g[W^0_{\sf t}
     \(g(x,t)\)
    </span>
    is some continuous function of its arguments which has been expanded out with Itô’s Lemma on the second line. Note also that the computations in Eq. (
-   <a data-reference="eq:general-wiener" data-reference-type="ref" href="#eq:general-wiener">
+   <a data-reference="7" data-reference-type="ref" href="#7">
     7
    </a>
    ) could be performed with numerical derivatives in principle, even if the function were extremely complicated. This is unlikely to be the best way to describe the process of interest, however, the mathematical expressions above can still be made a bit more meaningful to the programmer in this way. The code would probably look something like this.
@@ -625,7 +606,7 @@ S^{0}_{{\sf t}+1}(X',{\sf t}) &amp;= \frac{(W^0_{{\sf t}+1} - W^0_{\sf t})}{\del
     \(S^{0}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}-[B_{H}]_{{\sf t}}\)
    </span>
    . The integral in Eq. (
-   <a data-reference="eq:fbm" data-reference-type="ref" href="#eq:fbm">
+   <a data-reference="8" data-reference-type="ref" href="#8">
     8
    </a>
    ) can be approximated using an appropriate numerical procedure (like the trapezium rule). In the expression above
@@ -815,7 +796,7 @@ S^{1}_{{\sf t}+1}(X',{\sf t}) &amp;= [N_{S^{0}_{{\sf t}+1}}]^i_{{\sf t}+1}-[N_{S
    \[\begin{aligned}
 S^{i}_{{\sf t}+1}(X',{\sf t}) &amp;= [J_{\lambda}]^i_{{\sf t}+1}-[J_{\lambda}]^i_{\sf t}\,.\end{aligned}\tag{13}\]
    Note that the rejection method of Eq. (
-   <a data-reference="eq:rejection" data-reference-type="ref" href="#eq:rejection">
+   <a data-reference="11" data-reference-type="ref" href="#11">
     11
    </a>
    ) can be employed effectively to simulate any of these extensions as long as a sufficiently small
@@ -873,7 +854,7 @@ S^{1}_{{\sf t}+1}(X',{\sf t}) &amp;= \frac{1}{T}\sum^{{\sf t}}_{{\sf t}'=0}e^{-\
   </h3>
   <p>
    The general stochastic process that we defined with Eq. (
-   <a data-reference="eq:x-step-def" data-reference-type="ref" href="#eq:x-step-def">
+   <a data-reference="1" data-reference-type="ref" href="#1">
     1
    </a>
    ) also has an implicit
@@ -930,7 +911,7 @@ P_{{\sf t}+1}(x) &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega
     \(1/{\sf t}\)
    </span>
    in Eq. (
-   <a data-reference="eq:master-x-cont" data-reference-type="ref" href="#eq:master-x-cont">
+   <a data-reference="17" data-reference-type="ref" href="#17">
     17
    </a>
    ) is a normalisation factor — this just normalises the sum of all probabilities to 1 given that there is a sum over
@@ -954,7 +935,7 @@ P_{{\sf t}+1}(x) &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega
    <img alt="" id="fig:master-eqn" src="images/master-eq-graph.drawio.png" style="width:8cm"/>
    <figcaption>
     Graph representation of Eq. (
-    <a data-reference="eq:master-x-cont" data-reference-type="ref" href="#eq:master-x-cont">
+    <a data-reference="17" data-reference-type="ref" href="#17">
      17
     </a>
     ).
@@ -966,7 +947,7 @@ P_{{\sf t}+1}(x) &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega
     \(P_{({\sf t}+1){\sf t}'}(x,x')\)
    </span>
    ? One way to obtain this would be to extend Eq. (
-   <a data-reference="eq:master-x-cont" data-reference-type="ref" href="#eq:master-x-cont">
+   <a data-reference="17" data-reference-type="ref" href="#17">
     17
    </a>
    ) such that both matrix rows are marginalised over separately like so
@@ -974,11 +955,11 @@ P_{{\sf t}+1}(x) &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega
 &amp;P_{({\sf t}+1){\sf t}'}(x,x') = \nonumber \\
 &amp;\qquad \frac{1}{({\sf t}'-1){\sf t}}\sum_{{\sf t}''=0}^{{\sf t}}\sum_{{\sf t}'''=0}^{{\sf t}'-1}\int_{\omega_{{\sf t}''}}{\rm d}x''\int_{\omega_{{\sf t}'''}}{\rm d}x''' P_{{\sf t}''{\sf t}'''}(x'', x''') P_{({\sf t}+1){\sf t}''}(x\vert x'')P_{{\sf t}'{\sf t}'''}(x'\vert x''') \label{eq:joint-master-x-cont} \,.\end{aligned}\tag{19}\]
    Given Eqs. (
-   <a data-reference="eq:master-x-cont" data-reference-type="ref" href="#eq:master-x-cont">
+   <a data-reference="17" data-reference-type="ref" href="#17">
     17
    </a>
    ) and (
-   <a data-reference="eq:joint-master-x-cont" data-reference-type="ref" href="#eq:joint-master-x-cont">
+   <a data-reference="19" data-reference-type="ref" href="#19">
     19
    </a>
    ) it’s also possible to work out what the conditional probabilities would look like using the simple relation
@@ -987,7 +968,7 @@ P_{({\sf t}+1){\sf t}'}(x\vert x') &amp;= \frac{P_{({\sf t}+1){\sf t}'}(x,x')}{P
   </p>
   <p>
    The implicit notation in Eq. (
-   <a data-reference="eq:master-x-cont" data-reference-type="ref" href="#eq:master-x-cont">
+   <a data-reference="17" data-reference-type="ref" href="#17">
     17
    </a>
    ) can hide some staggering complexity. To analyse the system in more detail, we can also do a kind of Kramers-Moyal expansion
@@ -1007,11 +988,11 @@ P_{{\sf t}+1}(x) &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}P_{{\sf t}'}
 \alpha^i_{({\sf t}+1){\sf t}'}(x) &amp;=\int_{\omega_{{\sf t}'}} {\rm d}x'(x'-x)^iP_{({\sf t}+1){\sf t}'}(x'\vert x) \\
 \beta^{ij}_{({\sf t}+1){\sf t}'}(x) &amp;= \int_{\omega_{{\sf t}'}} {\rm d}x'(x'-x)^i(x'-x)^jP_{({\sf t}+1){\sf t}'}(x'\vert x) \,.\end{aligned}\tag{22}\]
    So the matrix notation of Eq. (
-   <a data-reference="eq:master-x-cont" data-reference-type="ref" href="#eq:master-x-cont">
+   <a data-reference="17" data-reference-type="ref" href="#17">
     17
    </a>
    ) can indeed hide a very complicated calculation. Truncating the expansion at second-order, Eq. (
-   <a data-reference="eq:master-x-cont-kramers-moyal" data-reference-type="ref" href="#eq:master-x-cont-kramers-moyal">
+   <a data-reference="21" data-reference-type="ref" href="#21">
     21
    </a>
    ) tells us that there can be first and second derivatives contributing to the flow of probability to each element of the row
@@ -1042,7 +1023,7 @@ P_{{\sf t}+1}(x) &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}P_{{\sf t}'}
    \[\begin{aligned}
 P_{{\sf t}+1}(x) - \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}P_{{\sf t}'}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\big[ P_{{\sf t}+1}(x) - P_{{\sf t}'}(x)\big] = - \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}J_{({\sf t}+1){\sf t}'}(x) \,.\end{aligned}\tag{23}\]
    By inspection of Eq. (
-   <a data-reference="eq:master-x-cont-kramers-moyal" data-reference-type="ref" href="#eq:master-x-cont-kramers-moyal">
+   <a data-reference="21" data-reference-type="ref" href="#21">
     21
    </a>
    ) we can therefore also deduce that
@@ -1090,7 +1071,7 @@ J^i_{({\sf t}+1){\sf t}'}(x) &amp;= \alpha^i_{({\sf t}+1){\sf t}'}(x)P_{{\sf t}'
    \[\begin{aligned}
 P_{{\sf t}+1}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} P_{{\sf t}'}(x) \,,\end{aligned}\tag{26}\]
    we can solve Eq. (
-   <a data-reference="eq:master-x-cont-kramers-moyal" data-reference-type="ref" href="#eq:master-x-cont-kramers-moyal">
+   <a data-reference="21" data-reference-type="ref" href="#21">
     21
    </a>
    ) to obtain the following stationary solution
@@ -1110,7 +1091,7 @@ P_{{\sf t}'}(x) &amp;= {\sf MultivariateNormalPDF}[x;\mu ({\sf t}'),\Sigma (\the
    <img alt="" id="fig:stat-sol-kramers-moyal-cond" src="images/gp-like-diag.drawio.png" style="width:8cm"/>
    <figcaption>
     Graph representation of the generative process implied by Eq. (
-    <a data-reference="eq:stat-sol-kramers-moyal-cond" data-reference-type="ref" href="#eq:stat-sol-kramers-moyal-cond">
+    <a data-reference="28" data-reference-type="ref" href="#28">
      28
     </a>
     ).
@@ -1118,11 +1099,11 @@ P_{{\sf t}'}(x) &amp;= {\sf MultivariateNormalPDF}[x;\mu ({\sf t}'),\Sigma (\the
   </figure>
   <p>
    It’s possible to take this derivation a bit further by expanding Eq. (
-   <a data-reference="eq:joint-master-x-cont" data-reference-type="ref" href="#eq:joint-master-x-cont">
+   <a data-reference="19" data-reference-type="ref" href="#19">
     19
    </a>
    ) in a similar fashion, truncating it to second-order, assuming only time-dependent terms and then solving it in the stationary limit. By plugging this solution (and its corresponding marginal distribution equivalent) into Eq. (
-   <a data-reference="eq:cond-master-x-cont" data-reference-type="ref" href="#eq:cond-master-x-cont">
+   <a data-reference="20" data-reference-type="ref" href="#20">
     20
    </a>
    ), it’s possible to get something that looks like this conditional distribution
@@ -1138,7 +1119,7 @@ P_{({\sf t}+1){\sf t}'}(x\vert x') &amp;\propto {\rm exp}\bigg\{ -\frac{1}{2}\su
     \(K^{-1}(\theta , {\sf t}+1,{\sf t}')\)
    </span>
    denotes taking its inverse. Eq. (
-   <a data-reference="eq:stat-sol-kramers-moyal-cond" data-reference-type="ref" href="#eq:stat-sol-kramers-moyal-cond">
+   <a data-reference="28" data-reference-type="ref" href="#28">
     28
    </a>
    ) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature
@@ -1169,14 +1150,14 @@ P_{({\sf t}+1){\sf t}'}(x\vert x') &amp;\propto {\rm exp}\bigg\{ -\frac{1}{2}\su
   </p>
   <p>
    What other processes can be described by Eq. (
-   <a data-reference="eq:master-x-cont" data-reference-type="ref" href="#eq:master-x-cont">
+   <a data-reference="17" data-reference-type="ref" href="#17">
     17
    </a>
    )? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
    \[\begin{aligned}
 P_{{\sf t}+1}(x) &amp;= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x') P_{({\sf t}+1){\sf t}}(x\vert x') \label{eq:master-x-cont-markov} \,.\end{aligned}\tag{29}\]
    It’s also easy to show that Eq. (
-   <a data-reference="eq:master-x-cont-kramers-moyal" data-reference-type="ref" href="#eq:master-x-cont-kramers-moyal">
+   <a data-reference="21" data-reference-type="ref" href="#21">
     21
    </a>
    ) naturally simplifies into the more usually applied Kramers-Moyal expansion when considering a Markovian process — you just remove the sum over
@@ -1191,7 +1172,7 @@ P_{{\sf t}+1}(x) &amp;= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x') P_{({\sf t}
   </p>
   <p>
    Note that an analog of Eq. (
-   <a data-reference="eq:master-x-cont" data-reference-type="ref" href="#eq:master-x-cont">
+   <a data-reference="17" data-reference-type="ref" href="#17">
     17
    </a>
    ) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
@@ -1259,7 +1240,7 @@ P_{{\sf t}+1}(x) &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t}\sum_{\omega_{
     \(a\cdot b = \sum_{\forall k}a^kb^k\)
    </span>
    . In principle, one can perform an approximative expansion on Eq. (
-   <a data-reference="eq:master-x-disc-char" data-reference-type="ref" href="#eq:master-x-disc-char">
+   <a data-reference="31" data-reference-type="ref" href="#31">
     31
    </a>
    ) like we did for continuous state spaces. This isn’t always the most practical way of analysing the system though.
@@ -1270,7 +1251,7 @@ P_{{\sf t}+1}(x) &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t}\sum_{\omega_{
     \(x\)
    </span>
    is just a vector of binary ‘on’ or ‘off’ states, Eq. (
-   <a data-reference="eq:master-x-disc" data-reference-type="ref" href="#eq:master-x-disc">
+   <a data-reference="30" data-reference-type="ref" href="#30">
     30
    </a>
    ) reduces to
@@ -1307,7 +1288,7 @@ P^i_{{\sf t}+1} &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P
   </h3>
   <p>
    So I’ve proposed a computational formalism and done a bit of analysis on it to demonstrate that it can cope with a variety of different stochastic phenomena. Now I think we’re ready to summarise what we want the stochadex software package to be able to do. But what’s so complicated about Eq. (
-   <a data-reference="eq:x-step-def" data-reference-type="ref" href="#eq:x-step-def">
+   <a data-reference="1" data-reference-type="ref" href="#1">
     1
    </a>
    )? Can’t we just implement an iterative algorithm with a single function? It’s true that the fundamental concept is very straightforward, but as I’ll discuss in due course; the stochadex needs to have a lot of configurable features so that it’s applicable in different situations. Ideally, the stochadex sampler should be designed to try and maintain a balance between performance and flexibility of utilisation.
@@ -1318,7 +1299,7 @@ P^i_{{\sf t}+1} &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P
     \(F\)
    </span>
    of Eq. (
-   <a data-reference="eq:x-step-def" data-reference-type="ref" href="#eq:x-step-def">
+   <a data-reference="1" data-reference-type="ref" href="#1">
     1
    </a>
    ) and the timestep function
@@ -1326,7 +1307,7 @@ P^i_{{\sf t}+1} &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P
     \(t\)
    </span>
    of Eq. (
-   <a data-reference="eq:t-steps-sum" data-reference-type="ref" href="#eq:t-steps-sum">
+   <a data-reference="2" data-reference-type="ref" href="#2">
     2
    </a>
    ) so that any process we want can be described. The point at which a simulation stops can also depend on some algorithm termination condition which the user should be able to specify up-front.
@@ -1371,7 +1352,7 @@ P^i_{{\sf t}+1} &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P
   </p>
   <p>
    It’s clear that in order to simulate Eq. (
-   <a data-reference="eq:x-step-def" data-reference-type="ref" href="#eq:x-step-def">
+   <a data-reference="1" data-reference-type="ref" href="#1">
     1
    </a>
    ), we need an interative algorithm which reapplies a user-specified function to the continually-updated history. But let’s now return to the point I made earlier about how the performance of such an algorithm will depend on the size of the state history matrix
@@ -2014,7 +1995,7 @@ P^i_{{\sf t}+1} &amp;= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P
        \(S^{i}_{{\sf t}+1}(X',{\sf t}) = (X^i_{{\sf t}+1}+X^i_{\sf t})(W^i_{{\sf t}+1}-W^i_{\sf t}) / 2\)
       </span>
       for Eq. (
-      <a data-reference="eq:gbm" data-reference-type="ref" href="#eq:gbm">
+      <a data-reference="6" data-reference-type="ref" href="#6">
        6
       </a>
       ).

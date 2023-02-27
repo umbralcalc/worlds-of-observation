@@ -468,13 +468,15 @@ S^{0}_{{\sf t}+1}(X',{\sf t}) &= \Lambda ({\sf t}+1) \\
 S^{1}_{{\sf t}+1}(X',{\sf t}) &= [N_{S^{0}_{{\sf t}+1}}]^i_{{\sf t}+1}-[N_{S^{0}_{{\sf t}}}]^i_{\sf t}\,.
 \end{align}
 %%
+This process could be simulated using the Go code we wrote for the time-inhomogeneous Poisson process above --- where we would just replace \texttt{EventRateLambdaFunction} with a function that generates the stochastic rate $\Lambda ({\sf t})$.
+
 Another extension is \emph{compound Poisson process noise}, where it's the count values $[N_{\lambda}]^i_{\sf t}$ which are replaced by independent samples $[J_{\lambda}]^i_{\sf t}$ from another probability distribution, i.e.,
 %%
 \begin{align}
 S^{i}_{{\sf t}+1}(X',{\sf t}) &= [J_{\lambda}]^i_{{\sf t}+1}-[J_{\lambda}]^i_{\sf t}\,.
 \end{align}
 %%
-Note that the rejection method of Eq.~(\ref{eq:rejection}) can be employed effectively to simulate any of these extensions as long as a sufficiently small $\tau$ is chosen.
+Note that the rejection method of Eq.~(\ref{eq:rejection}) can be employed effectively to simulate any of these extensions as long as a sufficiently small $\tau$ is chosen. Once again, the Go code we wrote above would be sufficient to simulate this process with one tweak: replace the allocation of the \texttt{element} variable to \texttt{StateElement(1.0)} on line number 36 with the output of a function which generates the $[J_{\lambda}]^i_{\sf t}$ samples.
 
 All of the examples we have discussed so far are Markovian. Given that we have explicitly constructed the formalism to handle non-Markovian phenomena as well, it would be worthwhile going some examples of this kind of process too. \emph{Self-exciting process noises} would generally take the form
 %%
