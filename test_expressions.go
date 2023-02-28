@@ -46,6 +46,13 @@ func TotalTimeElapsedFunction(timeStepNumber TimeStepNumber) TotalElapsedTime {
 	return totalElapsedTime
 }
 
+// takes two points in time as input
+func ExcitingKernel(currentTime TotalElapsedTime, somePreviousTime TotalElapsedTime) float64 {
+	// returns some number
+}
+
+
+
 // some function
 func G(wienerProcessSample float64, timeStepNumber TimeStepNumber) float64 {
 	// return something
