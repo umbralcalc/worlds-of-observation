@@ -23,7 +23,7 @@ $endfor$
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="w3-animate-opacity">
 
 <!-- Navbar -->
 <div class="w3-top">
@@ -43,17 +43,19 @@ $for(include-before)$
 $include-before$
 $endfor$
 $if(title)$
-<header class="w3-container w3-light-grey w3-center" style="padding:128px 16px">
+<hr/>
+<hr/>
+<hr/>
+<hr/>
+<header class="w3-container w3-animate-opacity w3-light-grey w3-center" style="padding:20px 16px">
 <h1 class="title">Diffusing Ideas</h1>
 <h3 class="subtitle">Software, noise and building mathematical toys</h3>
-$for(author)$
-<p class="author">$author$</p>
-$endfor$
 $if(date)$
 <p class="date">$date$</p>
 $endif$
 </header>
 $endif$
+<p class="author">Robert J. Hardwick</p>
 $body$
 $for(include-after)$
 $include-after$

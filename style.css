@@ -16,10 +16,23 @@ body {
     font-size: 18px;
 }
 
-h1, h2, h3, .author {
+h1 {
     font-family: ComputerModernBold;
-    color: black;
+    display: block;
+    font-size: 2.2em;
+}  
+
+h2 {
+    font-family: ComputerModernBold;
+    display: block;
+    font-size: 1.5em;
 }
+
+h3 {
+    font-family: ComputerModernBold;
+    display: block;
+    font-size: 1.5em;
+}  
 
 strong {
     font-family: ComputerModernBold;
@@ -31,19 +44,26 @@ p {
     text-align: justify;
 }
 
+hr {
+    height:4px;
+    border-width:1px;
+    color:black;
+    background-color:black;
+}
+
 .title {
-    text-align: center;
+    text-align: bottom;
 }
 
 .subtitle {
     color: grey;
-    text-align: center;
+    text-align: bottom;
 }
 
 .author {
-    text-align: center;
+    color: white;
+    text-align: bottom;
 }
-
 
 a:link {
     color: blue;
