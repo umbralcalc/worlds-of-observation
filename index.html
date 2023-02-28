@@ -322,22 +322,21 @@ X^{i}_{{\sf t}+1} &amp;= F^{i}_{{\sf t}+1}(X',{\sf t}) \,, \label{eq:x-step-def}
    as an entire matrix input into a function which populates the elements of its latest rows. In Go you could easily write something with the same idea in it, and the code would probably look like this.
   </p>
   <div class="sourceCode" data-language="Go" id="cb1">
-   <pre class="sourceCode go"><code class="sourceCode go"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1"></a><span class="kw">type</span> StateElement <span class="dt">float64</span></span>
-<span id="cb1-2"><a aria-hidden="true" href="#cb1-2"></a><span class="kw">type</span> StateVector  []StateElement</span>
-<span id="cb1-3"><a aria-hidden="true" href="#cb1-3"></a><span class="kw">type</span> StateHistory []StateVector</span>
-<span id="cb1-4"><a aria-hidden="true" href="#cb1-4"></a></span>
-<span id="cb1-5"><a aria-hidden="true" href="#cb1-5"></a><span class="co">// iterate the state history forward in time by one step</span></span>
-<span id="cb1-6"><a aria-hidden="true" href="#cb1-6"></a><span class="kw">func</span> IterationFormula(</span>
-<span id="cb1-7"><a aria-hidden="true" href="#cb1-7"></a>    stateHistory StateHistory, </span>
-<span id="cb1-8"><a aria-hidden="true" href="#cb1-8"></a>    timeStepNumber TimeStepNumber,</span>
-<span id="cb1-9"><a aria-hidden="true" href="#cb1-9"></a>) StateVector {</span>
-<span id="cb1-10"><a aria-hidden="true" href="#cb1-10"></a>    <span class="kw">for</span> t, stateVector := <span class="kw">range</span> stateHistory {</span>
-<span id="cb1-11"><a aria-hidden="true" href="#cb1-11"></a>        <span class="kw">for</span> i, stateElement := <span class="kw">range</span> stateVector {</span>
-<span id="cb1-12"><a aria-hidden="true" href="#cb1-12"></a>            <span class="co">// do something</span></span>
-<span id="cb1-13"><a aria-hidden="true" href="#cb1-13"></a>        }</span>
-<span id="cb1-14"><a aria-hidden="true" href="#cb1-14"></a>    }</span>
-<span id="cb1-15"><a aria-hidden="true" href="#cb1-15"></a>    <span class="kw">return</span> newestStateVector</span>
-<span id="cb1-16"><a aria-hidden="true" href="#cb1-16"></a>}</span></code></pre>
+   <pre class="sourceCode go"><code class="sourceCode go"><span id="cb1-1"><a aria-hidden="true" href="#cb1-1"></a><span class="kw">type</span> StateVector  []<span class="dt">float64</span></span>
+<span id="cb1-2"><a aria-hidden="true" href="#cb1-2"></a><span class="kw">type</span> StateHistory []StateVector</span>
+<span id="cb1-3"><a aria-hidden="true" href="#cb1-3"></a></span>
+<span id="cb1-4"><a aria-hidden="true" href="#cb1-4"></a><span class="co">// iterate the state history forward in time by one step</span></span>
+<span id="cb1-5"><a aria-hidden="true" href="#cb1-5"></a><span class="kw">func</span> IterationFormula(</span>
+<span id="cb1-6"><a aria-hidden="true" href="#cb1-6"></a>    stateHistory StateHistory, </span>
+<span id="cb1-7"><a aria-hidden="true" href="#cb1-7"></a>    timeStepNumber <span class="dt">int</span>,</span>
+<span id="cb1-8"><a aria-hidden="true" href="#cb1-8"></a>) StateVector {</span>
+<span id="cb1-9"><a aria-hidden="true" href="#cb1-9"></a>    <span class="kw">for</span> t, stateVector := <span class="kw">range</span> stateHistory {</span>
+<span id="cb1-10"><a aria-hidden="true" href="#cb1-10"></a>        <span class="kw">for</span> i, stateElement := <span class="kw">range</span> stateVector {</span>
+<span id="cb1-11"><a aria-hidden="true" href="#cb1-11"></a>            <span class="co">// do something</span></span>
+<span id="cb1-12"><a aria-hidden="true" href="#cb1-12"></a>        }</span>
+<span id="cb1-13"><a aria-hidden="true" href="#cb1-13"></a>    }</span>
+<span id="cb1-14"><a aria-hidden="true" href="#cb1-14"></a>    <span class="kw">return</span> newestStateVector</span>
+<span id="cb1-15"><a aria-hidden="true" href="#cb1-15"></a>}</span></code></pre>
   </div>
   <p>
    Pretty simple! But why go to all this trouble of storing matrix inputs for previous values of the same process? It’s true that this is mostly redundant for
@@ -379,26 +378,22 @@ t({\sf t}) &amp;= \sum^{{\sf t}}_{{\sf t}'=0}\delta t({\sf t}') \label{eq:t-step
    function and summing over it we can enable this flexibility in the computation. In case the summation notation is no fun for programmers; in Go we’re implicitly doing this.
   </p>
   <div class="sourceCode" data-language="Go" id="cb2">
-   <pre class="sourceCode go"><code class="sourceCode go"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1"></a><span class="kw">type</span> TimeStepNumber <span class="dt">int</span></span>
-<span id="cb2-2"><a aria-hidden="true" href="#cb2-2"></a></span>
-<span id="cb2-3"><a aria-hidden="true" href="#cb2-3"></a><span class="co">// both below are in some unit, e.g., seconds</span></span>
-<span id="cb2-4"><a aria-hidden="true" href="#cb2-4"></a><span class="kw">type</span> TimeIncrement    <span class="dt">float64</span></span>
-<span id="cb2-5"><a aria-hidden="true" href="#cb2-5"></a><span class="kw">type</span> TotalElapsedTime <span class="dt">float64</span></span>
-<span id="cb2-6"><a aria-hidden="true" href="#cb2-6"></a></span>
-<span id="cb2-7"><a aria-hidden="true" href="#cb2-7"></a><span class="co">// get the next increment from this step number forward</span></span>
-<span id="cb2-8"><a aria-hidden="true" href="#cb2-8"></a><span class="kw">func</span> TimeIncrementFunction(timeStepNumber TimeStepNumber) TimeIncrement {</span>
-<span id="cb2-9"><a aria-hidden="true" href="#cb2-9"></a>    <span class="co">// compute the next increment</span></span>
-<span id="cb2-10"><a aria-hidden="true" href="#cb2-10"></a>    <span class="kw">return</span> nextTimeIncrement</span>
-<span id="cb2-11"><a aria-hidden="true" href="#cb2-11"></a>}</span>
-<span id="cb2-12"><a aria-hidden="true" href="#cb2-12"></a></span>
-<span id="cb2-13"><a aria-hidden="true" href="#cb2-13"></a><span class="co">// compute the total time elapsed up to the input step number</span></span>
-<span id="cb2-14"><a aria-hidden="true" href="#cb2-14"></a><span class="kw">func</span> TotalTimeElapsedFunction(timeStepNumber TimeStepNumber) TotalElapsedTime {</span>
-<span id="cb2-15"><a aria-hidden="true" href="#cb2-15"></a>    totalElapsedTime := <span class="dv">0</span><span class="fl">.0</span></span>
-<span id="cb2-16"><a aria-hidden="true" href="#cb2-16"></a>    <span class="kw">for</span> t := <span class="dv">0</span>; t &lt; timeStepNumber; t++ {</span>
-<span id="cb2-17"><a aria-hidden="true" href="#cb2-17"></a>        totalElapsedTime += TimeIncrementFunction(t)</span>
-<span id="cb2-18"><a aria-hidden="true" href="#cb2-18"></a>    }</span>
-<span id="cb2-19"><a aria-hidden="true" href="#cb2-19"></a>    <span class="kw">return</span> totalElapsedTime</span>
-<span id="cb2-20"><a aria-hidden="true" href="#cb2-20"></a>}</span></code></pre>
+   <pre class="sourceCode go"><code class="sourceCode go"><span id="cb2-1"><a aria-hidden="true" href="#cb2-1"></a><span class="co">// get the next increment from this step number forward in</span></span>
+<span id="cb2-2"><a aria-hidden="true" href="#cb2-2"></a><span class="co">// some unit of time, e.g., seconds</span></span>
+<span id="cb2-3"><a aria-hidden="true" href="#cb2-3"></a><span class="kw">func</span> TimeIncrementFunction(timeStepNumber <span class="dt">int</span>) <span class="dt">float64</span> {</span>
+<span id="cb2-4"><a aria-hidden="true" href="#cb2-4"></a>    <span class="co">// compute the next increment</span></span>
+<span id="cb2-5"><a aria-hidden="true" href="#cb2-5"></a>    <span class="kw">return</span> nextTimeIncrement</span>
+<span id="cb2-6"><a aria-hidden="true" href="#cb2-6"></a>}</span>
+<span id="cb2-7"><a aria-hidden="true" href="#cb2-7"></a></span>
+<span id="cb2-8"><a aria-hidden="true" href="#cb2-8"></a><span class="co">// compute the total time elapsed up to the input step number in</span></span>
+<span id="cb2-9"><a aria-hidden="true" href="#cb2-9"></a><span class="co">// some unit of time, e.g., seconds</span></span>
+<span id="cb2-10"><a aria-hidden="true" href="#cb2-10"></a><span class="kw">func</span> ElapsedTimeFunction(timeStepNumber <span class="dt">int</span>) <span class="dt">float64</span> {</span>
+<span id="cb2-11"><a aria-hidden="true" href="#cb2-11"></a>    totalElapsedTime := <span class="dv">0</span><span class="fl">.0</span></span>
+<span id="cb2-12"><a aria-hidden="true" href="#cb2-12"></a>    <span class="kw">for</span> t := <span class="dv">0</span>; t &lt; timeStepNumber; t++ {</span>
+<span id="cb2-13"><a aria-hidden="true" href="#cb2-13"></a>        totalElapsedTime += TimeIncrementFunction(t)</span>
+<span id="cb2-14"><a aria-hidden="true" href="#cb2-14"></a>    }</span>
+<span id="cb2-15"><a aria-hidden="true" href="#cb2-15"></a>    <span class="kw">return</span> totalElapsedTime</span>
+<span id="cb2-16"><a aria-hidden="true" href="#cb2-16"></a>}</span></code></pre>
   </div>
   <p>
    So, now that we’ve mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, it is frequently possible to split
@@ -474,20 +469,20 @@ P^i_{{\sf t}+1}(x) &amp;= {\sf NormalPDF}[x^i;0,\delta t({\sf t}+1)] \,.\end{ali
 <span id="cb3-4"><a aria-hidden="true" href="#cb3-4"></a>)</span>
 <span id="cb3-5"><a aria-hidden="true" href="#cb3-5"></a></span>
 <span id="cb3-6"><a aria-hidden="true" href="#cb3-6"></a><span class="co">// generate a new Wiener process increment for a state element</span></span>
-<span id="cb3-7"><a aria-hidden="true" href="#cb3-7"></a><span class="kw">func</span> NewWienerProcessIncrement(timeStepNumber TimeStepNumber) StateElement {</span>
+<span id="cb3-7"><a aria-hidden="true" href="#cb3-7"></a><span class="kw">func</span> NewWienerProcessIncrement(timeStepNumber <span class="dt">int</span>) <span class="dt">float64</span> {</span>
 <span id="cb3-8"><a aria-hidden="true" href="#cb3-8"></a>    <span class="co">// use the time increment function we defined earlier</span></span>
 <span id="cb3-9"><a aria-hidden="true" href="#cb3-9"></a>    timeIncrement := TimeIncrementFunction(timeStepNumber)</span>
 <span id="cb3-10"><a aria-hidden="true" href="#cb3-10"></a>    <span class="co">// multiply by the square-root here as </span></span>
 <span id="cb3-11"><a aria-hidden="true" href="#cb3-11"></a>    <span class="co">// it is proportional to the standard deviation</span></span>
 <span id="cb3-12"><a aria-hidden="true" href="#cb3-12"></a>    value := math.Sqrt(timeIncrement) * rand.NormFloat64()</span>
-<span id="cb3-13"><a aria-hidden="true" href="#cb3-13"></a>    <span class="kw">return</span> StateElement(value)</span>
+<span id="cb3-13"><a aria-hidden="true" href="#cb3-13"></a>    <span class="kw">return</span> value</span>
 <span id="cb3-14"><a aria-hidden="true" href="#cb3-14"></a>}</span>
 <span id="cb3-15"><a aria-hidden="true" href="#cb3-15"></a></span>
 <span id="cb3-16"><a aria-hidden="true" href="#cb3-16"></a><span class="co">// returns the state vector from the S(X',t) function we defined </span></span>
-<span id="cb3-17"><a aria-hidden="true" href="#cb3-17"></a><span class="co">// in the main text above</span></span>
+<span id="cb3-17"><a aria-hidden="true" href="#cb3-17"></a><span class="co">// for the Wiener Process in the main text above</span></span>
 <span id="cb3-18"><a aria-hidden="true" href="#cb3-18"></a><span class="kw">func</span> SFunctionWienerProcess(</span>
 <span id="cb3-19"><a aria-hidden="true" href="#cb3-19"></a>    stateHistory StateHistory, </span>
-<span id="cb3-20"><a aria-hidden="true" href="#cb3-20"></a>    timeStepNumber TimeStepNumber,</span>
+<span id="cb3-20"><a aria-hidden="true" href="#cb3-20"></a>    timeStepNumber <span class="dt">int</span>,</span>
 <span id="cb3-21"><a aria-hidden="true" href="#cb3-21"></a>) StateVector {</span>
 <span id="cb3-22"><a aria-hidden="true" href="#cb3-22"></a>    <span class="co">// we don't care about the state history so the noise = Markovian</span></span>
 <span id="cb3-23"><a aria-hidden="true" href="#cb3-23"></a>    sFunctionValue := <span class="bu">make</span>(StateVector, <span class="dv">0</span>)</span>
@@ -543,7 +538,7 @@ S^0_{{\sf t}+1}(X',{\sf t}) &amp;= g[W^0_{{\sf t}+1},t({\sf t}+1)]-g[W^0_{\sf t}
   </p>
   <div class="sourceCode" data-language="Go" id="cb4">
    <pre class="sourceCode go"><code class="sourceCode go"><span id="cb4-1"><a aria-hidden="true" href="#cb4-1"></a><span class="co">// some function</span></span>
-<span id="cb4-2"><a aria-hidden="true" href="#cb4-2"></a><span class="kw">func</span> G(wienerProcessSample <span class="dt">float64</span>, timeStepNumber TimeStepNumber) <span class="dt">float64</span> {</span>
+<span id="cb4-2"><a aria-hidden="true" href="#cb4-2"></a><span class="kw">func</span> G(wienerProcessSample <span class="dt">float64</span>, timeStepNumber <span class="dt">int</span>) <span class="dt">float64</span> {</span>
 <span id="cb4-3"><a aria-hidden="true" href="#cb4-3"></a>    <span class="co">// return something</span></span>
 <span id="cb4-4"><a aria-hidden="true" href="#cb4-4"></a>}</span>
 <span id="cb4-5"><a aria-hidden="true" href="#cb4-5"></a></span>
@@ -551,18 +546,18 @@ S^0_{{\sf t}+1}(X',{\sf t}) &amp;= g[W^0_{{\sf t}+1},t({\sf t}+1)]-g[W^0_{\sf t}
 <span id="cb4-7"><a aria-hidden="true" href="#cb4-7"></a><span class="kw">func</span> DgDt(</span>
 <span id="cb4-8"><a aria-hidden="true" href="#cb4-8"></a>    newWienerProcessSample <span class="dt">float64</span>, </span>
 <span id="cb4-9"><a aria-hidden="true" href="#cb4-9"></a>    previousWienerProcessSample <span class="dt">float64</span>,</span>
-<span id="cb4-10"><a aria-hidden="true" href="#cb4-10"></a>    timeStepNumber TimeStepNumber,</span>
+<span id="cb4-10"><a aria-hidden="true" href="#cb4-10"></a>    timeStepNumber <span class="dt">int</span>,</span>
 <span id="cb4-11"><a aria-hidden="true" href="#cb4-11"></a>) <span class="dt">float64</span> {</span>
 <span id="cb4-12"><a aria-hidden="true" href="#cb4-12"></a>    <span class="kw">return</span> (G(newWienerProcessSample, timeStepNumber) - </span>
 <span id="cb4-13"><a aria-hidden="true" href="#cb4-13"></a>        G(previousWienerProcessSample, timeStepNumber)) / </span>
-<span id="cb4-14"><a aria-hidden="true" href="#cb4-14"></a>        <span class="dt">float64</span>(TimeIncrementFunction(timeStepNumber))</span>
+<span id="cb4-14"><a aria-hidden="true" href="#cb4-14"></a>        TimeIncrementFunction(timeStepNumber)</span>
 <span id="cb4-15"><a aria-hidden="true" href="#cb4-15"></a>}</span>
 <span id="cb4-16"><a aria-hidden="true" href="#cb4-16"></a></span>
 <span id="cb4-17"><a aria-hidden="true" href="#cb4-17"></a><span class="co">// discretely represents the dg/dx expression in the equation above</span></span>
 <span id="cb4-18"><a aria-hidden="true" href="#cb4-18"></a><span class="kw">func</span> DgDx(</span>
 <span id="cb4-19"><a aria-hidden="true" href="#cb4-19"></a>    newWienerProcessSample <span class="dt">float64</span>, </span>
 <span id="cb4-20"><a aria-hidden="true" href="#cb4-20"></a>    previousWienerProcessSample <span class="dt">float64</span>,</span>
-<span id="cb4-21"><a aria-hidden="true" href="#cb4-21"></a>    timeStepNumber TimeStepNumber,</span>
+<span id="cb4-21"><a aria-hidden="true" href="#cb4-21"></a>    timeStepNumber <span class="dt">int</span>,</span>
 <span id="cb4-22"><a aria-hidden="true" href="#cb4-22"></a>) <span class="dt">float64</span> {</span>
 <span id="cb4-23"><a aria-hidden="true" href="#cb4-23"></a>    <span class="kw">return</span> (G(newWienerProcessSample, timeStepNumber) - </span>
 <span id="cb4-24"><a aria-hidden="true" href="#cb4-24"></a>        G(previousWienerProcessSample, timeStepNumber)) / </span>
@@ -574,7 +569,7 @@ S^0_{{\sf t}+1}(X',{\sf t}) &amp;= g[W^0_{{\sf t}+1},t({\sf t}+1)]-g[W^0_{\sf t}
 <span id="cb4-30"><a aria-hidden="true" href="#cb4-30"></a>    <span class="co">// newDgDx and previousDgDx could be passed in here</span></span>
 <span id="cb4-31"><a aria-hidden="true" href="#cb4-31"></a>    newWienerProcessSample <span class="dt">float64</span>, </span>
 <span id="cb4-32"><a aria-hidden="true" href="#cb4-32"></a>    previousWienerProcessSample <span class="dt">float64</span>,</span>
-<span id="cb4-33"><a aria-hidden="true" href="#cb4-33"></a>    timeStepNumber TimeStepNumber,</span>
+<span id="cb4-33"><a aria-hidden="true" href="#cb4-33"></a>    timeStepNumber <span class="dt">int</span>,</span>
 <span id="cb4-34"><a aria-hidden="true" href="#cb4-34"></a>) <span class="dt">float64</span> {</span>
 <span id="cb4-35"><a aria-hidden="true" href="#cb4-35"></a>    <span class="co">// newDgDx and previousDgDx are the result of applying the function </span></span>
 <span id="cb4-36"><a aria-hidden="true" href="#cb4-36"></a>    <span class="co">// for dg/dx defined above on two different timesteps</span></span>
@@ -622,36 +617,33 @@ S^{0}_{{\sf t}+1}(X',{\sf t}) &amp;= \frac{(W^0_{{\sf t}+1} - W^0_{\sf t})}{\del
   <div class="sourceCode" data-language="Go" id="cb5">
    <pre class="sourceCode go"><code class="sourceCode go"><span id="cb5-1"><a aria-hidden="true" href="#cb5-1"></a><span class="kw">import</span> <span class="st">"scientificgo.org/special"</span></span>
 <span id="cb5-2"><a aria-hidden="true" href="#cb5-2"></a></span>
-<span id="cb5-3"><a aria-hidden="true" href="#cb5-3"></a><span class="kw">type</span> HurstExponent <span class="dt">float64</span></span>
-<span id="cb5-4"><a aria-hidden="true" href="#cb5-4"></a></span>
-<span id="cb5-5"><a aria-hidden="true" href="#cb5-5"></a><span class="co">// computes the integral term in the fractional Brownian motion process</span></span>
-<span id="cb5-6"><a aria-hidden="true" href="#cb5-6"></a><span class="co">// defined above using a scientific library</span></span>
-<span id="cb5-7"><a aria-hidden="true" href="#cb5-7"></a><span class="kw">func</span> ComputeTheIntegral(</span>
-<span id="cb5-8"><a aria-hidden="true" href="#cb5-8"></a>    currentTime TotalElapsedTime,</span>
-<span id="cb5-9"><a aria-hidden="true" href="#cb5-9"></a>    nextTime TotalElapsedTime,</span>
-<span id="cb5-10"><a aria-hidden="true" href="#cb5-10"></a>    hurstExponent HurstExponent,</span>
-<span id="cb5-11"><a aria-hidden="true" href="#cb5-11"></a>    numberOfIntegrationSteps <span class="dt">int</span>,</span>
-<span id="cb5-12"><a aria-hidden="true" href="#cb5-12"></a>) <span class="dt">float64</span> {</span>
-<span id="cb5-13"><a aria-hidden="true" href="#cb5-13"></a>    currentT := <span class="dt">float64</span>(currentTime)</span>
-<span id="cb5-14"><a aria-hidden="true" href="#cb5-14"></a>    nextT := <span class="dt">float64</span>(nextTime)</span>
-<span id="cb5-15"><a aria-hidden="true" href="#cb5-15"></a>    integralStepSize := nextT - currentT/<span class="dt">float64</span>(numberOfIntegrationSteps)</span>
-<span id="cb5-16"><a aria-hidden="true" href="#cb5-16"></a>    h := <span class="dt">float64</span>(hurstExponent)</span>
-<span id="cb5-17"><a aria-hidden="true" href="#cb5-17"></a>    a := []<span class="dt">float64</span>{h - <span class="dv">0</span><span class="fl">.5</span>, <span class="dv">0</span><span class="fl">.5</span> - h}</span>
-<span id="cb5-18"><a aria-hidden="true" href="#cb5-18"></a>    b := []<span class="dt">float64</span>{h + <span class="dv">0</span><span class="fl">.5</span>}</span>
-<span id="cb5-19"><a aria-hidden="true" href="#cb5-19"></a>    integralValue := <span class="dv">0</span><span class="fl">.0</span></span>
-<span id="cb5-20"><a aria-hidden="true" href="#cb5-20"></a>    <span class="co">// implements the trapezium rule in a loop over the steps</span></span>
-<span id="cb5-21"><a aria-hidden="true" href="#cb5-21"></a>    <span class="co">// between the current and the next point in time</span></span>
-<span id="cb5-22"><a aria-hidden="true" href="#cb5-22"></a>    <span class="kw">for</span> t := <span class="dv">0</span>; t &lt; numberOfIntegrationSteps; t++ {</span>
-<span id="cb5-23"><a aria-hidden="true" href="#cb5-23"></a>        t1 := currentT + <span class="dt">float64</span>(t)*integralStepSize</span>
-<span id="cb5-24"><a aria-hidden="true" href="#cb5-24"></a>        t2 := t1 + integralStepSize</span>
-<span id="cb5-25"><a aria-hidden="true" href="#cb5-25"></a>        functionValue1 := (math.Pow(t1-currentT, h<span class="dv">-0</span><span class="fl">.5</span>) / math.Gamma(h<span class="fl">+0.5</span>)) *</span>
-<span id="cb5-26"><a aria-hidden="true" href="#cb5-26"></a>            special.HypPFQ(a, b, <span class="dv">1</span><span class="fl">.0</span>-t1/currentT)</span>
-<span id="cb5-27"><a aria-hidden="true" href="#cb5-27"></a>        functionValue2 := (math.Pow(t2-currentT, h<span class="dv">-0</span><span class="fl">.5</span>) / math.Gamma(h<span class="fl">+0.5</span>)) *</span>
-<span id="cb5-28"><a aria-hidden="true" href="#cb5-28"></a>            special.HypPFQ(a, b, <span class="dv">1</span><span class="fl">.0</span>-t2/currentT)</span>
-<span id="cb5-29"><a aria-hidden="true" href="#cb5-29"></a>        integralValue += <span class="dv">0</span><span class="fl">.5</span> * (functionValue1 + functionValue2) * integralStepSize</span>
-<span id="cb5-30"><a aria-hidden="true" href="#cb5-30"></a>    }</span>
-<span id="cb5-31"><a aria-hidden="true" href="#cb5-31"></a>    <span class="kw">return</span> integralValue</span>
-<span id="cb5-32"><a aria-hidden="true" href="#cb5-32"></a>}</span></code></pre>
+<span id="cb5-3"><a aria-hidden="true" href="#cb5-3"></a><span class="co">// computes the integral term in the fractional Brownian motion process</span></span>
+<span id="cb5-4"><a aria-hidden="true" href="#cb5-4"></a><span class="co">// defined above using a scientific library</span></span>
+<span id="cb5-5"><a aria-hidden="true" href="#cb5-5"></a><span class="kw">func</span> FractionalBrownianMotionIntegral(</span>
+<span id="cb5-6"><a aria-hidden="true" href="#cb5-6"></a>    currentTime <span class="dt">float64</span>,</span>
+<span id="cb5-7"><a aria-hidden="true" href="#cb5-7"></a>    nextTime <span class="dt">float64</span>,</span>
+<span id="cb5-8"><a aria-hidden="true" href="#cb5-8"></a>    hurstExponent <span class="dt">float64</span>,</span>
+<span id="cb5-9"><a aria-hidden="true" href="#cb5-9"></a>    numberOfIntegrationSteps <span class="dt">int</span>,</span>
+<span id="cb5-10"><a aria-hidden="true" href="#cb5-10"></a>) <span class="dt">float64</span> {</span>
+<span id="cb5-11"><a aria-hidden="true" href="#cb5-11"></a>    integralStepSize := (nextTime - currentTime)/<span class="dt">float64</span>(numberOfIntegrationSteps)</span>
+<span id="cb5-12"><a aria-hidden="true" href="#cb5-12"></a>    a := []<span class="dt">float64</span>{hurstExponent - <span class="dv">0</span><span class="fl">.5</span>, <span class="dv">0</span><span class="fl">.5</span> - hurstExponent}</span>
+<span id="cb5-13"><a aria-hidden="true" href="#cb5-13"></a>    b := []<span class="dt">float64</span>{hurstExponent + <span class="dv">0</span><span class="fl">.5</span>}</span>
+<span id="cb5-14"><a aria-hidden="true" href="#cb5-14"></a>    integralValue := <span class="dv">0</span><span class="fl">.0</span></span>
+<span id="cb5-15"><a aria-hidden="true" href="#cb5-15"></a>    <span class="co">// implements the trapezium rule in a loop over the steps</span></span>
+<span id="cb5-16"><a aria-hidden="true" href="#cb5-16"></a>    <span class="co">// between the current and the next point in time</span></span>
+<span id="cb5-17"><a aria-hidden="true" href="#cb5-17"></a>    <span class="kw">for</span> t := <span class="dv">0</span>; t &lt; numberOfIntegrationSteps; t++ {</span>
+<span id="cb5-18"><a aria-hidden="true" href="#cb5-18"></a>        t1 := currentTime + <span class="dt">float64</span>(t)*integralStepSize</span>
+<span id="cb5-19"><a aria-hidden="true" href="#cb5-19"></a>        t2 := t1 + integralStepSize</span>
+<span id="cb5-20"><a aria-hidden="true" href="#cb5-20"></a>        functionValue1 := (math.Pow(t1-currentTime, hurstExponent<span class="dv">-0</span><span class="fl">.5</span>) /</span>
+<span id="cb5-21"><a aria-hidden="true" href="#cb5-21"></a>        math.Gamma(hurstExponent<span class="fl">+0.5</span>)) *</span>
+<span id="cb5-22"><a aria-hidden="true" href="#cb5-22"></a>        special.HypPFQ(a, b, <span class="dv">1</span><span class="fl">.0</span>-t1/currentTime)</span>
+<span id="cb5-23"><a aria-hidden="true" href="#cb5-23"></a>        functionValue2 := (math.Pow(t2-currentTime, hurstExponent<span class="dv">-0</span><span class="fl">.5</span>) /</span>
+<span id="cb5-24"><a aria-hidden="true" href="#cb5-24"></a>        math.Gamma(hurstExponent<span class="fl">+0.5</span>)) *</span>
+<span id="cb5-25"><a aria-hidden="true" href="#cb5-25"></a>        special.HypPFQ(a, b, <span class="dv">1</span><span class="fl">.0</span>-t2/currentTime)</span>
+<span id="cb5-26"><a aria-hidden="true" href="#cb5-26"></a>        integralValue += <span class="dv">0</span><span class="fl">.5</span> * (functionValue1 + functionValue2) * integralStepSize</span>
+<span id="cb5-27"><a aria-hidden="true" href="#cb5-27"></a>    }</span>
+<span id="cb5-28"><a aria-hidden="true" href="#cb5-28"></a>    <span class="kw">return</span> integralValue</span>
+<span id="cb5-29"><a aria-hidden="true" href="#cb5-29"></a>}</span></code></pre>
   </div>
   <p>
    So far we have mostly been discussing noises with continuous sample paths, but we can easily adapt our computation to discontinuous sample paths as well. For instance,
@@ -717,47 +709,45 @@ p({\sf event}) &amp;= \frac{\lambda ({\sf t})}{\lambda ({\sf t}) + \frac{1}{\tau
    . The following chunk of Go code may also help to understand this concept from the programmer’s perspective.
   </p>
   <div class="sourceCode" data-language="Go" id="cb6">
-   <pre class="sourceCode go"><code class="sourceCode go"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1"></a><span class="kw">type</span> SmallTimeInterval <span class="dt">float64</span></span>
-<span id="cb6-2"><a aria-hidden="true" href="#cb6-2"></a></span>
-<span id="cb6-3"><a aria-hidden="true" href="#cb6-3"></a><span class="co">// generate new event rates as a function of timestep</span></span>
-<span id="cb6-4"><a aria-hidden="true" href="#cb6-4"></a><span class="kw">func</span> EventRateLambdaFunction(timeStepNumber TimeStepNumber) <span class="dt">float64</span> {</span>
-<span id="cb6-5"><a aria-hidden="true" href="#cb6-5"></a>    <span class="co">// return a new rate</span></span>
-<span id="cb6-6"><a aria-hidden="true" href="#cb6-6"></a>}</span>
-<span id="cb6-7"><a aria-hidden="true" href="#cb6-7"></a></span>
-<span id="cb6-8"><a aria-hidden="true" href="#cb6-8"></a><span class="co">// get the next exponentially-distributed time increment</span></span>
-<span id="cb6-9"><a aria-hidden="true" href="#cb6-9"></a><span class="kw">func</span> ExpDistributedTimeIncrementFunction(</span>
-<span id="cb6-10"><a aria-hidden="true" href="#cb6-10"></a>    smallTimeInterval SmallTimeInterval,</span>
-<span id="cb6-11"><a aria-hidden="true" href="#cb6-11"></a>) TimeIncrement {</span>
-<span id="cb6-12"><a aria-hidden="true" href="#cb6-12"></a>    nextTimeIncrement := <span class="dt">float64</span>(smallTimeInterval) * rand.ExpFloat64()</span>
-<span id="cb6-13"><a aria-hidden="true" href="#cb6-13"></a>    <span class="kw">return</span> TimeIncrement(nextTimeIncrement)</span>
-<span id="cb6-14"><a aria-hidden="true" href="#cb6-14"></a>}</span>
-<span id="cb6-15"><a aria-hidden="true" href="#cb6-15"></a></span>
-<span id="cb6-16"><a aria-hidden="true" href="#cb6-16"></a><span class="co">// returns the time-inhomogeneous Poisson process S(X',t) term </span></span>
-<span id="cb6-17"><a aria-hidden="true" href="#cb6-17"></a><span class="kw">func</span> SFunctionInhomogeneousPoissonProcess(</span>
-<span id="cb6-18"><a aria-hidden="true" href="#cb6-18"></a>    stateHistory StateHistory,</span>
-<span id="cb6-19"><a aria-hidden="true" href="#cb6-19"></a>    timeStepNumber TimeStepNumber,</span>
-<span id="cb6-20"><a aria-hidden="true" href="#cb6-20"></a>) StateVector {</span>
-<span id="cb6-21"><a aria-hidden="true" href="#cb6-21"></a>    <span class="co">// notice how the noise is also Markovian here too</span></span>
-<span id="cb6-22"><a aria-hidden="true" href="#cb6-22"></a>    <span class="kw">var</span> smallTimeInterval SmallTimeInterval</span>
-<span id="cb6-23"><a aria-hidden="true" href="#cb6-23"></a>    sFunctionValue := <span class="bu">make</span>(StateVector, <span class="dv">0</span>)</span>
-<span id="cb6-24"><a aria-hidden="true" href="#cb6-24"></a>    <span class="kw">for</span> element = <span class="kw">range</span> stateVector {</span>
-<span id="cb6-25"><a aria-hidden="true" href="#cb6-25"></a>        timeIncrement := ExpDistributedTimeIncrementFunction(</span>
-<span id="cb6-26"><a aria-hidden="true" href="#cb6-26"></a>            smallTimeInterval,</span>
-<span id="cb6-27"><a aria-hidden="true" href="#cb6-27"></a>        )</span>
-<span id="cb6-28"><a aria-hidden="true" href="#cb6-28"></a>        <span class="co">// specify an arbitrary function of time for the event rate here</span></span>
-<span id="cb6-29"><a aria-hidden="true" href="#cb6-29"></a>        eventRateLambda := EventRateLambdaFunction(timeStepNumber)</span>
-<span id="cb6-30"><a aria-hidden="true" href="#cb6-30"></a>        prob := eventRateLambda /</span>
-<span id="cb6-31"><a aria-hidden="true" href="#cb6-31"></a>            (eventRateLambda + <span class="dv">1</span><span class="fl">.0</span>/<span class="dt">float64</span>(timeIncrement))</span>
-<span id="cb6-32"><a aria-hidden="true" href="#cb6-32"></a>        <span class="co">// note that the difference between steps for a Poisson</span></span>
-<span id="cb6-33"><a aria-hidden="true" href="#cb6-33"></a>        <span class="co">// process can only ever be 0 or 1</span></span>
-<span id="cb6-34"><a aria-hidden="true" href="#cb6-34"></a>        element := StateElement(<span class="dv">0</span><span class="fl">.0</span>)</span>
-<span id="cb6-35"><a aria-hidden="true" href="#cb6-35"></a>        <span class="kw">if</span> rand.Float64() &lt; prob {</span>
-<span id="cb6-36"><a aria-hidden="true" href="#cb6-36"></a>            element = StateElement(<span class="dv">1</span><span class="fl">.0</span>)</span>
-<span id="cb6-37"><a aria-hidden="true" href="#cb6-37"></a>        }</span>
-<span id="cb6-38"><a aria-hidden="true" href="#cb6-38"></a>        sFunctionValue = <span class="bu">append</span>(sFunctionValue, element)</span>
-<span id="cb6-39"><a aria-hidden="true" href="#cb6-39"></a>    }</span>
-<span id="cb6-40"><a aria-hidden="true" href="#cb6-40"></a>    <span class="kw">return</span> sFunctionValue</span>
-<span id="cb6-41"><a aria-hidden="true" href="#cb6-41"></a>}</span></code></pre>
+   <pre class="sourceCode go"><code class="sourceCode go"><span id="cb6-1"><a aria-hidden="true" href="#cb6-1"></a><span class="co">// generate new event rates as a function of timestep</span></span>
+<span id="cb6-2"><a aria-hidden="true" href="#cb6-2"></a><span class="kw">func</span> EventRateLambdaFunction(timeStepNumber <span class="dt">int</span>) <span class="dt">float64</span> {</span>
+<span id="cb6-3"><a aria-hidden="true" href="#cb6-3"></a>    <span class="co">// return a new rate</span></span>
+<span id="cb6-4"><a aria-hidden="true" href="#cb6-4"></a>}</span>
+<span id="cb6-5"><a aria-hidden="true" href="#cb6-5"></a></span>
+<span id="cb6-6"><a aria-hidden="true" href="#cb6-6"></a><span class="co">// get the next exponentially-distributed time increment</span></span>
+<span id="cb6-7"><a aria-hidden="true" href="#cb6-7"></a><span class="kw">func</span> ExpDistributedTimeIncrementFunction(</span>
+<span id="cb6-8"><a aria-hidden="true" href="#cb6-8"></a>    smallTimeInterval <span class="dt">float64</span>,</span>
+<span id="cb6-9"><a aria-hidden="true" href="#cb6-9"></a>) <span class="dt">float64</span> {</span>
+<span id="cb6-10"><a aria-hidden="true" href="#cb6-10"></a>    nextTimeIncrement := smallTimeInterval * rand.ExpFloat64()</span>
+<span id="cb6-11"><a aria-hidden="true" href="#cb6-11"></a>    <span class="kw">return</span> nextTimeIncrement</span>
+<span id="cb6-12"><a aria-hidden="true" href="#cb6-12"></a>}</span>
+<span id="cb6-13"><a aria-hidden="true" href="#cb6-13"></a></span>
+<span id="cb6-14"><a aria-hidden="true" href="#cb6-14"></a><span class="co">// returns the time-inhomogeneous Poisson process S(X',t) term </span></span>
+<span id="cb6-15"><a aria-hidden="true" href="#cb6-15"></a><span class="kw">func</span> SFunctionInhomogeneousPoissonProcess(</span>
+<span id="cb6-16"><a aria-hidden="true" href="#cb6-16"></a>    stateHistory StateHistory,</span>
+<span id="cb6-17"><a aria-hidden="true" href="#cb6-17"></a>    timeStepNumber <span class="dt">int</span>,</span>
+<span id="cb6-18"><a aria-hidden="true" href="#cb6-18"></a>) StateVector {</span>
+<span id="cb6-19"><a aria-hidden="true" href="#cb6-19"></a>    <span class="co">// notice how the noise is also Markovian here too</span></span>
+<span id="cb6-20"><a aria-hidden="true" href="#cb6-20"></a>    <span class="kw">var</span> smallTimeInterval <span class="dt">float64</span></span>
+<span id="cb6-21"><a aria-hidden="true" href="#cb6-21"></a>    sFunctionValue := <span class="bu">make</span>(StateVector, <span class="dv">0</span>)</span>
+<span id="cb6-22"><a aria-hidden="true" href="#cb6-22"></a>    <span class="kw">for</span> element = <span class="kw">range</span> stateVector {</span>
+<span id="cb6-23"><a aria-hidden="true" href="#cb6-23"></a>        timeIncrement := ExpDistributedTimeIncrementFunction(</span>
+<span id="cb6-24"><a aria-hidden="true" href="#cb6-24"></a>            smallTimeInterval,</span>
+<span id="cb6-25"><a aria-hidden="true" href="#cb6-25"></a>        )</span>
+<span id="cb6-26"><a aria-hidden="true" href="#cb6-26"></a>        <span class="co">// specify an arbitrary function of time for the event rate here</span></span>
+<span id="cb6-27"><a aria-hidden="true" href="#cb6-27"></a>        eventRateLambda := EventRateLambdaFunction(timeStepNumber)</span>
+<span id="cb6-28"><a aria-hidden="true" href="#cb6-28"></a>        prob := eventRateLambda /</span>
+<span id="cb6-29"><a aria-hidden="true" href="#cb6-29"></a>            (eventRateLambda + <span class="dv">1</span><span class="fl">.0</span>/timeIncrement)</span>
+<span id="cb6-30"><a aria-hidden="true" href="#cb6-30"></a>        <span class="co">// note that the difference between steps for a Poisson</span></span>
+<span id="cb6-31"><a aria-hidden="true" href="#cb6-31"></a>        <span class="co">// process can only ever be 0 or 1</span></span>
+<span id="cb6-32"><a aria-hidden="true" href="#cb6-32"></a>        element := <span class="dv">0</span><span class="fl">.0</span></span>
+<span id="cb6-33"><a aria-hidden="true" href="#cb6-33"></a>        <span class="kw">if</span> rand.Float64() &lt; prob {</span>
+<span id="cb6-34"><a aria-hidden="true" href="#cb6-34"></a>            element = <span class="dv">1</span><span class="fl">.0</span></span>
+<span id="cb6-35"><a aria-hidden="true" href="#cb6-35"></a>        }</span>
+<span id="cb6-36"><a aria-hidden="true" href="#cb6-36"></a>        sFunctionValue = <span class="bu">append</span>(sFunctionValue, element)</span>
+<span id="cb6-37"><a aria-hidden="true" href="#cb6-37"></a>    }</span>
+<span id="cb6-38"><a aria-hidden="true" href="#cb6-38"></a>    <span class="kw">return</span> sFunctionValue</span>
+<span id="cb6-39"><a aria-hidden="true" href="#cb6-39"></a>}</span></code></pre>
   </div>
   <p>
    There are a few extensions to the simple Poisson process that introduce additional stochastic processes.
@@ -780,6 +770,17 @@ p({\sf event}) &amp;= \frac{\lambda ({\sf t})}{\lambda ({\sf t}) + \frac{1}{\tau
    \[\begin{aligned}
 S^{0}_{{\sf t}+1}(X',{\sf t}) &amp;= \Lambda ({\sf t}+1) \\
 S^{1}_{{\sf t}+1}(X',{\sf t}) &amp;= [N_{S^{0}_{{\sf t}+1}}]^i_{{\sf t}+1}-[N_{S^{0}_{{\sf t}}}]^i_{\sf t}\,.\end{aligned}\tag{12}\]
+   This process could be simulated using the Go code we wrote for the time-inhomogeneous Poisson process above — where we would just replace
+   <code>
+    EventRateLambdaFunction
+   </code>
+   with a function that generates the stochastic rate
+   <span class="math inline">
+    \(\Lambda ({\sf t})\)
+   </span>
+   .
+  </p>
+  <p>
    Another extension is
    <em>
     compound Poisson process noise
@@ -803,7 +804,19 @@ S^{i}_{{\sf t}+1}(X',{\sf t}) &amp;= [J_{\lambda}]^i_{{\sf t}+1}-[J_{\lambda}]^i
    <span class="math inline">
     \(\tau\)
    </span>
-   is chosen.
+   is chosen. Once again, the Go code we wrote above would be sufficient to simulate this process with one tweak: replace the allocation of the
+   <code>
+    element
+   </code>
+   variable to
+   <code>
+    element = 1.0
+   </code>
+   with the output of a function which generates the
+   <span class="math inline">
+    \([J_{\lambda}]^i_{\sf t}\)
+   </span>
+   samples.
   </p>
   <p>
    All of the examples we have discussed so far are Markovian. Given that we have explicitly constructed the formalism to handle non-Markovian phenomena as well, it would be worthwhile going some examples of this kind of process too.
@@ -833,8 +846,42 @@ S^{1}_{{\sf t}+1}(X',{\sf t}) &amp;= [N_{S^{0}_{{\sf t}+1}}]^i_{{\sf t}+1}-[N_{S
    <span class="math inline">
     \(\mu\)
    </span>
-   is some constant background rate.
+   is some constant background rate. In order to simulate a Hawkes process using our formalism, the Go code would look like this.
   </p>
+  <div class="sourceCode" data-language="Go" id="cb7">
+   <pre class="sourceCode go"><code class="sourceCode go"><span id="cb7-1"><a aria-hidden="true" href="#cb7-1"></a><span class="kw">func</span> ExcitingKernel(</span>
+<span id="cb7-2"><a aria-hidden="true" href="#cb7-2"></a>    currentTime <span class="dt">float64</span>, somePreviousTime <span class="dt">float64</span>,</span>
+<span id="cb7-3"><a aria-hidden="true" href="#cb7-3"></a>) <span class="dt">float64</span> {</span>
+<span id="cb7-4"><a aria-hidden="true" href="#cb7-4"></a>    <span class="co">// returns some number</span></span>
+<span id="cb7-5"><a aria-hidden="true" href="#cb7-5"></a>}</span>
+<span id="cb7-6"><a aria-hidden="true" href="#cb7-6"></a></span>
+<span id="cb7-7"><a aria-hidden="true" href="#cb7-7"></a><span class="co">// returns the Hawkes process S(X',t) term</span></span>
+<span id="cb7-8"><a aria-hidden="true" href="#cb7-8"></a><span class="kw">func</span> SFunctionHawkesProcess(</span>
+<span id="cb7-9"><a aria-hidden="true" href="#cb7-9"></a>    stateHistory StateHistory,</span>
+<span id="cb7-10"><a aria-hidden="true" href="#cb7-10"></a>    timeStepNumber <span class="dt">int</span>,</span>
+<span id="cb7-11"><a aria-hidden="true" href="#cb7-11"></a>) StateVector {</span>
+<span id="cb7-12"><a aria-hidden="true" href="#cb7-12"></a>    <span class="co">// notice how the noise is also Markovian here too</span></span>
+<span id="cb7-13"><a aria-hidden="true" href="#cb7-13"></a>    <span class="kw">var</span> smallTimeInterval <span class="dt">float64</span></span>
+<span id="cb7-14"><a aria-hidden="true" href="#cb7-14"></a>    sFunctionValue := <span class="bu">make</span>(StateVector, <span class="dv">0</span>)</span>
+<span id="cb7-15"><a aria-hidden="true" href="#cb7-15"></a>    <span class="kw">for</span> element = <span class="kw">range</span> stateVector {</span>
+<span id="cb7-16"><a aria-hidden="true" href="#cb7-16"></a>        timeIncrement := ExpDistributedTimeIncrementFunction(</span>
+<span id="cb7-17"><a aria-hidden="true" href="#cb7-17"></a>            smallTimeInterval,</span>
+<span id="cb7-18"><a aria-hidden="true" href="#cb7-18"></a>        )</span>
+<span id="cb7-19"><a aria-hidden="true" href="#cb7-19"></a>        <span class="co">// specify an arbitrary function of time for the event rate here</span></span>
+<span id="cb7-20"><a aria-hidden="true" href="#cb7-20"></a>        eventRateLambda := EventRateLambdaFunction(timeStepNumber)</span>
+<span id="cb7-21"><a aria-hidden="true" href="#cb7-21"></a>        prob := eventRateLambda /</span>
+<span id="cb7-22"><a aria-hidden="true" href="#cb7-22"></a>            (eventRateLambda + <span class="dv">1</span><span class="fl">.0</span>/timeIncrement)</span>
+<span id="cb7-23"><a aria-hidden="true" href="#cb7-23"></a>        <span class="co">// note that the difference between steps for a Poisson</span></span>
+<span id="cb7-24"><a aria-hidden="true" href="#cb7-24"></a>        <span class="co">// process can only ever be 0 or 1</span></span>
+<span id="cb7-25"><a aria-hidden="true" href="#cb7-25"></a>        element := <span class="dv">0</span><span class="fl">.0</span></span>
+<span id="cb7-26"><a aria-hidden="true" href="#cb7-26"></a>        <span class="kw">if</span> rand.Float64() &lt; prob {</span>
+<span id="cb7-27"><a aria-hidden="true" href="#cb7-27"></a>            element = <span class="dv">1</span><span class="fl">.0</span></span>
+<span id="cb7-28"><a aria-hidden="true" href="#cb7-28"></a>        }</span>
+<span id="cb7-29"><a aria-hidden="true" href="#cb7-29"></a>        sFunctionValue = <span class="bu">append</span>(sFunctionValue, element)</span>
+<span id="cb7-30"><a aria-hidden="true" href="#cb7-30"></a>    }</span>
+<span id="cb7-31"><a aria-hidden="true" href="#cb7-31"></a>    <span class="kw">return</span> sFunctionValue</span>
+<span id="cb7-32"><a aria-hidden="true" href="#cb7-32"></a>}</span></code></pre>
+  </div>
   <p>
    Note that this idea of integration kernels could also be applied back to our Wiener process. For example, another type of non-Markovian phenomenon that frequently arises across physical and life systems integrates the Wiener process history like so
    \[\begin{aligned}
