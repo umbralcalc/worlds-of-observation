@@ -478,7 +478,7 @@ S^{1}_{{\sf t}+1}(X',{\sf t}) &= [N_{S^{0}_{{\sf t}+1}}]^i_{{\sf t}+1}-[N_{S^{0}
 where the stochastic rate ${\cal I}_{{\sf t}+1} (X',{\sf t})$ now depends on the history explicitly. Amongst other potential inputs we can see, e.g., Hawkes processes~\cite{hawkes1971spectra} as an example of above by substituting 
 %%
 \begin{align}
-{\cal I}_{{\sf t}+1} (X',{\sf t}) &= \mu + \sum^{{\sf t}}_{{\sf t}'=0}\gamma [t({\sf t})-t({\sf t}')](S^{1}_{{\sf t}'}-S^{1}_{{\sf t}'-1}) \,,
+{\cal I}_{{\sf t}+1} (X',{\sf t}) &= \mu + \sum^{{\sf t}}_{{\sf t}'=0}\gamma [t({\sf t})-t({\sf t}')]S^{1}_{{\sf t}'} \,,
 \end{align}
 %%
 where $\gamma$ is the `exciting kernel' and $\mu$ is some constant background rate. In order to simulate a Hawkes process using our formalism, the Go code would look like this.
@@ -496,23 +496,31 @@ func SFunctionHawkesProcess(
     timeStepNumber int,
 ) StateVector {
     // notice how the noise is also Markovian here too
-    var smallTimeInterval float64
-    sFunctionValue := make(StateVector, 0)
-    for element = range stateVector {
-        timeIncrement := ExpDistributedTimeIncrementFunction(
-            smallTimeInterval,
-        )
-        // specify an arbitrary function of time for the event rate here
-        eventRateLambda := EventRateLambdaFunction(timeStepNumber)
-        prob := eventRateLambda /
-            (eventRateLambda + 1.0/timeIncrement)
-        // note that the difference between steps for a Poisson
-        // process can only ever be 0 or 1
-        element := 0.0
-        if rand.Float64() < prob {
-            element = 1.0
-        }
-        sFunctionValue = append(sFunctionValue, element)
+    var constantBackgroundRate float64
+    sFunctionValue := make(StateVector, 2)
+    timeIncrement := ExpDistributedTimeIncrementFunction(
+        smallTimeInterval,
+    )
+    // loop over past state vectors and sum them to get the
+    // self-exciting stochastic event rate for the Hawkes process
+    // and put this in state vector index 0
+    sFunctionValue[0] = constantBackgroundRate
+    for lagIndex, stateVector := range stateHistory {
+        currentTime := ElapsedTimeFunction(timeStepNumber)
+        laggedTime := ElapsedTimeFunction(timeStepNumber-lagIndex)
+        sFunctionValue[0] += ExcitingKernel(
+            currentTime, 
+            laggedTime,
+        ) * stateVector[1]
+    }
+    // use the stochastic rate to compute the probability of the 
+    // next event occurring with the same rejection method as for the
+    // time-inhomogeneous Poisson process above
+    prob := sFunctionValue[0] /
+        (sFunctionValue[0] + 1.0/timeIncrement)
+    sFunctionValue[1] := 0.0
+    if rand.Float64() < prob {
+        sFunctionValue[1] = 1.0
     }
     return sFunctionValue
 }
@@ -522,7 +530,7 @@ Note that this idea of integration kernels could also be applied back to our Wie
 %%
 \begin{align}
 S^{0}_{{\sf t}+1}(X',{\sf t}) &= W^0_{{\sf t}+1}-W^0_{\sf t}\\
-S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{1}{T}\sum^{{\sf t}}_{{\sf t}'=0}e^{-\frac{t({\sf t})-t({\sf t}')}{T}} (S^{0}_{{\sf t}'}-S^{0}_{{\sf t}'-1}) \,,
+S^{1}_{{\sf t}+1}(X',{\sf t}) &= \frac{1}{T}\sum^{{\sf t}}_{{\sf t}'=0}e^{-\frac{t({\sf t})-t({\sf t}')}{T}} S^{0}_{{\sf t}'}\,,
 \end{align}
 %%
 where $T$ is some decay coefficient which quantifies the length of memory in continuous time.
