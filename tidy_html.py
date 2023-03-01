@@ -2,7 +2,7 @@ import re
 from bs4 import BeautifulSoup as bs
 
 def main():
-    with open("index.html", "r") as f:
+    with open("temp/dummy_index.html", "r") as f:
         soup = bs(f.read(), "html.parser")
         i = 1
         eq_references = {}
@@ -43,16 +43,16 @@ def main():
             link.attrs["data-reference"] = eq_num
     
     html = soup.prettify("utf-8")
-    with open("index.html", "wb") as f:
+    with open("temp/dummy_index.html", "wb") as f:
         f.write(html)
 
     # read file
-    with open("index.html", 'r') as fp:
+    with open("temp/dummy_index.html", 'r') as fp:
         # read an store all lines into list
         lines = fp.readlines()
     
     # Write file
-    with open("index.html", 'w') as fp:
+    with open("temp/dummy_index.html", 'w') as fp:
         # iterate each line
         for number, line in enumerate(lines):
             if (number < 122) or (number > 140):

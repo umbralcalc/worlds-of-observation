@@ -111,7 +111,7 @@
 
 \title{\Huge \bfseries\sffamily Diffusing Ideas}
 \subtitle{\Large \bfseries\sffamily \color{gray75} Software, noise and building mathematical toys}
-\author{\bfseries\sffamily Robert J. Hardwick}
+\author{\bfseries\sffamily Robert J. Hardwick  \and C. M. Gomez-Perales}
 \date{\today}
 
 \begin{document}
@@ -128,26 +128,26 @@
 {\color{gray75} \rule{13cm}{0.4pt}}\vspace*{-\baselineskip}\vspace{3.2pt} % Thin horizontal rule
 {\color{gray75} \rule{13cm}{1.6pt}} % Thick horizontal rule
 \vspace{1.75\baselineskip} \\
-{\large \bfseries\sffamily Robert J. Hardwick \\
+{\large \bfseries\sffamily Robert J. Hardwick and C. M. Gomez-Perales \\
 \vspace*{1.2\baselineskip}}
 \today
 \vfill
-Shared by the author under an \href{https://opensource.org/licenses/MIT}{MIT License}.\\ \vspace{1mm}
+Shared by the authors under an \href{https://opensource.org/licenses/MIT}{MIT License}.\\ \vspace{1mm}
 The code to compile this book is open source and can be found in this repository: \url{https://github.com/umbralcalc/diffusing-ideas}.
 \end{titlepage}
 
 
 \chapter*{Introduction}
 
-\emph{Diffusing Ideas} is a book of research exploration and software development which I have written for the interest of mathematically-inclined programmers and computational scientists. It's the output of many interrelated projects over several years which have sought to generalise the computational mathematics of simulating, statistically inferring, manipulating and automatically controlling stochastic phenomena as far as possible.
+\emph{Diffusing Ideas} is a book of research exploration and software development which we have written for the interest of mathematically-inclined programmers and computational scientists. It's the output of many interrelated projects over several years which have sought to generalise the computational mathematics of simulating, statistically inferring, manipulating and automatically controlling stochastic phenomena as far as possible.
 
-The book accompanies a lot of new open-source scientific software written predominantly in Go~\cite{golang}, and with some Python~\cite{pythonlang} to top it off. A major motivation for creating these new tools is to prepare a foundation of code from which to develop new and more complex applications. I also hope that the resulting framework will enable anyone to explore and study new phenomena effectively, regardless of their scientific background.
+The book accompanies a lot of new open-source scientific software written predominantly in Go~\cite{golang}, and with some Python~\cite{pythonlang} to top it off. A major motivation for creating these new tools is to prepare a foundation of code from which to develop new and more complex applications. We also hope that the resulting framework will enable anyone to explore and study new phenomena effectively, regardless of their scientific background.
 
-The need to properly test all this software has also provided a wonderful excuse to study and play with an extensive range of mathematical toy models. I've chosen these models based on a fairly broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. However, I've often found that mathematical formalities can obscure the computations that a programmer must implement. So, while I've tried to be as ambitious as possible with the level of technical sophistication in these models, I've also tried to write the expressions in a computer-friendly way where feasible\footnote{For example, I'll typically be thinking more in terms of `matrices' and less about `operators'.} and have added code snippets throughout.
+The need to properly test all this software has also provided a wonderful excuse to study and play with an extensive range of mathematical toy models. we've chosen these models based on a fairly broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. However, we've often found that mathematical formalities can obscure the computations that a programmer must implement. So, while we've tried to be as ambitious as possible with the level of technical sophistication in these models, we've also tried to write the expressions in a computer-friendly way where feasible\footnote{For example, we'll typically be thinking more in terms of `matrices' and less about `operators'.} and have added code snippets throughout.
 
-A quick note on the code: any software that I describe in this book (including the software which compiles the book itself~\cite{diffusingideasbookgithub}) will always be shared under a MIT License~\cite{mitlicense} in a public Git repository.\footnote{The repositories will always be somewhere on this list: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though I apologise in advance if I don't follow these up very quickly as all of this work has to be conducted independently in free time, outside of work hours.
+A quick note on the code: any software that we describe in this book (including the software which compiles the book itself~\cite{diffusingideasbookgithub}) will always be shared under a MIT License~\cite{mitlicense} in a public Git repository.\footnote{The repositories will always be somewhere on this list: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though we apologise in advance if we don't follow these up very quickly as all of this work has to be conducted independently in free time, outside of work hours.
 
-No quest would be complete without a guide, so I think this introduction should end with a list of the key milestones in the book; comprising its four major parts. These parts each correspond to answering one of the following interdependent research questions:
+No quest would be complete without a guide, so we think this introduction should end with a list of the key milestones in the book; comprising its four major parts. These parts each correspond to answering one of the following interdependent research questions:
 
 \begin{enumerate}[leftmargin=2.5\parindent] 
 \item[{\bfseries\sffamily Part 1.}]{How do we simulate a general set of stochastic phenomena?}
@@ -166,11 +166,11 @@ No quest would be complete without a guide, so I think this introduction should 
 
 \chapter{\sffamily Building a generalised simulator}
 
-{\bfseries\sffamily Concept.} To design and build a generalised simulation engine that is able to generate samples from a `Pokédex' of possible stochastic processes that a researcher might encounter. A `Pokédex' here is just my fanciful description for a very general class of multidimensional stochastic processes that pop up everywhere in taming the mathematical wilds of real-world phenomena, and which also leads to a name for the software itself: the `stochadex'. With such a thing pre-built and self-contained, it can become the basis upon which to build generalised software solutions for a lot of different problems. For the mathematically-inclined, this chapter will require the introduction of a new formalism which we shall refer back to throughout the book. For the programmers, the public Git repository for the code that is described in this chapter can be found here: \href{https://github.com/umbralcalc/stochadex}{https://github.com/umbralcalc/stochadex}.
+{\bfseries\sffamily Concept.} To design and build a generalised simulation engine that is able to generate samples from a `Pokédex' of possible stochastic processes that a researcher might encounter. A `Pokédex' here is just a fanciful description for a very general class of multidimensional stochastic processes that pop up everywhere in taming the mathematical wilds of real-world phenomena, and which also leads to a name for the software itself: the `stochadex'. With such a thing pre-built and self-contained, it can become the basis upon which to build generalised software solutions for a lot of different problems. For the mathematically-inclined, this chapter will require the introduction of a new formalism which we shall refer back to throughout the book. For the programmers, the public Git repository for the code that is described in this chapter can be found here: \href{https://github.com/umbralcalc/stochadex}{https://github.com/umbralcalc/stochadex}.
 
 \section{\sffamily Computational formalism}
 
-Before we dive into software design of the stochadex, we need to mathematically define the general computational approach that we're going to take. Because the language of stochastic processes is primarily mathematics, I'd argue this step is essential in enabling a really general description. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
+Before we dive into software design of the stochadex, we need to mathematically define the general computational approach that we're going to take. Because the language of stochastic processes is primarily mathematics, we'd argue this step is essential in enabling a really general description. From experience, it seems reasonable to start by writing down the following formula which describes iterating some arbitrary process forward in time (by one finite step) and adding a new row each to some matrix $X' \rightarrow X$
 %%
 \begin{align}
 X^{i}_{{\sf t}+1} &= F^{i}_{{\sf t}+1}(X',{\sf t}) \,, \label{eq:x-step-def}
@@ -294,7 +294,7 @@ In another example, to model \emph{geometric Brownian motion noise} we would sim
 & S^{i}_{{\sf t}+1}(X',{\sf t}) = X^i_{\sf t}(W^i_{{\sf t}+1}-W^i_{\sf t})\label{eq:gbm} \,.
 \end{align}
 %%
-Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{{\sf t}+1}(X',{\sf t}) = (X^i_{{\sf t}+1}+X^i_{\sf t})(W^i_{{\sf t}+1}-W^i_{\sf t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}. The Go code for any of these should hoepfully be fairly straightforward to deduce based on the lines I've already written above.
+Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{{\sf t}+1}(X',{\sf t}) = (X^i_{{\sf t}+1}+X^i_{\sf t})(W^i_{{\sf t}+1}-W^i_{\sf t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}. The Go code for any of these should hoepfully be fairly straightforward to deduce based on the lines we've already written above.
 
 We can imagine even more general processes that are still Markovian. One example of these in a single-dimension state space would be to define the noise through some general function of the Wiener process like so
 %%
@@ -347,13 +347,13 @@ func D2gDx2(
 }
 \end{lstlisting}
 
-Let's now look at a more complicated type of noise. For example, \emph{fractional Brownian motion} $[B_{H}]_{\sf t}$ with Hurst exponent $H$. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process in one of our state space dimensions by modifying a standard Wiener process like so
+Let's now look at a more complicated type of noise. For example, we might consider sampling from a \emph{fractional Brownian motion} process $[B_{H}]_{\sf t}$, where $H$ is known as the `Hurst exponent'. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process in one of our state space dimensions by modifying the standard Wiener process by a fairly complicated integral factor which looks like this
 %%
 \begin{align}
 S^{0}_{{\sf t}+1}(X',{\sf t}) &= \frac{(W^0_{{\sf t}+1} - W^0_{\sf t})}{\delta t({\sf t})}\int^{t({\sf t}+1)}_{t({\sf t})}{\rm d}t' \frac{(t'-t)^{H-\frac{1}{2}}}{\Gamma (H+\frac{1}{2})} {}_2F_1 \bigg( H-\frac{1}{2};\frac{1}{2}-H;H+\frac{1}{2};1-\frac{t'}{t}\bigg) \label{eq:fbm} \,,
 \end{align}
 %%
-where $S^{0}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}-[B_{H}]_{{\sf t}}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule). In the expression above ${}_2F_1$ and $\Gamma$ are the ordinary hypergeometric and gamma functions, respectively. A discretised form of this integral is written below in Go to try and disentangle some of the complexity in the expression.
+where $S^{0}_{{\sf t}+1}(X',{\sf t})=[B_{H}]_{{\sf t}+1}-[B_{H}]_{{\sf t}}$. The integral in Eq.~(\ref{eq:fbm}) can be approximated using an appropriate numerical procedure (like the trapezium rule, for instance). In the expression above, we have used the symbols ${}_2F_1$ and $\Gamma$ to denote the ordinary hypergeometric and gamma functions, respectively. A discretised form of this integral is written below in Go to try and disentangle some of the mathematics as a program.
 
 \begin{lstlisting}[language=Go]
 import "scientificgo.org/special"
@@ -537,7 +537,7 @@ The general stochastic process that we defined with Eq.~(\ref{eq:x-step-def}) al
 P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying I find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
+where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
 
 The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation factor --- this just normalises the sum of all probabilities to 1 given that there is a sum over ${\sf t}'$. Note that, if the process is defined over continuous time, we would need to replace 
 %%
@@ -630,7 +630,7 @@ P_{({\sf t}+1){\sf t}'}(x\vert x') &\propto {\rm exp}\bigg\{ -\frac{1}{2}\sum^d_
 & \qquad \qquad + \sum^d_{i=1}\sum^d_{j=1}\big[ x-f({\sf t}+1)\big]^i [K^{-1}(\theta , {\sf t}+1,{\sf t}')]^{ij}\big[ x'-f({\sf t}')\big]^j  \bigg\} \label{eq:stat-sol-kramers-moyal-cond}\,,
 \end{align}
 %%
-where $K(\theta , {\sf t}+1,{\sf t}')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}(\theta , {\sf t}+1,{\sf t}')$ denotes taking its inverse. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which I've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though.
+where $K(\theta , {\sf t}+1,{\sf t}')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}(\theta , {\sf t}+1,{\sf t}')$ denotes taking its inverse. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which we've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though.
 
 What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
@@ -667,13 +667,13 @@ where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `
 
 \section{\sffamily Software design}
 
-So I've proposed a computational formalism and done a bit of analysis on it to demonstrate that it can cope with a variety of different stochastic phenomena. Now I think we're ready to summarise what we want the stochadex software package to be able to do. But what's so complicated about Eq.~(\ref{eq:x-step-def})? Can't we just implement an iterative algorithm with a single function? It's true that the fundamental concept is very straightforward, but as I'll discuss in due course; the stochadex needs to have a lot of configurable features so that it's applicable in different situations. Ideally, the stochadex sampler should be designed to try and maintain a balance between performance and flexibility of utilisation.
+So we've proposed a computational formalism and done a bit of analysis on it to demonstrate that it can cope with a variety of different stochastic phenomena. Now we're ready to summarise what we want the stochadex software package to be able to do. But what's so complicated about Eq.~(\ref{eq:x-step-def})? Can't we just implement an iterative algorithm with a single function? It's true that the fundamental concept is very straightforward, but as we'll discuss in due course; the stochadex needs to have a lot of configurable features so that it's applicable in different situations. Ideally, the stochadex sampler should be designed to try and maintain a balance between performance and flexibility of utilisation.
 
 If we begin with the obvious first set of criteria; we want to be able to freely configure the iteration function $F$ of Eq.~(\ref{eq:x-step-def}) and the timestep function $t$ of Eq.~(\ref{eq:t-steps-sum}) so that any process we want can be described. The point at which a simulation stops can also depend on some algorithm termination condition which the user should be able to specify up-front.
 
-Once someone has written the code to create these functions for the stochadex, I want to then be able to recall them in future only with configuration files while maintaining the possibility of changing their simulation run parameters. This flexibility should facilitate our uses for the simulation later in the book, and from this perspective it also makes sense that the parameters should include the random seed and initial state value.
+Once someone has written the code to create these functions for the stochadex, we want to then be able to recall them in future only with configuration files while maintaining the possibility of changing their simulation run parameters. This flexibility should facilitate our uses for the simulation later in the book, and from this perspective it also makes sense that the parameters should include the random seed and initial state value.
 
-The state history matrix $X$ should be configurable in terms of its number of rows --- what we'll call the `state width' --- and its number of columns --- what we'll call the `state history depth'. If we were to keep increasing the state width up to millions of elements or more, it's likely that on most machines the algorithm performance would grind to a halt when trying to iterate over the resulting $X$ within a single thread. Hence, before the algorithm or its performance in any more detail, we can pre-empt the requirement that $X$ should represented in computer memory by a set of partitioned matrices which are all capable of communicating to one-another downstream. In this paradigm, I'd like the user to be able to configure which state partitions are able to communicate with each other without having to write any new code.
+The state history matrix $X$ should be configurable in terms of its number of rows --- what we'll call the `state width' --- and its number of columns --- what we'll call the `state history depth'. If we were to keep increasing the state width up to millions of elements or more, it's likely that on most machines the algorithm performance would grind to a halt when trying to iterate over the resulting $X$ within a single thread. Hence, before the algorithm or its performance in any more detail, we can pre-empt the requirement that $X$ should represented in computer memory by a set of partitioned matrices which are all capable of communicating to one-another downstream. In this paradigm, we'd like the user to be able to configure which state partitions are able to communicate with each other without having to write any new code.
 
 For convenience, it seems sensible to also make the outputs from stochadex runs configurable. A user should be able to change the form of output that they want through, e.g., some specified function of $X$ at the time of outputting data. The times that the stochadex should output this data can also be decided by some user-specified condition so that the frequency of output is fully configurable as well. 
 
@@ -684,11 +684,11 @@ For convenience, it seems sensible to also make the outputs from stochadex runs 
 \label{fig:data-types-design}
 \end{figure}
 
-In summary, I've put together a schematic of data types and their relationships in Fig.~\ref{fig:data-types-design}. In this diagram there is some indication of the data type that I propose to store each piece information in (in Go syntax), and the diagram as a whole should serve as a useful guide to the basic structure of configuration files for the stochadex.
+In summary, we've put together a schematic of data types and their relationships in Fig.~\ref{fig:data-types-design}. In this diagram there is some indication of the data type that we propose to store each piece information in (in Go syntax), and the diagram as a whole should serve as a useful guide to the basic structure of configuration files for the stochadex.
 
-It's clear that in order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history. But let's now return to the point I made earlier about how the performance of such an algorithm will depend on the size of the state history matrix $X$. The key bit of the algorithm design that isn't so straightforward is: how do we sucessfully split this state history up into separate partitions in memory while still enabling them to communicate effectively with each other? Other generalised simulation frameworks --- such as SimPy~\cite{simpy}, StoSpa~\cite{stospa} and FLAME GPU~\cite{flamegpu} --- have all approached this problem in different ways, and with different software architectures. 
+It's clear that in order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history. But let's now return to the point we made earlier about how the performance of such an algorithm will depend on the size of the state history matrix $X$. The key bit of the algorithm design that isn't so straightforward is: how do we sucessfully split this state history up into separate partitions in memory while still enabling them to communicate effectively with each other? Other generalised simulation frameworks --- such as SimPy~\cite{simpy}, StoSpa~\cite{stospa} and FLAME GPU~\cite{flamegpu} --- have all approached this problem in different ways, and with different software architectures. 
 
-In Fig.~\ref{fig:loop-design} I've illustrated what a loop involving two separate state partitions looks like in the stochadex simulator. Each parition is handled by concurrently running execution threads of the same process, while a separate process is used to handle the outputs from the algorithm. While this diagram illustrates only a single use for multiple processes, it's obviously true that we may run many of these whole diagrams at once on a multicore machine to generate a batch of independent ensembles if necessary.
+In Fig.~\ref{fig:loop-design} we've illustrated what a loop involving two separate state partitions looks like in the stochadex simulator. Each parition is handled by concurrently running execution threads of the same process, while a separate process is used to handle the outputs from the algorithm. While this diagram illustrates only a single use for multiple processes, it's obviously true that we may run many of these whole diagrams at once on a multicore machine to generate a batch of independent ensembles if necessary.
 
 \begin{figure}[h]
 \centering
@@ -700,15 +700,19 @@ In Fig.~\ref{fig:loop-design} I've illustrated what a loop involving two separat
 
 \section{\sffamily Implementation details}
 
-Now that the design of the algorithm and its basic data types have been outlined, we can finally turn to the implementation details. As I mentioned in the introduction, most of the core software in this book has been written in Go --- the main reason for this is mostly because it is a performant language that I enjoy developing with. More objectively, the key feature of Go that made it attractive for building the stochadex are its lightweight concurrency primitives called `goroutines'~\cite{goroutines} which made it easy and quick to piece together a scalable pipeline without excessive head-scratching. Ideal for projects in your limited free time!
+Now that the design of the algorithm and its basic data types have been outlined, we can finally turn to the implementation details. As we mentioned in the introduction, most of the core software in this book has been written in Go --- the main reason for this is mostly because it is a performant language that we enjoy developing with. More objectively, the key feature of Go that made it attractive for building the stochadex are its lightweight concurrency primitives called `goroutines'~\cite{goroutines} which made it easy and quick to piece together a scalable pipeline without excessive head-scratching. Ideal for projects in your limited free time!
 
-
+\section{\sffamily Code documentation}
 
 \chapter{\sffamily Simulating a financial market}
 
 {\bfseries\sffamily Concept.} The idea here is to use the Q-Hawkes processes and the Bouchaud work to come up with some interesting simulations of financial markets. 
 
 \section{\sffamily Introducing Q-Hawkes processes}
+
+
+\section{\sffamily Code documentation}
+
 
 
 \chapter{\sffamily Quantum jumps on generic networks}
@@ -718,12 +722,16 @@ Now that the design of the algorithm and its basic data types have been outlined
 \section{\sffamily The Lindblad equation}
 
 
+\section{\sffamily Code documentation}
+
+
 \part*{{\sffamily Part 2. {\color{gray75} How do we then learn/identify the answer to Part 1 from real-world data?}}}
 
 \chapter{\sffamily Empirical dynamical emulators}
 
 {\bfseries\sffamily Concept.} The idea here is to leverage our probabilistic formalism to be able to empirically emulate a wide variety stochastic phenomena within a generalised framework.
 
+\section{\sffamily Code documentation}
 
 \chapter{\sffamily Inferring dynamical 2D maps}
 
@@ -732,11 +740,16 @@ Now that the design of the algorithm and its basic data types have been outlined
 
 \section{\sffamily Adapting the stochadex formalism}
 
+\section{\sffamily Code documentation}
+
+
 \chapter{\sffamily Learning from ants on curved surfaces}
 
 {\bfseries\sffamily Concept.} The idea here is 
 
 \section{\sffamily Diffusive limits for ant interactions}
+
+\section{\sffamily Code documentation}
 
 
 \chapter{\sffamily Hydrodynamic ensembles from input data}
@@ -746,11 +759,17 @@ Now that the design of the algorithm and its basic data types have been outlined
 
 \section{\sffamily The Boltzmann/Navier-Stokes equations}
 
+
+\section{\sffamily Code documentation}
+
 \chapter{\sffamily Generalised statistical inference tools}
 
 {\bfseries\sffamily Concept.} The idea here is to extend the stochadex with tools for very generalised statistical inference (ABC algorithms and the like) that will work in nearly every situation. Probably need to exploit the phase space analogy of the formalism.
 
 \section{\sffamily Likelihood-free methods}
+
+
+\section{\sffamily Code documentation}
 
 
 \part*{{\sffamily Part 3. {\color{gray75} How do we simulate a general set of control policies to interact with the answer to Part 1?}}}
@@ -761,6 +780,9 @@ Now that the design of the algorithm and its basic data types have been outlined
 {\bfseries\sffamily Concept.} The idea here is 
 
 \section{\sffamily Parameterising general interactions}
+
+
+\section{\sffamily Code documentation}
 
 
 \chapter{\sffamily Angling for freshwater fish}
@@ -799,13 +821,16 @@ Look into the likelihood from, e.g., an electrofishing survey such as in Ref.~\c
 \end{align}
 
 
+\section{\sffamily Code documentation}
+
+
 \chapter{\sffamily Managing a Rugby match}
 
 {\bfseries\sffamily Concept.} The idea here is 
 
 \section{\sffamily Introduction}
 
-Since the basic game engine will run using the \href{https://github.com/umbralcalc/stochadex}{stochadex} sampler, the novelties in this project are all in the design of the rugby match model itself. And, in this instance, I'm not especially keen on spending a lot of time doing detailed data analysis to come up with the most realistic values for the parameters that are dreamed up here. Even though this would also be interesting.
+Since the basic game engine will run using the \href{https://github.com/umbralcalc/stochadex}{stochadex} sampler, the novelties in this project are all in the design of the rugby match model itself. And, in this instance, we're not especially keen on spending a lot of time doing detailed data analysis to come up with the most realistic values for the parameters that are dreamed up here. Even though this would also be interesting.
 
 One could do this data analysis, for instance, by scraping player-level performance data from one of the excellent websites that collect live commentary data such as \href{https://www.rugbypass.com/}{rugbypass.com} or \href{https://www.espn.co.uk/rugby/}{espn.co.uk/rugby}.
 
@@ -835,9 +860,15 @@ The diagrams below sum up what should hopefully work as a decent initial approxi
 
 \section{\sffamily Writing the game itself}
 
+\section{\sffamily Code documentation}
+
+
 \chapter{\sffamily Influencing house prices}
 
 {\bfseries\sffamily Concept.} The idea here is 
+
+
+\section{\sffamily Code documentation}
 
 
 \part*{{\sffamily  Part 4. {\color{gray75} How do we then optimise the answer to Part 3 to achieve a specified control objective?}}}
@@ -847,21 +878,25 @@ The diagrams below sum up what should hopefully work as a decent initial approxi
 
 {\bfseries\sffamily Concept.} The idea  controlhere is 
 
+\section{\sffamily Code documentation}
 
 \chapter{\sffamily Resource allocation for epidemics}
 
 {\bfseries\sffamily Concept.} The idea here is to limit the spread of some abstract epidemic through the correct time-dependent resource allocation.
 
+\section{\sffamily Code documentation}
 
 \chapter{\sffamily Quantum system control}
 
 {\bfseries\sffamily Concept.} The idea here is to follow stuff along these lines \href{https://arxiv.org/pdf/1210.7127.pdf}{here}.
 
+\section{\sffamily Code documentation}
 
 \chapter{\sffamily Other models}
 
 {\bfseries\sffamily Concept.} The idea here is
 
+\section{\sffamily Code documentation}
 
 
 
