@@ -1,0 +1,35 @@
+\chapter{\sffamily Managing a Rugby match}
+
+{\bfseries\sffamily Concept.} The idea here is 
+
+\section{\sffamily Introduction}
+
+Since the basic game engine will run using the \href{https://github.com/umbralcalc/stochadex}{stochadex} sampler, the novelties in this project are all in the design of the rugby match model itself. And, in this instance, we're not especially keen on spending a lot of time doing detailed data analysis to come up with the most realistic values for the parameters that are dreamed up here. Even though this would also be interesting.
+
+One could do this data analysis, for instance, by scraping player-level performance data from one of the excellent websites that collect live commentary data such as \href{https://www.rugbypass.com/}{rugbypass.com} or \href{https://www.espn.co.uk/rugby/}{espn.co.uk/rugby}.
+
+This game is primarily a way of testing out the interface of the stochadex for other users to build projects with. This should help to both iron out some of the kinks in the design, as well as prioritise adding some more convenience methods for event-based modelling into its code base.
+
+\section{\sffamily Designing the event simulation engine}
+
+We need to begin by specifying an appropriate event space to live in when simulating a rugby match. It is important at this level that events are defined in quite broadly applicable terms, as it will define the state space available to our stochastic sampler and hence the simulated game will never be allowed to exist outside of it. So, in order to capture the fully detailed range of events that are possible in a real-world match, we will need to be a little imaginative in how we define certain gameplay elements when we move through the space.
+
+The diagrams below sum up what should hopefully work as a decent initial approximation while providing a little context with specific examples of play action.
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{images/test.drawio.png}
+\caption{Simplified event graph of a rugby union match - replace with drawio.}
+\label{fig:event-graph}
+\end{figure}
+
+\begin{figure}[h]
+\includegraphics[width=10cm]{images/test.drawio.png}
+\caption{Optional model ideas - replace with drawio.}
+\label{fig:model-ideas}
+\end{figure}
+
+\section{\sffamily Linking to player attributes}
+
+\section{\sffamily Deciding on gameplay actions}
+
+\section{\sffamily Writing the game itself}

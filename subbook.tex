@@ -1,0 +1,151 @@
+\documentclass{book}
+
+\usepackage{etoolbox}
+
+\makeatletter
+\def\subtitle#1{\gdef\@subtitle{#1}}
+\patchcmd\maketitle
+  {{\LARGE \@title \par}}
+  {{\LARGE \@title \par}%
+   \vskip 1.5em
+   {\Large \@subtitle \par}}
+\makeatother
+
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath,mathtools,bbm}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{appendix}
+\usepackage{enumitem}
+\usepackage{bm}
+\usepackage{multicol}
+\usepackage{geometry}
+\usepackage{colortbl}
+\usepackage{changepage}
+\usepackage{color}
+\usepackage{mathrsfs}
+\usepackage{bigints}
+\usepackage{pdflscape}
+\usepackage{adjustbox}
+\usepackage{tocloft}
+\usepackage{lscape}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks=true,
+            linkcolor=blue,
+            urlcolor=blue,
+            citecolor=blue]{hyperref}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97}
+\definecolor{stringorange}{rgb}{0.95, 0.4, 0.18}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{stringorange},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle}
+
+\sloppy
+\usepackage{tikz, lipsum}% http://ctan.org/pkg/{pgf,lipsum}
+\newcommand*{\chapnumfont}{\normalfont\sffamily\huge\bfseries}
+\newcommand*{\printchapternum}{
+  \begin{tikzpicture}
+    \draw[fill,color=gray75] (0,0) rectangle (2cm,2cm);
+    \draw[color=white] (1cm,1cm) node { \chapnumfont\thechapter };
+  \end{tikzpicture}
+}
+\newcommand*{\chaptitlefont}{\normalfont\sffamily\Huge\bfseries}
+\newcommand*{\printchaptertitle}[1]{\flushright\chaptitlefont#1}
+
+\makeatletter
+% \@makechapterhead prints regular chapter heading.
+% Taken directly from report.cls and modified.
+\def\@makechapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedleft
+    \ifnum \c@secnumdepth >\m@ne
+        \printchapternum
+        \par\nobreak
+        \vskip 20\p@
+    \fi
+    \interlinepenalty\@M
+    \printchaptertitle{#1}\par\nobreak
+    \vskip 40\p@
+  }}
+% \@makeschapterhead prints starred chapter heading.
+% Taken directly from report.cls and modified.
+\def\@makeschapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedleft
+    \interlinepenalty\@M
+    \printchaptertitle{#1}\par\nobreak
+    \vskip 40\p@
+  }}
+\makeatother
+
+\makeatletter\@addtoreset{chapter}{part}\makeatother%
+
+\renewcommand{\cfttoctitlefont}{\hfill\Huge\bfseries\sffamily}
+
+\renewcommand\contentsname{Table of contents}
+
+\definecolor{gray75}{gray}{0.75}
+
+\title{\Huge \bfseries\sffamily Diffusing Ideas}
+\subtitle{\Large \bfseries\sffamily \color{gray75} Software, noise and building mathematical toys}
+\author{\bfseries\sffamily Robert J. Hardwick  \and C. M. Gomez-Perales}
+\date{\today}
+
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{1.5\baselineskip}
+{\color{gray75}\rule{13cm}{1.3pt}}\vspace*{-\baselineskip}\vspace*{2pt} % Thick horizontal rule
+{\color{gray75}\rule{13cm}{0.4pt}} \\ % Thin horizontal rule
+\vspace{1.2\baselineskip} % Whitespace 
+{\Huge \bfseries\sffamily Diffusing Ideas} \\ 
+\vspace{4mm}
+{\Large \bfseries\sffamily \color{gray75} Software, noise and building mathematical toys \\}
+\vspace*{0.75\baselineskip}
+{\color{gray75}\rule{13cm}{0.4pt}}\vspace*{-\baselineskip}\vspace*{2.75pt} % Thick horizontal rule
+{\color{gray75}\rule{13cm}{1.3pt}} \\ % Thin horizontal rule
+\vspace{1.0\baselineskip} % Whitespace 
+{\large \bfseries\sffamily Robert J. Hardwick and C. M. Gomez-Perales \\
+\vspace*{1.2\baselineskip}}
+\today
+\vfill
+Shared by the authors under an \href{https://opensource.org/licenses/MIT}{MIT License}.\\ \vspace{1mm}
+The code to compile this book is open source and can be found in this repository: \url{https://github.com/umbralcalc/diffusing-ideas}.
+\end{titlepage}
+
+\mainmatter
+
+\part*{\includegraphics*[width=14cm]{images/page-design-1.png}}
+
+\input{building_a_generalised_simulator/chapter.tex}
+
+
+%\appendix
+%\chapter{First and only appendix}
+\backmatter
+\bibliographystyle{JHEP.bst}
+\bibliography{book.bib}
+\end{document}
