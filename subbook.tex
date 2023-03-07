@@ -36,6 +36,18 @@
             urlcolor=blue,
             citecolor=blue]{hyperref}
 
+\ExplSyntaxOn
+\NewDocumentCommand{\getenv}{om}
+  {
+    \sys_get_shell:nnN { kpsewhich ~ --var-value ~ #2 }
+      { \cctab_select:N \c_str_cctab } \l_tmpa_tl
+    \tl_trim_spaces:N \l_tmpa_tl
+    \IfNoValueTF { #1 }
+      { \tl_use:N \l_tmpa_tl }
+      { \tl_set_eq:NN #1 \l_tmpa_tl }
+  }
+\ExplSyntaxOff
+
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
@@ -106,6 +118,9 @@
 
 \renewcommand\contentsname{Table of contents}
 
+\getenv[\compilechapter]{CHAPTER_TO_COMPILE}
+\getenv[\numberofchapter]{CHAPTER_NUMBER}
+
 \definecolor{gray75}{gray}{0.75}
 
 \title{\Huge \bfseries\sffamily Diffusing Ideas}
@@ -119,7 +134,8 @@
 
 \part*{\includegraphics*[width=14cm]{images/page-design-1.png}}
 
-\input{building_a_generalised_simulator/chapter.tex}
+\setcounter{chapter}{\numberofchapter}
+\input{\compilechapter}
 
 
 %\appendix
