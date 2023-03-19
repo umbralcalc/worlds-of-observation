@@ -88,17 +88,13 @@ a:active {
 img {
     display: block;
     margin: 0 auto;
-    width: 100%;
+    width: 40%;
 }
 
 figcaption {
     display: block;
     margin: 0 auto;
     width: 40%;
-}
-
-header {
-    width: 30%;
 }
 
 /* W3.CSS 4.15 December 2020 by Jan Egil and Borge Refsnes */
