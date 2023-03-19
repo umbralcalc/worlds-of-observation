@@ -84,12 +84,6 @@ a:active {
     color: blue;
     text-decoration: none;
 }
-  
-img {
-    display: block;
-    margin: 0 auto;
-    width: 350px;
-}
 
 figcaption {
     display: block;
