@@ -513,34 +513,28 @@ So we've proposed a computational formalism and done a bit of analysis on it to 
 
 If we begin with the obvious first set of criteria; we want to be able to freely configure the iteration function $F$ of Eq.~(\ref{eq:x-step-def}) and the timestep function $t$ of Eq.~(\ref{eq:t-steps-sum}) so that any process we want can be described. The point at which a simulation stops can also depend on some algorithm termination condition which the user should be able to specify up-front.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=13cm]{images/stochadex-data-types.drawio.png}
+\caption{A relational summary of the core data types in the stochadex.}
+\label{fig:data-types-design}
+\end{figure}
+
 Once someone has written the code to create these functions for the stochadex, we want to then be able to recall them in future only with configuration files while maintaining the possibility of changing their simulation run parameters. This flexibility should facilitate our uses for the simulation later in the book, and from this perspective it also makes sense that the parameters should include the random seed and initial state value.
 
 The state history matrix $X$ should be configurable in terms of its number of rows --- what we'll call the `state width' --- and its number of columns --- what we'll call the `state history depth'. If we were to keep increasing the state width up to millions of elements or more, it's likely that on most machines the algorithm performance would grind to a halt when trying to iterate over the resulting $X$ within a single thread. Hence, before the algorithm or its performance in any more detail, we can pre-empt the requirement that $X$ should represented in computer memory by a set of partitioned matrices which are all capable of communicating to one-another downstream. In this paradigm, we'd like the user to be able to configure which state partitions are able to communicate with each other without having to write any new code.
 
 For convenience, it seems sensible to also make the outputs from stochadex runs configurable. A user should be able to change the form of output that they want through, e.g., some specified function of $X$ at the time of outputting data. The times that the stochadex should output this data can also be decided by some user-specified condition so that the frequency of output is fully configurable as well. 
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=15cm]{images/stochadex-data-types.drawio.png}
-\caption{A relational summary of the core data types in the stochadex.}
-\label{fig:data-types-design}
-\end{figure}
-
 In summary, we've put together a schematic of data types and their relationships in Fig.~\ref{fig:data-types-design}. In this diagram there is some indication of the data type that we propose to store each piece information in (in Go syntax), and the diagram as a whole should serve as a useful guide to the basic structure of configuration files for the stochadex.
 
-It's clear that in order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history. But let's now return to the point we made earlier about how the performance of such an algorithm will depend on the size of the state history matrix $X$. The key bit of the algorithm design that isn't so straightforward is: how do we sucessfully split this state history up into separate partitions in memory while still enabling them to communicate effectively with each other? Other generalised simulation frameworks --- such as SimPy~\cite{simpy}, StoSpa~\cite{stospa} and FLAME GPU~\cite{flamegpu} --- have all approached this problem in different ways, and with different software architectures. 
-
-In Fig.~\ref{fig:loop-design} we've illustrated what a loop involving two separate state partitions looks like in the stochadex simulator. Each parition is handled by concurrently running execution threads of the same process, while a separate process is used to handle the outputs from the algorithm. While this diagram illustrates only a single use for multiple processes, it's obviously true that we may run many of these whole diagrams at once on a multicore machine to generate a batch of independent ensembles if necessary.
-
 \begin{figure}[h]
 \centering
-\includegraphics[width=15cm]{images/stochadex-loop.drawio.png}
+\includegraphics[width=13cm]{images/stochadex-loop.drawio.png}
 \caption{A loop of the stochadex simulation algorithm with two state partitions.}
 \label{fig:loop-design}
 \end{figure}
 
-\section{\sffamily Implementation details}
+It's clear that in order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history. But let's now return to the point we made earlier about how the performance of such an algorithm will depend on the size of the state history matrix $X$. The key bit of the algorithm design that isn't so straightforward is: how do we sucessfully split this state history up into separate partitions in memory while still enabling them to communicate effectively with each other? Other generalised simulation frameworks --- such as SimPy~\cite{simpy}, StoSpa~\cite{stospa} and FLAME GPU~\cite{flamegpu} --- have all approached this problem in different ways, and with different software architectures. 
 
-Now that the design of the algorithm and its basic data types have been outlined, we can finally turn to the implementation details. As we mentioned in the introduction, most of the core software in this book has been written in Go --- the main reason for this is mostly because it is a performant language that we enjoy developing with. More objectively, the key feature of Go that made it attractive for building the stochadex are its lightweight concurrency primitives called `goroutines'~\cite{goroutines} which made it easy and quick to piece together a scalable pipeline without excessive head-scratching. Ideal for projects in your limited free time!
-
-\textcolor{red}{Remember to reference the godoc documentation for the code here.}
+In Fig.~\ref{fig:loop-design} we've illustrated what a loop involving separate state partitions looks like in the stochadex simulator. Each partition is handled by concurrently running execution threads of the same process, while a separate process may be used to handle the outputs from the algorithm. While this diagram illustrates only a single use for multiple processes, it's obviously true that we may run many of these whole diagrams at once on a multicore machine to generate a batch of independent ensembles if necessary.

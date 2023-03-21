@@ -120,6 +120,7 @@
 
 \getenv[\compilechapter]{CHAPTER_TO_COMPILE}
 \getenv[\numberofchapter]{CHAPTER_NUMBER}
+\getenv[\chapterfrontpage]{CHAPTER_FRONTPAGE}
 
 \definecolor{gray75}{gray}{0.75}
 
@@ -132,7 +133,7 @@
 
 \mainmatter
 
-\part*{\includegraphics*[width=14cm]{images/page-design-1.png}}
+\part*{\includegraphics*[width=14cm]{\chapterfrontpage}}
 
 \setcounter{chapter}{\numberofchapter}
 \input{\compilechapter}

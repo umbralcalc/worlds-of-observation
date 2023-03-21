@@ -25,6 +25,7 @@ for filename in "${filenames[@]}"
 do
    export CHAPTER_NUMBER=$counter
    export CHAPTER_TO_COMPILE=$filename
+   export CHAPTER_FRONTPAGE="images/page-design-$((counter+1)).png"
    latexmk -xelatex -synctex=1 -interaction=nonstopmode -file-line-error -jobname="$filename" subbook.tex
    read -p "Compiled $filename as chapter $((counter+1)). Press any key to resume ..."
    counter=$((counter+1))
