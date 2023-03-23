@@ -23,6 +23,7 @@ declare -a filenames=(
 counter=0
 for filename in "${filenames[@]}"
 do
+   rm $filename.pdf
    export CHAPTER_NUMBER=$counter
    export CHAPTER_TO_COMPILE=$filename
    export CHAPTER_FRONTPAGE="images/page-design-$((counter+1)).png"
