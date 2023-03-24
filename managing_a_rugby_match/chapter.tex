@@ -14,12 +14,14 @@ Let's begin by specifying an appropriate event space to live in when simulating 
 \label{fig:event-graph}
 \end{figure}
 
+In addition to occupying some state in the event graph, the state of a rugby match also includes a binary `possession' element which encodes which team has the ball at any moment. We should also include the 2-dimensional pitch location of the ball as an element of the match state in order to get a better sense of how likely some event transitions are, e.g., when playing on the edge of the pitch near the touchline it's clearly more likely that a Run Phase is going to result in a lineout than if the state is currently in the centre of the pitch. To add even more detail, we will include states for each playing position on each side which encode: the playing abilities of each player, their fatigue status and their substitution status. The latter of these encodes whether or not the player has been injured or yellow/red-carded during the course of a game and should also enable management strategies to become more nuanced.
+
 Since a rugby match exists in continuous time, it is natural to choose a continuous-time event-based simulation model for our game engine. As we have discussed in previous chapters already, this means we will be characterising transition probabilities of the event graph by ratios of event rates in time. But what are the event transitions we should be considering and how should we model them? Let's now go through these in turn with our motivations in each case.
 
-We begin with what we'll call the `possession change transition'. 
+We begin with what we'll call the `possession change transition'; this transition may occur during any of the white-coloured events on the graph in Fig.~\ref{fig:event-graph} and let's assign this a time and state-dependent expected rate of occurance $\lambda_{\rm pos}(X, t)$. 
 
 
-\section{\sffamily Linking to player attributes}
+\section{\sffamily Linking event rates to match state}
 
 \section{\sffamily Deciding on gameplay actions}
 
