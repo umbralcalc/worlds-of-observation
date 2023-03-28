@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="" xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="pandoc" name="generator"/>
+  <meta content="width=device-width, initial-scale=1.0, user-scalable=yes" name="viewport"/>
+  <meta content="Robert J. Hardwick" name="author"/>
+  <style>
+   code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" type="text/javascript">
+  </script>
+  <script async="" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <link href="style.css" rel="stylesheet"/>
+ </head>
+ <body class="w3-animate-opacity">
+  <!-- Navbar -->
+  <div class="w3-top">
+   <div class="w3-bar w3-light-grey w3-card w3-left-align w3-large">
+    <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-light-grey" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu">
+     <i class="fa fa-bars">
+     </i>
+    </a>
+    <a class="w3-bar-item w3-button w3-padding-large w3-white" href="#">
+     <font color="grey">
+      Home
+     </font>
+    </a>
+    <a class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" href="https://umbralcalc.github.io/diffusing-ideas/book.pdf">
+     <font color="grey">
+      Full Book PDF
+     </font>
+    </a>
+    <a class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white" href="https://github.com/umbralcalc?tab=repositories">
+     <font color="grey">
+      All The Code
+     </font>
+    </a>
+   </div>
+   <!-- Navbar on small screens -->
+   <div class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium w3-large" id="navDemo">
+    <a class="w3-bar-item w3-button w3-padding-large" href="#">
+     Full Book PDF
+    </a>
+   </div>
+  </div>
+  <hr/>
+  <hr/>
+  <hr/>
+  <hr/>
+  <header class="w3-container w3-animate-opacity w3-light-grey w3-center" style="padding:20px 16px">
+    <img src="images/book-frontcover.png", width=350px>
+  </header>
+  <p class="author">
+  <hr/>
+  <hr/>
+  <p>
+   Shared by the authors under an <a href="https://opensource.org/licenses/MIT">MIT License</a>.
+   <br/>
+   The code to compile this book is open source and can be found in <a href="https://github.com/umbralcalc/diffusing-ideas">this GitHub repository</a>.
+  </p>
+  <hr/>
+  <hr/>
+  <h2 class="unnumbered" id="introduction">
+   Introduction
+  </h2>
+  <p>
+   <em>Diffusing Ideas</em> is a book of research exploration and software development which we have written for the interest of mathematically-inclined programmers and computational scientists. It’s the output of many interrelated projects over several years which have sought to generalise the computational mathematics of simulating, statistically inferring, manipulating and automatically controlling stochastic phenomena as far as possible.
+  </p>
+  <p>
+   The book accompanies a lot of new open-source scientific software written predominantly in Go <span class="citation" data-cites="golang">[1]</span>, and with some Python <span class="citation" data-cites="pythonlang">[2]</span> to top it off. A major motivation for creating these new tools is to prepare a foundation of code from which to develop new and more complex applications. We also hope that the resulting framework will enable anyone to explore and study new phenomena effectively, regardless of their scientific background.
+  </p>
+  <p>
+   The need to properly test all this software has also provided a wonderful excuse to study and play with an extensive range of mathematical toy models. We’ve chosen these models based on a fairly broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. However, we’ve often found that mathematical formalities can obscure the computations that a programmer must implement. So, while we’ve tried to be as ambitious as possible with the level of technical sophistication in these models, we’ve also tried to write the expressions in a computer-friendly way where feasible<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a>
+   and have added code snippets throughout.
+  </p>
+  <p>
+   A quick note on the code: any software that we describe in this book (including the software which compiles the book itself <span class="citation" data-cites="diffusingideasbookgithub">[3]</span>) will always be shared under a MIT License <span class="citation" data-cites="mitlicense">[4]</span> in a public Git repository.<a class="footnote-ref" href="#fn2" id="fnref2" role="doc-noteref"><sup>2</sup></a>
+   Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though we apologise in advance if we don’t follow these up very quickly as all of this work has to be conducted independently in free time, outside of work hours.
+  </p>
+  <p>
+   No quest would be complete without a guide, so we think this introduction should end with a list of the key milestones in the book; comprising its four major parts. These parts each correspond to answering one of the following interdependent research questions:
+  </p>
+  <ol>
+   <li>
+    <p>
+     <span>
+      How do we simulate a general set of stochastic phenomena?
+     </span>
+    </p>
+   </li>
+   <li>
+    <p>
+     <span>
+      How do we then learn/identify the answer to
+      <span>
+       <strong>
+        Part 1
+       </strong>
+      </span>
+      from real-world data?
+     </span>
+    </p>
+   </li>
+   <li>
+    <p>
+     <span>
+      How do we simulate a general set of control policies to interact with the answer to
+      <span>
+       <strong>
+        Part 1
+       </strong>
+      </span>
+      ?
+     </span>
+    </p>
+   </li>
+   <li>
+    <p>
+     <span>
+      How do we then optimise the answer to
+      <span>
+       <strong>
+        Part 3
+       </strong>
+      </span>
+      to achieve a specified control objective?
+     </span>
+    </p>
+   </li>
+  </ol>
+  <p>
+  </p>
+  <hr/>
+  <hr/>
+  <h2 class="unnumbered" id="chapters">
+    Chapters
+   </h2>
+   <strong>
+     Part 1
+   </strong>
+   <br/>
+   <a href="building_a_generalised_simulator/chapter.pdf" target="_blank">Building a generalised simulator</a>
+   <br/>
+   <a href="simulating_a_financial_market/chapter.pdf" target="_blank">Simulating a financial market</a>
+   <br/>
+   <a href="quantum_jumps_on_generic_networks/chapter.pdf" target="_blank">Quantum jumps on generic networks</a>
+   <br/>
+   <br/>
+   <strong>
+     Part 2
+   </strong>
+   <br/>
+   <a href="empirical_dynamical_emulators/chapter.pdf" target="_blank">Empirical dynamical emulators</a>
+   <br/>
+   <a href="inferring_dynamical_2d_maps/chapter.pdf" target="_blank">Inferring dynamical 2D maps</a>
+   <br/>
+   <a href="learning_from_ants_on_curved_surfaces/chapter.pdf" target="_blank">Learning from ants on curved surfaces</a>
+   <br/>
+   <a href="a_world_of_hydrodynamic_ensembles/chapter.pdf" target="_blank">A world of hydrodynamic ensembles</a>
+   <br/>
+   <a href="generalised_statistical_inference_tools/chapter.pdf" target="_blank">Generalised statistical inference tools</a>
+   <br/>
+   <br/>
+   <strong>
+     Part 3
+   </strong>
+   <br/>
+   <a href="interacting_with_systems_in_general/chapter.pdf" target="_blank">Interacting with systems in general</a>
+   <br/>
+   <a href="angling_for_freshwater_fish/chapter.pdf" target="_blank">Angling for freshwater fish</a>
+   <br/>
+   <a href="managing_a_rugby_match/chapter.pdf" target="_blank">Managing a rugby match</a>
+   <br/>
+   <a href="influencing_house_prices/chapter.pdf" target="_blank">Influencing house prices</a>
+   <br/>
+   <br/>
+   <strong>
+     Part 4
+   </strong>
+   <br/>
+   <a href="optimising_actions_for_control_objectives/chapter.pdf" target="_blank">Optimising actions for control objectives</a>
+   <br/>
+   <a href="resource_allocation_for_epidemics/chapter.pdf" target="_blank">Resource allocation for epidemics</a>
+   <br/>
+   <a href="quantum_system_control/chapter.pdf" target="_blank">Quantum system control</a>
+   <hr/>
+   <hr/>
+  <h2 class="unnumbered" id="references">
+   References
+  </h2>
+  <div class="references" id="refs" role="doc-bibliography">
+   <div id="ref-golang">
+    <p>
+     [1] “The Go Programming Language.” <a href="https://go.dev/">https://go.dev/</a>.
+    </p>
+   </div>
+   <div id="ref-pythonlang">
+    <p>
+     [2] “The Python Programming Language.” <a href="https://www.python.org/">https://www.python.org/</a>.
+    </p>
+   </div>
+   <div id="ref-diffusingideasbookgithub">
+    <p>
+     [3] “The Diffusing Ideas GitHub Repository.” <a href="https://github.com/umbralcalc/diffusing-ideas">https://github.com/umbralcalc/diffusing-ideas</a>.
+    </p>
+   </div>
+   <div id="ref-mitlicense">
+    <p>
+     [4] “Open Source Initiative: MIT License.” <a href="https://opensource.org/licenses/MIT">https://opensource.org/licenses/MIT</a>.
+    </p>
+   </div>
+  <section class="footnotes" role="doc-endnotes">
+   <hr/>
+   <hr/>
+   <ol>
+    <li id="fn1" role="doc-endnote">
+     <p>
+      For example, we’ll typically be thinking more in terms of ‘matrices’ and less about ‘operators’.
+      <a class="footnote-back" href="#fnref1" role="doc-backlink">
+       ↩︎
+      </a>
+     </p>
+    </li>
+    <li id="fn2" role="doc-endnote">
+     <p>
+      The repositories will always be somewhere on this list: <a href="https://github.com/umbralcalc?tab=repositories">https://github.com/umbralcalc?tab=repositories</a>.
+      <a class="footnote-back" href="#fnref2" role="doc-backlink">
+       ↩︎
+      </a>
+     </p>
+    </li>
+   </ol>
+  </section>
+  <hr/>
+  <hr/>
+  <script>
+  // Used to toggle the menu on small screens when clicking on the menu button
+  function myFunction() {
+    var x = document.getElementById("navDemo");
+    if (x.className.indexOf("w3-show") == -1) {
+      x.className += " w3-show";
+    } else { 
+      x.className = x.className.replace(" w3-show", "");
+    }
+  }
+  </script>
+ </body>
+</html>
