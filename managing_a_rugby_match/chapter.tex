@@ -54,6 +54,17 @@ where $C(X_{{\sf t}}, {\sf t})$ is some spatial covariance matrix which depends 
 
 In the last section we introduced a continuous-time event-based simulation model for a rugby union match. In this section we are going to add more detail into this model by inventing how to associate specific player states and abilities to the event rates of the simulation. Before continuing, we want to reiterate that this model is entirely made up and, while we hope it illustrates some interesting mathematical modelling ideas in the context of rugby, there's no particular reason why a statistical inference with a reliable dataset should prefer our model to others which may exist. In other words, this toy model is just for fun!
 
+\begin{figure}[h]
+\includegraphics[width=15cm]{images/rugby-player-abilities.drawio.png}
+\caption{Associated playing abilities for each position type.}
+\label{fig:player-abilities}
+\end{figure}
+
+In Fig.~\ref{fig:player-abilities} we have begun by separating playing positions on the rugby field into their usual descriptions and then associating each player type with a short list of simplified attributes. Our model is then to associate a player with an `attacking' and `defensive' ability which corresponds to each of their attributes. For example, a Front Row Forward will have 8 abilities associated to them: 2 for each of their {\sf Scrum}, {\sf Lineout}, {\sf Ruck} and {\sf Maul} attributes.
+
+ 
+
+
 \section{\sffamily Deciding on gameplay actions}
 
 
