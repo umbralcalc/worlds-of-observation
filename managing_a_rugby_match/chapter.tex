@@ -60,9 +60,17 @@ In the last section we introduced a continuous-time event-based simulation model
 \label{fig:player-abilities}
 \end{figure}
 
-In Fig.~\ref{fig:player-abilities} we have begun by separating playing positions on the rugby field into their usual descriptions and then associating each player type with a short list of simplified attributes. Our model is then to associate a player with an `attacking' and `defensive' ability which corresponds to each of their attributes. For example, a Front Row Forward will have 8 abilities associated to them: 2 for each of their {\sf Scrum}, {\sf Lineout}, {\sf Ruck} and {\sf Maul} attributes.
+In Fig.~\ref{fig:player-abilities} we have begun by separating playing positions on the rugby field into their usual descriptions and then associating each player type with a short list of simplified attributes. Our model is then to associate a player with an `attacking' and `defensive' ability which corresponds to each of their attributes. For example, a Front Row Forward will have 8 abilities associated to them: 2 for each of their {\sf Scrum}, {\sf Lineout}, {\sf Ruck} and {\sf Maul} attributes. 
 
- 
+Let's now create a vector-valued function $o (a, X^1_{\sf t})$ which returns all of the attacking attributes associated to match state $a$ and an analogous one $d (a, X^1_{\sf t})$ for the defensive attributes. The dependencies of these functions on the ball possession state $X^1_{\sf t}$ comes from the fact that when, e.g., the {\sf Home Team} has possession of the ball it will be their attacking attributes that are returned by $o (a, X^1_{\sf t})$ and the {\sf Away Team}'s defensive attributes that are returned by $d (a, X^1_{\sf t})$. On the other hand, it should be the other team's attributes that are returned by each function when possession is given to the {\sf Away Team}. 
+
+There are different transition types, but thinking of equations of the form...
+%%
+\begin{align}
+\lambda_{a\rightarrow b}(X_{\sf t}, {\sf t}) = \sum_{\forall i} o^i(a, X^1_{\sf t})e^{-f^i[t({\sf t})-t^i_{\rm start}]} - \sum_{\forall j}d^j(a, X^1_{\sf t})e^{-f^j[t({\sf t})-t^j_{\rm start}]} \,,
+\end{align}
+%%
+where $f$ is a vector of each position-types' fatigue rate and the sums over indices $i$ and $j$ correspond to active players on the attacking and defending team, respectively.
 
 
 \section{\sffamily Deciding on gameplay actions}
