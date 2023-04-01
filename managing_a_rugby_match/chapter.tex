@@ -16,13 +16,16 @@ Let's begin by specifying an appropriate state space to live in when simulating 
 
 In addition to occupying some state in the event graph, the state of a rugby match must also include a binary `possession' element which encodes which team has the ball at any moment. We should also include the 2-dimensional pitch location of the ball as an element of the match state in order to get a better sense of how likely some state transitions are, e.g., when playing on the edge of the pitch near the touchline it's clearly more likely that a {\sf Run Phase} is going to result in a {\sf Lineout} than if the state is currently in the centre of the pitch. To add even more detail, in the next section we will elaborate further by introducing states for each playing position on each side, which encode the playing abilities of each player, their fatigue status and their substitution status. The latter of these keeps track of whether or not the player has been injured or yellow/red-carded during the course of a game and should also enable management strategies to become more nuanced.
 
-Since a rugby match exists in continuous time, it is natural to choose a continuous-time event-based simulation model for our game engine. As we have discussed in previous chapters already, this means we will be characterising transition probabilities of the event graph in Fig.~\ref{fig:event-graph} by ratios of event rates in time. Recalling our notation in previous chapters, if we consider the current state vector of the match $X_{\sf t}$, we can start by assigning each transition ${\sf a}\rightarrow {\sf b}$ on the event graph an associated expected rate of occurance $\lambda_{{\sf a}\rightarrow {\sf b}}$ which is defined in units of continuous time, e.g., seconds. In addition to the transitions displayed on the graph, we can add a `possession change transition'; where the possession of the ball in play moves to the opposing team. This transition may occur while the match is also in any of the white-coloured states on the graph (apart from {\sf Knock-on} which determines a possession change immediately through a {\sf Scrum}) and let's assign this an expected rate of occurance $\lambda_{\rm pos}$.
+Since a rugby match exists in continuous time, it is natural to choose a continuous-time event-based simulation model for our game engine. As we have discussed in previous chapters already, this means we will be characterising transition probabilities of the event graph in Fig.~\ref{fig:event-graph} by ratios of event rates in time. Recalling our notation in previous chapters, if we consider the current state vector of the match $X_{\sf t}$, we can start by assigning each transition ${\sf a}\rightarrow {\sf b}$ on the event graph an associated expected rate of occurance $\lambda_{{\sf a}\rightarrow {\sf b}}$ which is defined in units of continuous time, e.g., seconds. In addition to the transitions displayed on the graph, we can add a `possession change transition'; where the possession of the ball in play moves to the opposing team. This transition may occur while the match is also in any of the white-coloured states on the graph (apart from {\sf Knock-on} which determines a possession change immediately through a {\sf Scrum}) and let's assign this a state and timestep-dependent expected rate of occurance $\lambda_{\rm pos}(X_{\sf t}, {\sf t})$.
 
 Based on our dicussion above, an appropriate encoding for the overall game state at timestep index ${\sf t}$ could be a state vector $X_{{\sf t}}$ whose elements are
 %%
 \begin{align}
 X^0_{{\sf t}}&=\begin{cases} 0 & \text{Match State} = \text{{\sf Penalty}}\\ 1 & \text{Match State} = \text{{\sf Free Kick}} \\ \dots & \end{cases} \\
-X^1_{{\sf t}}&=\begin{cases} 0 & \text{Possession} = \text{{\sf Home Team}}\\ 1 & \text{Possession} = \text{{\sf Away Team}} \end{cases} \,.
+X^1_{{\sf t}}&=\begin{cases} 0 & \text{Possession} = \text{{\sf Home Team}}\\ 1 & \text{Possession} = \text{{\sf Away Team}} \end{cases} \\
+X^2_{{\sf t}} &= \text{Player 1 Attributes ({\sf Home Team})} \\
+&\dots \nonumber \\
+X^{32}_{{\sf t}} &= \text{Player 15 Attributes ({\sf Away Team})}\,.
 \end{align}
 %%
 But how does this overall game state connect to the event rates? The probabilistic answer is quite straightforward. If the probability of the match state being $X^0_{{\sf t}}={\sf a}$ at timestep ${\sf t}$ is written as $P^0_{{\sf t}}({\sf a})$, then the probability of $X^0_{{\sf t}+1}={\sf b}$ in the following timestep is
@@ -34,9 +37,11 @@ P^0_{{\sf t}+1}({\sf b}) = \frac{\lambda_{{\sf a}\rightarrow {\sf b}}{\cal T}_{{
 where $\forall {\sf b}$ in the summation indicates that all the available transitions from ${\sf a}$ should be summed over and ${\cal T}_{{\sf a}\rightarrow {\sf b}}(X_{\sf t}, {\sf t})$ is a time and state-dependent transition probability (which is normalised to $1$ by summing over all of the possible transitions from ${\sf a}$) that is determined by the playing tactics of each team as well as the general likelihoods of gameplay which are expected from a real rugby match. Note that in the expression above, we have also defined $\tau$ as a timescale short enough such that no transition is likely to occur during that interval. An equivalent to Eq.~(\ref{eq:match-state-transition-probs}) should also apply to the possession change transition rate, i.e., the probability that the {\sf Home Team} has possession $P^1_{{\sf t}}$ at time ${\sf t}$ evolves according to
 %%
 \begin{align}
-P^1_{{\sf t}+1} = \frac{\lambda_{\rm pos} {\cal T}_{\rm pos}(X_{\sf t}, {\sf t}) (1-P^1_{{\sf t}})}{\big[ \frac{1}{\tau} + \lambda_{\rm pos} {\cal T}_{\rm pos}(X_{\sf t}, {\sf t})\big] (1-P^1_{{\sf t}})} \label{eq:possession-change-probs}\,.
+P^1_{{\sf t}+1} = \frac{\lambda_{\rm pos}(X_{\sf t}, {\sf t}) (1-P^1_{{\sf t}})}{\big[ \frac{1}{\tau} + \lambda_{\rm pos}(X_{\sf t}, {\sf t})\big] (1-P^1_{{\sf t}})} \label{eq:possession-change-probs}\,.
 \end{align}
 %%
+
+Before we move on to other details, it's quite important to recognise that because our process is defined in continuous time, the possession change rate may well vary continuously (this will be especially true when we talk about, e.g., player fatigue). Hence, Eq.~(\ref{eq:match-state-transition-probs}) is only an \emph{approximation} of the true underlying dynamics that we are trying to simulate --- and this approximation will only be accurate if $\tau$ is small. The reader may recall that we discussed this same issue from the point of view of simulating time-inhomogeneous Poisson processes with the rejection method when we were building the stochadex in an earlier chapter. 
 
 While these match state transitions and possession changes are taking place, we also need to come up with a model for how the ball location $L_{{\sf t}}$ changes during the course of a game, and as a function of the current game state. If we associate every state on the event graph with a single change in spatial location of the ball on the pitch, we then need to construct a process which makes `jumps' in 2-dimensional space each time a state transition occurs. For the sake of simplicity, we will choose this model to just be a 2-dimensional Gaussian distribution such that the probability density $P_{{\sf t}}(\ell )$ of $L_{{\sf t}}=\ell$ at timestep ${\sf t}$ evolves according to
 %%
@@ -64,11 +69,21 @@ In order to model the effect of player fatigue over the course of a match, we ca
 %%
 \begin{align}
 a^i({\sf a}, X^1_{\sf t}, f, t_{\rm start}) &= a^i({\sf a}, X^1_{\sf t})e^{-f^i[t({\sf t})-t^i_{\rm start}]} \\
-d^j({\sf a}, X^1_{\sf t}, f, t_{\rm start}) &= d^j({\sf a}, X^1_{\sf t})e^{-f^j[t({\sf t})-t^j_{\rm start}]} \,.
+d^i({\sf a}, X^1_{\sf t}, f, t_{\rm start}) &= d^i({\sf a}, X^1_{\sf t})e^{-f^i[t({\sf t})-t^i_{\rm start}]} \,.
 \end{align}
 %%
 
-So how does each player affect the events of a match? In our model, we would argue that players should be able to influence the possession change transition probability ${\cal T}_{\rm pos}(X_{\sf t}, {\sf t})$...
+So how does each player affect the events of a match? In our model, we would argue that players should be able to directly influence the possession change rate $\lambda_{\rm pos}(X_{\sf t}, {\sf t})$ through a balance of attacking and defensive attributes like so
+%%
+\begin{align}
+\lambda_{\rm pos}(X_{\sf t}, {\sf t}) &= \frac{\lambda^*_{\rm pos}\sum_{\forall i}d^i({\sf a}, X^1_{\sf t}, f, t_{\rm start})}{\sum_{\forall i}a^i({\sf a}, X^1_{\sf t}, f, t_{\rm start}) + \sum_{\forall i}d^i({\sf a}, X^1_{\sf t}, f, t_{\rm start})}\,,
+\end{align}
+%%
+where $\lambda^*_{\rm pos}$ is the maximum rate that is physically possible and the $\forall i$ in the summations indicate summing over all elements returned by each vector-valued function. In addition to this possession change influence, players who have {\sf Run Phase} and {\sf Kick Phase} attributes may affect the gain in distance (and accuracy in the case of {\sf Kick Phase}) that each state translates to on the pitch.
+
+\begin{itemize}
+\item{Define the spatial distance model association to player attributes...}
+\end{itemize}
 
 
 \section{\sffamily Deciding on gameplay actions}
