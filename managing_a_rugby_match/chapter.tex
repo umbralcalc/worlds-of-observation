@@ -40,19 +40,29 @@ P^1_{{\sf t}+1} = \frac{\lambda_{\rm pos}(X_{\sf t}, {\sf t}) (1-P^1_{{\sf t}})}
 
 Before we move on to other details, it's quite important to recognise that because our process is defined in continuous time, the possession change rate may well vary continuously (this will be especially true when we talk about, e.g., player fatigue). Hence, Eq.~(\ref{eq:match-state-transition-probs}) is only an \emph{approximation} of the true underlying dynamics that we are trying to simulate --- and this approximation will only be accurate if $\tau$ is small. The reader may recall that we discussed this same issue from the point of view of simulating time-inhomogeneous Poisson processes with the rejection method when we were building the stochadex in an earlier chapter. 
 
-While these match state transitions and possession changes are taking place, we also need to come up with a model for how the ball location $L_{{\sf t}}$ changes during the course of a game, and as a function of the current game state. If we associate every state on the event graph with a single change in spatial location of the ball on the pitch, we then need to construct a process which makes `jumps' in 2-dimensional space each time a state transition occurs. To keep things simple and intuitive, we will say that movements of the ball are only allowed to occur during either a {\sf Run Phase} or a {\sf Kick Phase}. 
+While these match state transitions and possession changes are taking place, we also need to come up with a model for how the ball location $L_{{\sf t}}$ changes during the course of a game, and as a function of the current game state. Note that, because the ball location is a part of the overall game state, it will be included as information contained within some elements of $X_{{\sf t}}$ as well. To make this explicit, we can simply set $X^2_{{\sf t}}=L^{\rm lon}_{{\sf t}}$ and $X^3_{{\sf t}}=L^{\rm lat}_{{\sf t}}$ --- where $L^{\rm lon}_{{\sf t}}$ denotes the longitudinal component (lengthwise along the pitch) and $L^{\rm lat}_{{\sf t}}$ denotes the lateral component (widthwise across the pitch). If we associate every state on the event graph with a single change in spatial location of the ball on the pitch, we then need to construct a process which makes `jumps' in 2-dimensional space each time a state transition occurs. To keep things simple and intuitive, we will say that movements of the ball are only allowed to occur during either a {\sf Run Phase} or a {\sf Kick Phase}. 
 
-In the case of a {\sf Run Phase}, we will choose the longitudinal component (lengthwise along the pitch) of the ball location $L^{\rm lon}_{{\sf t}}$ to be updated by the difference between samples drawn from two gamma distributions (one associated to each team). Hence, the probability density $P_{{\sf t}}(\ell )$ of $L^{\rm lon}_{{\sf t}}=\ell$ at timestep ${\sf t}$ evolves according to
+In the case of a {\sf Run Phase}, we will choose the longitudinal component of the ball location $L^{\rm lon}_{{\sf t}}$ to be updated by the difference between samples drawn from two exponential distributions (one associated to each team). Hence, the probability density $P_{{\sf t}}(\ell )$ of $L^{\rm lon}_{{\sf t}}=\ell$ at timestep ${\sf t}$ evolves according to
 %%
 \begin{align}
-P_{{\sf t}+1}(\ell ) = \int^\infty_0 {\rm d}\ell'\, {\sf GammaPDF}(\ell + \ell'; k_{\rm att}, \theta_{\rm att}){\sf GammaPDF}(\ell'; k_{\rm def}, \theta_{\rm def}) \,,
+P_{{\sf t}+1}(\ell ) = \int^\infty_0 {\rm d}\ell'\, {\sf ExponentialPDF}(\ell + \ell'; l_{\rm att}){\sf ExponentialPDF}(\ell'; l_{\rm def}) \,,
 \end{align}
 %%
-where $(k_{\rm att}, \theta_{\rm att})$ are the gamma distribution parameters for the attacking team; $(k_{\rm def}, \theta_{\rm def})$ are the gamma distribution parameters for the defending team; and we have chosen positive values of $\ell$ to be aligned with the forward direction for the attacking team. We shall elaborate on how these gamma distribution parameters are calculated when we discuss associating events for player abilities in due course.
+where $l_{\rm att}$, $l_{\rm def}$ are the exponential distribution scale parameters for the attacking and defending teams, respectively, and we have chosen positive values of $\ell$ to be aligned with the forward direction for the attacking team. If we now consider lateral component of the ball location $L^{\rm lat}_{{\sf t}}$ during a {\sf Run Phase}; it makes sense that this wouldn't be affected much by either team within the scope of detail in this first version of our model. Hence, the probability density $P_{{\sf t}}(w)$ of $L^{\rm lat}_{{\sf t}}=w$ can just be 
+%%
+\begin{align}
+P_{{\sf t}+1}(w) = {\sf NormalPDF}(w; L^{\rm lat}_{{\sf t}}, \sigma_w^2) \label{eq:lateral-motion-rugby} \,,
+\end{align}
+%%
+where $\sigma_w$ is the typical jump in lateral motion (the standard deviation parameter of the normal distribution). We shall elaborate on how $\sigma_w$, $l_{\rm att}$ and $l_{\rm def}$ are calculated when we discuss associating events for player abilities in due course.
 
-\textcolor{red}{Need to discuss: lateral motion for run phases and both longitudinal and lateral motion for kick phases.}
-
-Note that because the ball location is a part of the overall game state, it will be included as information contained within some elements of $X_{{\sf t}}$ as well. To make this explicit, we can simply set $X^2_{{\sf t}}=L^{\rm lon}_{{\sf t}}$ and $X^3_{{\sf t}}=L^{\rm lat}_{{\sf t}}$.
+Turning our attention to the {\sf Kick Phase}, the longitudinal component is only realistically controlled by the attacking team. Therefore, the probability density $P_{{\sf t}}(\ell )$ of $L^{\rm lon}_{{\sf t}}=\ell$ at timestep ${\sf t}$ could evolve according to
+%%
+\begin{align}
+P_{{\sf t}+1}(\ell ) = {\sf ExponentialPDF}(\ell'; l_{\rm att}) \,,
+\end{align}
+%%
+where $l_{\rm att}$ this time is the exponential scale parameter for the attacking team player who is kicking. Similarly, the lateral component for a {\sf Kick Phase} is only going to be controlled by the accuracy of the kicker. Therefore, the corresponding update to the probability density can take the same form as Eq.~(\ref{eq:lateral-motion-rugby}) with the interpretation of $\sigma_w$ now being the accuracy of the kicker in this context.
 
 \section{\sffamily Associating events to player states and abilities}
 
