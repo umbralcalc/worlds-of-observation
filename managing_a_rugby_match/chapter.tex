@@ -42,33 +42,39 @@ Before we move on to other details, it's quite important to recognise that becau
 
 While these match state transitions and possession changes are taking place, we also need to come up with a model for how the ball location $L_{{\sf t}}$ changes during the course of a game, and as a function of the current game state. Note that, because the ball location is a part of the overall game state, it will be included as information contained within some elements of $X_{{\sf t}}$ as well. To make this explicit, we can simply set $X^2_{{\sf t}}=L^{\rm lon}_{{\sf t}}$ and $X^3_{{\sf t}}=L^{\rm lat}_{{\sf t}}$ --- where $L^{\rm lon}_{{\sf t}}$ denotes the longitudinal component (lengthwise along the pitch) and $L^{\rm lat}_{{\sf t}}$ denotes the lateral component (widthwise across the pitch). If we associate every state on the event graph with a single change in spatial location of the ball on the pitch, we then need to construct a process which makes `jumps' in 2-dimensional space each time a state transition occurs. To keep things simple and intuitive, we will say that movements of the ball are only allowed to occur during either a {\sf Run Phase} or a {\sf Kick Phase}. 
 
-In the case of a {\sf Run Phase}, we will choose the longitudinal component of the ball location $L^{\rm lon}_{{\sf t}}$ to be updated by the difference between samples drawn from two exponential distributions (one associated to each team). Hence, the probability density $P_{{\sf t}}(\ell )$ of $L^{\rm lon}_{{\sf t}}=\ell$ at timestep ${\sf t}$ evolves according to
+In the case of a {\sf Run Phase}, let's choose the longitudinal component of the ball location $L^{\rm lon}_{{\sf t}}$ to be updated by the difference between samples drawn from two exponential distributions (one associated to each team). Hence, the probability density $P_{{\sf t}}(\ell )$ of $L^{\rm lon}_{{\sf t}}=\ell$ at timestep ${\sf t}$ evolves according to
 %%
 \begin{align}
-P_{{\sf t}+1}(\ell ) = \int^\infty_0 {\rm d}\ell'\, {\sf ExponentialPDF}(\ell + \ell'; l_{\rm att}){\sf ExponentialPDF}(\ell'; l_{\rm def}) \,,
+P_{{\sf t}+1}(\ell ) = \int^\infty_0 {\rm d}\ell'\, {\sf ExponentialPDF}(\ell + \ell'; a_{\rm run}){\sf ExponentialPDF}(\ell'; d_{\rm run}) \label{eq:longitudinal-motion-rugby} \,,
 \end{align}
 %%
-where $l_{\rm att}$, $l_{\rm def}$ are the exponential distribution scale parameters for the attacking and defending teams, respectively, and we have chosen positive values of $\ell$ to be aligned with the forward direction for the attacking team. If we now consider lateral component of the ball location $L^{\rm lat}_{{\sf t}}$ during a {\sf Run Phase}; it makes sense that this wouldn't be affected much by either team within the scope of detail in this first version of our model. Hence, the probability density $P_{{\sf t}}(w)$ of $L^{\rm lat}_{{\sf t}}=w$ can just be 
+where $a_{\rm run}$ and $d_{\rm run}$ are the exponential distribution scale parameters for an attacking and defending player, respectively, and we have chosen positive values of $\ell$ to be aligned with the forward direction for the attacking team. We shall elaborate on where $a_{\rm run}$ and $d_{\rm run}$ come from when we discuss associating events for player abilities in due course. If we now consider lateral component of the ball location $L^{\rm lat}_{{\sf t}}$ during a {\sf Run Phase}; it makes sense that this wouldn't be affected much by either team within the scope of detail in this first version of our model. Hence, the probability density $P_{{\sf t}}(w)$ of $L^{\rm lat}_{{\sf t}}=w$ at timestep ${\sf t}$ can just be updated like so
 %%
 \begin{align}
-P_{{\sf t}+1}(w) = {\sf NormalPDF}(w; L^{\rm lat}_{{\sf t}}, \sigma_w^2) \label{eq:lateral-motion-rugby} \,,
+P_{{\sf t}+1}(w) = {\sf NormalPDF}(w; L^{\rm lat}_{{\sf t}}, \sigma_{\rm run}^2) \label{eq:lateral-motion-rugby} \,,
 \end{align}
 %%
-where $\sigma_w$ is the typical jump in lateral motion (the standard deviation parameter of the normal distribution). We shall elaborate on how $\sigma_w$, $l_{\rm att}$ and $l_{\rm def}$ are calculated when we discuss associating events for player abilities in due course.
+where $\sigma_{\rm run}$ is the typical jump in lateral motion (the standard deviation parameter of the normal distribution).
 
-Turning our attention to the {\sf Kick Phase}, the longitudinal component is only realistically controlled by the attacking team. Therefore, the probability density $P_{{\sf t}}(\ell )$ of $L^{\rm lon}_{{\sf t}}=\ell$ at timestep ${\sf t}$ could evolve according to
+Turning our attention to the {\sf Kick Phase}; the longitudinal component is only realistically controlled by the attacking team. There's also an angular component to this motion which is associated to the direction that the kicker is orientating their kick. Therefore, the probability density of $P_{{\sf t}}(\ell )$ with $L^{\rm lon}_{{\sf t}}=\ell \cos \theta$ and $L^{\rm lat}_{{\sf t}}=\ell \sin \theta$ at timestep ${\sf t}$ will evolve according to
 %%
 \begin{align}
-P_{{\sf t}+1}(\ell ) = {\sf ExponentialPDF}(\ell'; l_{\rm att}) \,,
+P_{{\sf t}+1}(\ell ) = {\sf ExponentialPDF}(\ell; a_{\rm kick}) \label{eq:longitudinal-motion-rugby-kicking} \,,
 \end{align}
 %%
-where $l_{\rm att}$ this time is the exponential scale parameter for the attacking team player who is kicking. Similarly, the lateral component for a {\sf Kick Phase} is only going to be controlled by the accuracy of the kicker. Therefore, the corresponding update to the probability density can take the same form as Eq.~(\ref{eq:lateral-motion-rugby}) with the interpretation of $\sigma_w$ now being the accuracy of the kicker in this context.
+where $a_{\rm kick}$ this time is the exponential scale parameter for the attacking team player who is kicking and $\theta$ is the angle they have chosen to kick at (where straight ahead is defined as $\theta = 0$). Similarly, the lateral component for a {\sf Kick Phase} is only going to be controlled by the accuracy of the kicker with the angle and longitudinal distance already applied. Therefore, the corresponding update to the probability density $P_{{\sf t}}(w)$ where $L^{\rm lon}_{{\sf t}}=w \sin \theta$ and $L^{\rm lat}_{{\sf t}}=w \cos \theta$ at timestep ${\sf t}$ will look like
+%%
+\begin{align}
+P_{{\sf t}+1}(w) = {\sf NormalPDF}(w; L^{\rm lat}_{{\sf t}} + \ell \sin \theta, \sigma_{\rm kick}^2) \label{eq:lateral-motion-rugby-kicking} \,,
+\end{align}
+%%
+with a standard deviation $\sigma_{\rm kick}$, and its interpretation now being the accuracy of the kicker.
 
 \section{\sffamily Associating events to player states and abilities}
 
 In the last section we introduced a continuous-time event-based simulation model for a rugby union match. In this section we are going to add more detail into this model by inventing how to associate specific player states and abilities to the event rates of the simulation. Before continuing, we want to reiterate that this model is entirely made up and, while we hope it illustrates some interesting mathematical modelling ideas in the context of rugby, there's no particular reason why a statistical inference with a reliable dataset should prefer our model to others which may exist.
 
-In Fig.~\ref{fig:player-abilities} we have begun by separating playing positions on the rugby field into their usual descriptions and then associating each player type with a short list of simplified attributes. Our model is then to associate a player with an `attacking' and `defensive' ability which corresponds to each of their attributes. For example, a Front Row Forward will have 8 abilities associated to them: 2 for each of their {\sf Scrum}, {\sf Lineout}, {\sf Ruck} and {\sf Maul} attributes.
+In Fig.~\ref{fig:player-abilities} we began by separating playing positions on the rugby field into their usual descriptions and then associating each player type with a short list of simplified attributes. Our model is then to associate a player with an `possession attacking' and `possession defending' ability which corresponds to each of their attributes. For example, a Front Row Forward will have 8 abilities associated to them: 2 for each of their {\sf Scrum}, {\sf Lineout}, {\sf Ruck} and {\sf Maul} attributes.
 
 \begin{figure}[h]
 \includegraphics[width=15cm]{images/rugby-player-abilities.drawio.png}
@@ -76,26 +82,26 @@ In Fig.~\ref{fig:player-abilities} we have begun by separating playing positions
 \label{fig:player-abilities}
 \end{figure}
 
-Let's now create a vector-valued function $a({\sf a}, X^1_{\sf t})$ which returns all of the attacking attributes associated to match state ${\sf a}$ and an analogous one $d({\sf a}, X^1_{\sf t})$ for the defensive attributes. The dependencies of these functions on the ball possession state $X^1_{\sf t}$ comes from the fact that when, e.g., the {\sf Home Team} has possession of the ball it will be their attacking attributes that are returned by $a({\sf a}, X^1_{\sf t})$ and the {\sf Away Team}'s defensive attributes that are returned by $d({\sf a}, X^1_{\sf t})$. On the other hand, it should be the other team's attributes that are returned by each function when possession is given to the {\sf Away Team}. The overall game state $X_{{\sf t}}$ should contain the information required for these functions and so we should assign elements $X^4_{{\sf t}}, X^5_{{\sf t}}, \dots$ with these attributes to complete the overall game state representation.
+Let's now create a vector-valued function $a_{\rm pos}({\sf a}, X^1_{\sf t})$ which returns all of the posession attacking attributes associated to match state ${\sf a}$ and an analogous one $d_{\rm pos}({\sf a}, X^1_{\sf t})$ for the possession defending attributes. The dependencies of these functions on the ball possession state $X^1_{\sf t}$ comes from the fact that when, e.g., the {\sf Home Team} has possession of the ball it will be their possession attacking attributes that are returned by $a_{\rm pos}({\sf a}, X^1_{\sf t})$ and the {\sf Away Team}'s possession defending attributes that are returned by $d_{\rm pos}({\sf a}, X^1_{\sf t})$. On the other hand, it should be the other team's attributes that are returned by each function when possession is given to the {\sf Away Team}. The overall game state $X_{{\sf t}}$ should contain the information required for these functions and so we should assign elements $X^4_{{\sf t}}, X^5_{{\sf t}}, \dots$ with these attributes to complete the overall game state representation.
 
 In order to model the effect of player fatigue over the course of a match, we can also include some vectors of position-related player fatigue values $f$ and times at which each the player started $t_{\rm start}$ into the definition of each attribute like so
 %%
 \begin{align}
-a^i({\sf a}, X^1_{\sf t}, f, t_{\rm start}) &= a^i({\sf a}, X^1_{\sf t})e^{-f^i[t({\sf t})-t^i_{\rm start}]} \\
-d^i({\sf a}, X^1_{\sf t}, f, t_{\rm start}) &= d^i({\sf a}, X^1_{\sf t})e^{-f^i[t({\sf t})-t^i_{\rm start}]} \,.
+a^i_{\rm pos}({\sf a}, X^1_{\sf t}, f, t_{\rm start}) &= a^i_{\rm pos}({\sf a}, X^1_{\sf t})e^{-f^i[t({\sf t})-t^i_{\rm start}]} \label{eq:att-player-fatigue} \\
+d^i_{\rm pos}({\sf a}, X^1_{\sf t}, f, t_{\rm start}) &= d^i_{\rm pos}({\sf a}, X^1_{\sf t})e^{-f^i[t({\sf t})-t^i_{\rm start}]} \label{eq:def-player-fatigue} \,.
 \end{align}
 %%
 So how does each player affect the events of a match? In our model, we would argue that players should be able to directly influence the possession change rate $\lambda_{\rm pos}(X_{\sf t}, {\sf t})$ through a balance of attacking and defensive attributes like so
 %%
 \begin{align}
-\lambda_{\rm pos}(X_{\sf t}, {\sf t}) &= \frac{\lambda^*_{\rm pos}\sum_{\forall i}d^i({\sf a}, X^1_{\sf t}, f, t_{\rm start})}{\sum_{\forall i}a^i({\sf a}, X^1_{\sf t}, f, t_{\rm start}) + \sum_{\forall i}d^i({\sf a}, X^1_{\sf t}, f, t_{\rm start})}\,,
+\lambda_{\rm pos}(X_{\sf t}, {\sf t}) &= \frac{\lambda^*_{\rm pos}\sum_{\forall i}d^i_{\rm pos}({\sf a}, X^1_{\sf t}, f, t_{\rm start})}{\sum_{\forall i}a^i_{\rm pos}({\sf a}, X^1_{\sf t}, f, t_{\rm start}) + \sum_{\forall i}d^i_{\rm pos}({\sf a}, X^1_{\sf t}, f, t_{\rm start})}\,,
 \end{align}
 %%
 where $\lambda^*_{\rm pos}$ is the maximum rate that is physically possible and the $\forall i$ in the summations indicate summing over all elements returned by each vector-valued function. In addition to this possession change influence, players who have {\sf Run Phase} and {\sf Kick Phase} attributes may affect the gain in distance (and accuracy in the case of {\sf Kick Phase}) that each state translates to on the pitch. 
 
-Let's first describe how we intend the {\sf Run Phase} to work. Every time the match state transitions into a {\sf Run Phase}, an individual player on the attacking side is chosen at random (uniformally across the team) to be the the nominal `attacker'. At the same time, an individual player on the defending side is chosen at random (again, uniformally across the team) to be the the nominal `defender'. 
+Let's first describe how we intend the {\sf Run Phase} to work. Every time the match state transitions into a {\sf Run Phase}, an individual player on the attacking side is chosen at random (uniformally across the team\footnote{This uniform sampling could be refined later to associate sampling probabilities with game state and player roles.}) to be the the nominal `attacker'. At the same time, an individual player on the defending side is chosen at random (again, uniformally across the team) to be the the nominal `defender'. Once these players have been chosen (and hence the $a_{\rm run}$ and $d_{\rm run}$ parameters have been determined), the longitudinal motion update we described in Eq.~(\ref{eq:longitudinal-motion-rugby}) can then be applied. Note that the $a_{\rm run}$ and $d_{\rm run}$ parameters should also receive a fatigue decrement depending on the time that each player has remained on the pitch, much like the exponential factors we applied in Eqs.~(\ref{eq:att-player-fatigue}) and~(\ref{eq:def-player-fatigue}).
 
-\textcolor{red}{Need to discuss: how to map player attributes to run phase and kick phase ball location changes.}
+Finally, we turn or attention to the mechanics of a {\sf Kick Phase}. For tactical kicking in the middle of play, this operates in a similar way as a {\sf Run Phase}; one of the players on the attacking side (the side in possession of the ball) is chosen at random (uniformally) and their $a_{\rm kick}$ and $\sigma_{\rm kick}$ attributes are used in Eqs.~(\ref{eq:longitudinal-motion-rugby-kicking}) and~(\ref{eq:lateral-motion-rugby-kicking}) to update the position of the ball. In the specific case of {\sf Goal} kicking from a {\sf Penalty}, the designated place kicker on each side also uses their same {\sf Kick Phase} attributes to determine the success/failure of the kick at the posts.
 
 \section{\sffamily Deciding on gameplay actions}
 
