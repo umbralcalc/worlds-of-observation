@@ -4,3 +4,16 @@
 
 \section{\sffamily Formalising general interactions}
 
+Let's start by considering how we might adapt the mathematical formalism we have been using so far to be able to take actions which can manipulate the state at each timestep. Using the mathematical notation that we inherited from the stochadex, we may extend the formula for updating the state history matrix $X'\rightarrow X$ to include a layer of interaction which is facilitated by a new matrix-valued `action' function $A$ like so
+%%
+\begin{align}
+X_{{\sf t}+1}^i &= A^i_{{\sf t}}(F(X', {\sf t})) \label{eq:generalised-actions} \,.
+\end{align}
+%%
+From the perspective of the whole matrix $X$ update, this is technically equivalent to applying the composition of functions so that
+%%
+\begin{align}
+X = G(X', {\sf t})=A\circ F(X', {\sf t}) \,.
+\end{align}
+%%
+The choice of timestep ${\sf t}$ (instead of ${\sf t}+1$) in Eq.~(\ref{eq:generalised-actions}) may look a little odd at first, however, it will become easier to use this formalism for optimisation later by thinking of this as simply `the actions that were taken at timestep ${\sf t}$'.
