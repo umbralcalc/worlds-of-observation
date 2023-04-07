@@ -4,16 +4,45 @@
 
 \section{\sffamily Formalising general interactions}
 
-Let's start by considering how we might adapt the mathematical formalism we have been using so far to be able to take actions which can manipulate the state at each timestep. Using the mathematical notation that we inherited from the stochadex, we may extend the formula for updating the state history matrix $X'\rightarrow X$ to include a layer of interaction which is facilitated by a new matrix-valued `action' function ${\cal A}$ like so
+Let's start by considering how we might adapt the mathematical formalism we have been using so far to be able to take actions which can manipulate the state at each timestep. Using the mathematical notation that we inherited from the stochadex, we may extend the formula for updating the state history matrix $X'\rightarrow X$ to include two layers of possible interactions which are facilitated by a new vector-valued `parametric action' function $A_{{\sf t}}$ and a new matrix-valued `state action' function ${\cal A}$. During a timestep over which these actions are applied, the stochadex state update formula can be extended to look like this system of equations
 %%
 \begin{align}
-X_{{\sf t}+1}^i &= {\cal A}^i_{{\sf t}}(F(X', z, {\sf t})) \label{eq:generalised-actions} \,.
+Z_{{\sf t}}^i &= A_{{\sf t}}^i(X', Z_{{\sf t}-1},{\sf t}) \label{eq:generalised-param-actions} \\
+X_{{\sf t}+1}^i &= {\cal A}^i_{{\sf t}}[F(X', Z_{\sf t}, {\sf t}), {\sf t}] \label{eq:generalised-state-actions} \,.
 \end{align}
 %%
-From the perspective of the whole matrix $X$ update, this is technically equivalent to applying the composition of functions so that
+The choice of timestep ${\sf t}$ (instead of ${\sf t}+1$) in Eq.~(\ref{eq:generalised-state-actions}) may look a little odd at first, however, it will become easier to use this formalism for optimisation later by thinking of this as simply `the actions that were taken at timestep ${\sf t}$'.
+
+In Eq.~(\ref{eq:generalised-param-actions}), we have replaced the constant vector of parameters $z$ (as in the stochadex formalism) for a time-dependent vector $Z_{{\sf t}}$ of parameters that can be updated by $A_{\sf t}$ at any timestep. From the perspective of the whole matrix $X$ update, the actions of both $A_{\sf t}$ and ${\cal A}$ are technically equivalent to applying the formal composition of functions so that
 %%
 \begin{align}
-X = G(X', z, {\sf t})={\cal A}\circ F(X', z, {\sf t}) \,.
+X = {\cal F}(X', Z_{{\sf t}-1}, {\sf t})={\cal A}\{ F[X', A_{\sf t}(X', Z_{{\sf t}-1}, {\sf t}), {\sf t}], {\sf t} \}\,,
 \end{align}
 %%
-The choice of timestep ${\sf t}$ (instead of ${\sf t}+1$) in Eq.~(\ref{eq:generalised-actions}) may look a little odd at first, however, it will become easier to use this formalism for optimisation later by thinking of this as simply `the actions that were taken at timestep ${\sf t}$'.
+where ${\cal F}$ refers to a modified version of the $F$ function which contains our actions. Hence, while these relations provide two distinct ways one might encode actions to manipulate a stochastic phenomenon, we shall often just refer to them together as `taking an action' ${\cal A}_{\sf t}$ at timestep ${\sf t}$. It is, however, important not to forget this mathematical formulation when performing calculations. In Go, the code for the new iteration formula which includes taking actions in the timestep would look like this.
+
+\begin{lstlisting}[language=Go]
+// iterate the state history forward in time by one step
+// with actions in the process
+func IterationFormulaWithActions(
+    stateHistory StateHistory, 
+    otherParams  OtherParams,
+    timeStepNumber int,
+) StateVector {
+    // taking a parametric action
+    otherParams = TakeParametricAction(
+        stateHistory StateHistory, 
+        otherParams  OtherParams,
+        timeStepNumber int,
+    )
+    newestStateVector := IterationFormula(
+        stateHistory, 
+        otherParams,
+        timeStepNumber,
+    )
+    stateHistory = append(stateHistory, newestStateVector)
+    // taking a state action
+    newestStateVector = TakeStateAction(stateHistory, timeStepNumber)
+    return newestStateVector
+}
+\end{lstlisting}
