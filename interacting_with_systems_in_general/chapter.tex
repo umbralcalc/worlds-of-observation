@@ -7,47 +7,59 @@
 Let's start by considering how we might adapt the mathematical formalism we have been using so far to be able to take actions which can manipulate the state at each timestep. Using the mathematical notation that we inherited from the stochadex, we may extend the formula for updating the state history matrix $X'\rightarrow X$ to include a vector-valued `state measurement' function $M_{\sf t}$ and two layers of possible interactions which are facilitated by a new vector-valued `parametric action' function $G_{{\sf t}}$ and a new vector-valued `state action' function $H_{{\sf t}}$. During a timestep over which these actions are applied, the stochadex state update formula can be extended to look like this system of equations
 %%
 \begin{align}
-{\cal S}_{{\sf t}} &= M_{{\sf t}}(X', {\sf t}) \label{eq:generalised-state-measurement} \\
+{\cal S}_{{\sf t}}^i &= M_{{\sf t}}^i(X', Z_{\sf t}, {\sf t}) \label{eq:generalised-state-measurement} \\
 Z_{{\sf t}+1}^i &= G_{{\sf t}+1}^i(Z_{{\sf t}}, {\cal S}_{{\sf t}}, {\cal A}_{{\sf t}}, {\sf t}) \label{eq:generalised-param-actions} \\
 X_{{\sf t}+1}^i &= H^i_{{\sf t}+1}[F_{\sf t}(X', Z_{{\sf t}+1}, {\sf t}), S_{\sf t}, {\cal A}_{\sf t}, {\sf t}] \label{eq:generalised-state-actions} \,,
 \end{align}
 %%
-where, other than the new functions we have introduced; the concept of a `measured state' ${\cal S}_{{\sf t}}$ of the system (some vector of the that doesn't have to share the same length as $X_{\sf t}$) and actions performed ${\cal A}_{{\sf t}}$ on the system (some vector of parameters which define what actions are taken) at timestep ${\sf t}$ have also been defined here.
+where, other than the new functions, we have introduced; the concept of a `measured state' ${\cal S}_{{\sf t}}$ of the system (some vector of the that doesn't have to share the same length as $X_{\sf t}$) and the actions performed ${\cal A}_{{\sf t}}$ on the system (some vector of parameters which define what actions are taken) at timestep ${\sf t}$.
 
-In Eqs.~(\ref{eq:generalised-param-actions}) and~(\ref{eq:generalised-state-actions}), notice that we have replaced the constant vector of parameters $z$ (as in the stochadex formalism) for a time-dependent vector $Z_{{\sf t}}$ of parameters that can be updated by $G_{\sf t}$ at any (but not necessarily every) timestep. From the perspective of the whole matrix $X$ update step, the measurement of $M_{\sf t}$ proceeded by the actions of both $G_{\sf t}$ and $H_{\sf t}$ are technically equivalent to applying the formal composition of functions such that
+In Eqs.~(\ref{eq:generalised-param-actions}) and~(\ref{eq:generalised-state-actions}), notice that we have replaced the constant vector of parameters $z$ (as in the stochadex formalism) for a time-dependent vector $Z_{{\sf t}}$ of parameters that can be updated by $G_{\sf t}$ at any (but not necessarily every) timestep. From the perspective of the whole matrix $X$ update step, the measurement of $M_{\sf t}$ proceeded by the actions of both $G_{\sf t}$ and $H_{\sf t}$ all combine to become technically equivalent to applying a formal composition of functions like this
 %%
 \begin{align}
-X^i_{{\sf t}+1} = {\cal F}^i_{{\sf t}+1}(X', Z_{{\sf t}}, {\cal A}_{\sf t}, {\sf t})=H^i_{{\sf t}+1}( F_{\sf t}(X', G_{{\sf t}+1}^i(Z_{{\sf t}}, M_{{\sf t}}(X', {\sf t}), {\cal A}_{{\sf t}}, {\sf t}), {\sf t}), M_{{\sf t}}(X', {\sf t}), {\cal A}_{{\sf t}}, {\sf t} ) \label{eq:action-iteration-formula}\,,
+X^i_{{\sf t}+1} &=H^i_{{\sf t}+1}( F_{\sf t}(X', G_{{\sf t}+1}^i(Z_{{\sf t}}, M_{{\sf t}}(X', Z_{{\sf t}}, {\sf t}), {\cal A}_{{\sf t}}, {\sf t}), {\sf t}), M_{{\sf t}}(X', Z_{{\sf t}}, {\sf t}), {\cal A}_{{\sf t}}, {\sf t} ) \\
+&= {\cal F}^i_{{\sf t}+1}(X', Z_{{\sf t}}, {\cal A}_{\sf t}, {\sf t}) \label{eq:action-iteration-formula}\,,
 \end{align}
 %%
-which looks like an absolute mess! However, it illustrates how ${\cal F}$, which refers to a modified version of the $F$ function, contains our actions but no other new parameters need be specified; only function operations. Hence, while we have provided two distinct ways one might encode actions to manipulate a stochastic phenomenon, we shall often just refer to them together as `taking an action' ${\cal A}_{\sf t}$ at timestep ${\sf t}$ --- because the parameters which define either type of action at this timestep should be stored within ${\cal A}_{\sf t}$. It is, however, important not to forget the full mathematical formulation when performing calculations. 
+which looks like an absolute mess! However, it illustrates how ${\cal F}$, which refers to a modified version of the $F$ function, contains our actions but no other new parameters need be specified; only function operations. Hence, while we have provided two distinct ways one might encode actions to manipulate a stochastic phenomenon, we shall often just refer to them together as `taking an action' ${\cal A}_{\sf t}$ at timestep ${\sf t}$ --- because the parameters which define either type of action at this timestep should all be stored within ${\cal A}_{\sf t}$ anyway. It is, however, important not to forget the full mathematical formulation when performing calculations. 
 
 In Go, the code for the new iteration formula given by Eq.~(\ref{eq:action-iteration-formula}), which includes taking actions in the same timestep, would look something like this.
 
-\textcolor{red}{Need to edit this code below to match new mathematical formalism}
-
 \begin{lstlisting}[language=Go]
+type ActionsVector       []float64
+type MeasuredStateVector []float64
+
 // iterate the state history forward in time by one step
 // with actions in the process
 func IterationFormulaWithActions(
     stateHistory StateHistory, 
     otherParams  OtherParams,
+    actions ActionsVector,
     timeStepNumber int,
 ) StateVector {
+    // measuring the state
+    var measuredState MeasuredStateVector
+    measuredState = MeasureTheState(stateHistory, otherParams, timeStepNumber)
     // taking a parametric action
-    otherParams = TakeParametricAction(
-        stateHistory StateHistory, 
-        otherParams  OtherParams,
-        timeStepNumber int,
+    newestOtherParams := TakeParametricAction(
+        otherParams,
+        measuredState, 
+        actions,
+        timeStepNumber,
     )
     newestStateVector := IterationFormula(
         stateHistory, 
         otherParams,
         timeStepNumber,
     )
-    stateHistory = append(stateHistory, newestStateVector)
     // taking a state action
-    newestStateVector = TakeStateAction(stateHistory, timeStepNumber)
+    newestStateVector = TakeStateAction(
+        newestStateVector,
+        measuredState,
+        actions,
+        timeStepNumber,
+    )
     return newestStateVector
 }
 \end{lstlisting}
+
