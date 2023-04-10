@@ -82,30 +82,35 @@ In Fig.~\ref{fig:player-abilities} we began by separating playing positions on t
 \label{fig:player-abilities}
 \end{figure}
 
-Let's now create a vector-valued function $a_{\rm pos}(X_{\sf t})$ which returns all of the posession attacking attributes associated to match state $X^0_{\sf t}$ and an analogous one $d_{\rm pos}(X_{\sf t})$ for the possession defending attributes. The dependencies of these functions on the ball possession state $X^1_{\sf t}$ comes from the fact that when, e.g., the {\sf Home Team} has possession of the ball it will be their possession attacking attributes that are returned by $a_{\rm pos}(X_{\sf t})$ and the {\sf Away Team}'s possession defending attributes that are returned by $d_{\rm pos}(X_{\sf t})$. On the other hand, it should be the other team's attributes that are returned by each function when possession is given to the {\sf Away Team}. The overall game state $X_{{\sf t}}$ should contain the information required for these functions and so we should assign elements $X^4_{{\sf t}}, X^5_{{\sf t}}, \dots$ with these attributes to complete the overall game state representation.
+Let's now create a vector-valued function $a_{\rm pos}(X_{\sf t}, z)$ which returns all of the posession attacking attributes (which are all stored in $z$) that are associated to match state $X^0_{\sf t}$ and an analogous one $d_{\rm pos}(X_{\sf t}, z)$ for the possession defending attributes. The dependencies of these functions on the ball possession state $X^1_{\sf t}$ comes from the fact that when, e.g., the {\sf Home Team} has possession of the ball it will be their possession attacking attributes that are returned by $a_{\rm pos}(X_{\sf t}, z)$ and the {\sf Away Team}'s possession defending attributes that are returned by $d_{\rm pos}(X_{\sf t}, z)$.
 
-In order to model the effect of player fatigue over the course of a match, we can also include some vectors of position-related player fatigue values $f$ and times at which each the player started $t_{\rm start}$ into the definition of each attribute like so
+In order to model the effect of player fatigue over the course of a match, we can include some vectors of player fatigue values $f$ and times at which each player started playing $t_{\rm start}$ into a formula for the decline of each attribute. We can then assign these values to be part of the overall match state like so
 %%
 \begin{align}
-a^i_{\rm pos}(X_{\sf t}, f, t_{\rm start}) &= a^i_{\rm pos}(X_{\sf t})e^{-f^i[t({\sf t})-t^i_{\rm start}]} \label{eq:att-player-fatigue} \\
-d^i_{\rm pos}(X_{\sf t}, f, t_{\rm start}) &= d^i_{\rm pos}(X_{\sf t})e^{-f^i[t({\sf t})-t^i_{\rm start}]} \label{eq:def-player-fatigue} \,.
+X^j_{\sf t} &= a^j_{\rm pos}(X_{\sf t}, z)e^{-f^j[t({\sf t})-t^j_{\rm start}]} \label{eq:att-player-fatigue} \\
+X^k_{\sf t} &= d^k_{\rm pos}(X_{\sf t}, z)e^{-f^k[t({\sf t})-t^k_{\rm start}]} \label{eq:def-player-fatigue} \,,
 \end{align}
 %%
-So how does each player affect the events of a match? In our model, we would argue that players should be able to directly influence the possession change rate $\lambda_{\rm pos}(X_{\sf t}, z, {\sf t})$ through a balance of attacking and defensive attributes like so
+where the $j$ and $k$ each index the range of indices in the overall match state which correspond to the attacking and defending team player states, respectively.
+
+So how does each player affect the events of a match? In our model, we would argue that players should be able to directly influence the possession change rate $\lambda_{\rm pos}(X_{\sf t}, z, {\sf t})$ through a balance of attacking and defensive attributes in the following relation
 %%
 \begin{align}
-\lambda_{\rm pos}(X_{\sf t}, z, {\sf t}) &= \frac{\lambda^*_{\rm pos}\sum_{\forall i}d^i_{\rm pos}(X_{\sf t}, f, t_{\rm start})}{\sum_{\forall i}a^i_{\rm pos}(X_{\sf t}, f, t_{\rm start}) + \sum_{\forall i}d^i_{\rm pos}(X_{\sf t}, f, t_{\rm start})}\,,
+\lambda_{\rm pos}(X_{\sf t}, z, {\sf t}) &= \frac{\lambda^*_{\rm pos}\sum_{\forall k}X^j_{{\sf t}}}{\sum_{\forall k}X^j_{{\sf t}} + \sum_{\forall j}X^k_{{\sf t}}}\,,
 \end{align}
 %%
-where $\lambda^*_{\rm pos}$ is the maximum rate that is physically possible and the $\forall i$ in the summations indicate summing over all elements returned by each vector-valued function. In addition to this possession change influence, players who have {\sf Run Phase} and {\sf Kick Phase} attributes may affect the gain in distance (and accuracy in the case of {\sf Kick Phase}) that each state translates to on the pitch. 
+where $\lambda^*_{\rm pos}$ is the maximum rate that is physically possible and the $\forall j$ and $\forall k$ in the summations indicate summing over all attacking and defending player attributes, respectively. In addition to this possession change influence, players who have {\sf Run Phase} and {\sf Kick Phase} attributes may affect the gain in distance (and accuracy in the case of {\sf Kick Phase}) that each state translates to on the pitch. 
 
 Let's first describe how we intend the {\sf Run Phase} to work. Every time the match state transitions into a {\sf Run Phase}, an individual player on the attacking side is chosen at random (uniformally across the team\footnote{This uniform sampling could be refined later to associate sampling probabilities with game state and player roles.}) to be the the nominal `attacker'. At the same time, an individual player on the defending side is chosen at random (again, uniformally across the team) to be the the nominal `defender'. Once these players have been chosen (and hence the $a_{\rm run}$ and $d_{\rm run}$ parameters have been determined), the longitudinal motion update we described in Eq.~(\ref{eq:longitudinal-motion-rugby}) can then be applied. Note that the $a_{\rm run}$ and $d_{\rm run}$ parameters should also receive a fatigue decrement depending on the time that each player has remained on the pitch, much like the exponential factors we applied in Eqs.~(\ref{eq:att-player-fatigue}) and~(\ref{eq:def-player-fatigue}).
 
 Finally, we turn or attention to the mechanics of a {\sf Kick Phase}. For tactical kicking in the middle of play, this operates in a similar way as a {\sf Run Phase}; one of the players on the attacking side (the side in possession of the ball) is chosen at random (uniformally) and their $a_{\rm kick}$ and $\sigma_{\rm kick}$ attributes are used in Eqs.~(\ref{eq:longitudinal-motion-rugby-kicking}) and~(\ref{eq:lateral-motion-rugby-kicking}) to update the position of the ball. In the specific case of {\sf Goal} kicking from a {\sf Penalty}, the designated place kicker on each side also uses their same {\sf Kick Phase} attributes to determine the success/failure of the kick at the posts.
 
-\section{\sffamily Deciding on gameplay actions}
+\section{\sffamily Deciding on managerial actions}
 
-So how does managing a rugby match map to measured states and taking actions? To begin with, let us assume that the measurement of the total match state is perfect in this instance, such that ${\cal S}_{{\sf t}}=X_{{\sf t}}$. We then have to decide between what sorts of managerial actions are parametric in nature and which ones directly act on the state of the system itself. 
+So how does managing a rugby match map to measured states and taking actions? To begin with, it makes sense to claim that the measurement of the total match state is perfect in this instance, and hence ${\cal S}_{{\sf t}}=X_{{\sf t}}$. We then have to decide between what sorts of managerial actions are parametric in nature (and hence affect $z$) and which ones directly act on the state of the system itself. 
+
+Our model structure would suggest that the only way in which a manager can influence the state of a match is through modifying the parameters which go into the $a_{\rm pos}(X_{\sf t},z)$, $d_{\rm pos}(X_{\sf t},z)$ or ${\cal T}_{{\sf a}\rightarrow {\sf b}}(X_{\sf t},z,{\sf t})$ functions. Additionally, we would argue that the parameters $a_{\sf run}$, $d_{\sf run}$, $a_{\rm kick}$ and $\sigma_{\rm kick}$ in Eqs.~(\ref{eq:longitudinal-motion-rugby}), (\ref{eq:longitudinal-motion-rugby-kicking}) and (\ref{eq:lateral-motion-rugby-kicking}) can also be determined by the manager to some extent through player selection/substitutions.
+
 
 \section{\sffamily Writing the game itself}
 
