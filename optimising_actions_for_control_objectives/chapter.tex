@@ -4,4 +4,14 @@
 
 \section{\sffamily States, actions and formulating rewards}
 
-We observe the state at timestep ${\sf t}$ with ${\cal S}_{{\sf t}} = M_{{\sf t}}(X', Z_{\sf t}, {\sf t})$. In a Markov Decision Process (MDP), based on this observation alone, we would then take actions $X_{{\sf t}+1} = {\cal F}_{{\sf t}+1}(X',Z_{\sf t},{\cal A}_{\sf t},{\sf t})$, for which we would later attribute reward ${\cal R}_{{\sf t}}$.
+Up to this point, we have only considered actions which were either scheduled up front through some fixed process or through user interaction via a game interface. In order to start creating algorithms to act on the system state for us, we now need to develop a formalism which `closes the loop' by feeding information back from the stochastic process to another decision-making process. Note that in most cases, the state of real-world phenomena cannot be measured perfectly. So in order to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to model this measurement process as part of the information retrieval step.
+
+Let's now define the concept of a `measured state' ${\cal S}_{{\sf t}}$ of the system (some vector that doesn't have to share the same length as $X_{\sf t}$) at timestep ${\sf t}$. We can then say generally that this measured state is `observed' using the following measurement function
+%%
+\begin{align}
+{\cal S}_{{\sf t}}^i &= M_{{\sf t}}^i(X', Z_{\sf t}, {\sf t}) \label{eq:generalised-state-measurement} \,,
+\end{align}
+%%
+where we have also extended the definition of $Z_{\sf t}$ to include parameters which control how this measurement is performed.
+
+In a Markov Decision Process (MDP), based on this observation alone, we would then take actions $X_{{\sf t}+1} = {\cal F}_{{\sf t}+1}(X',Z_{\sf t},{\cal A}_{\sf t},{\sf t})$, for which we would later attribute reward ${\cal R}_{{\sf t}}$.

@@ -370,10 +370,10 @@ Note that this idea of integration kernels could also be applied back to our Wie
 %%
 \begin{align}
 S^{0}_{{\sf t}+1}(X',z,{\sf t}) &= W^0_{{\sf t}+1}-W^0_{\sf t}\\
-S^{1}_{{\sf t}+1}(X',z,{\sf t}) &= \frac{1}{T}\sum^{{\sf t}}_{{\sf t}'=0}e^{-\frac{t({\sf t})-t({\sf t}')}{T}} S^{0}_{{\sf t}'}\,,
+S^{1}_{{\sf t}+1}(X',z,{\sf t}) &= u\sum^{{\sf t}}_{{\sf t}'=0}e^{-u[t({\sf t})-t({\sf t}')]} S^{0}_{{\sf t}'}\,,
 \end{align}
 %%
-where $T$ is some decay coefficient which quantifies the length of memory in continuous time.
+where $u$ is inversely proportional to the length of memory in continuous time.
 
 So we've introduced the basic elements of our computational formalism and demonstrated how flexible the approach can be in simulating just about any stochastic phenomenon imaginable. Before progressing to algorithm design, it will be helpful to discuss some useful concepts that should enable us analyse the system later on in the book.
 
