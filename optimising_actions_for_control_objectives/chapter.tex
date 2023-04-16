@@ -6,12 +6,35 @@
 
 Up to this point, we have only considered actions which were either scheduled up front through some fixed process or through user interaction via a game interface. In order to start creating algorithms to act on the system state for us, we now need to develop a formalism which `closes the loop' by feeding information back from the stochastic process to another decision-making process. Note that in most cases, the state of real-world phenomena cannot be measured perfectly. So in order to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to model this measurement process as part of the information retrieval step.
 
-Let's now define the concept of a `measured state' ${\cal S}_{{\sf t}}$ of the system (some vector that doesn't have to share the same length as $X_{\sf t}$) at timestep ${\sf t}$. We can then say generally that this measured state is `observed' using the following measurement function
+Let's now define the concept of a `measured state' ${\cal S}_{{\sf t}}$ of the system at timestep ${\sf t}$; this is a new vector that doesn't have to share the same length as $X_{\sf t}$. We can then say generally that this measured state is `observed' using the following measurement function
 %%
 \begin{align}
 {\cal S}_{{\sf t}}^i &= M_{{\sf t}}^i(X', Z_{\sf t}, {\sf t}) \label{eq:generalised-state-measurement} \,,
 \end{align}
 %%
-where we have also extended the definition of $Z_{\sf t}$ to include parameters which control how this measurement is performed.
+where we have also extended the definition of $Z_{\sf t}$ to include parameters which control how this measurement is performed. If we are now given the conditional probability that an action vector ${\cal A}_{\sf t}=a$ is taken given that state vector ${\cal S}_{\sf t}=s$ has been measured
+%%
+\begin{align}
+\pi (a,s) = p(a\vert s) \,,
+\end{align}
+%%
+we can use this to draw new actions for the agent. From this point on we'll call $\pi$ the `policy' adoped by the agent.
 
-In a Markov Decision Process (MDP), based on this observation alone, we would then take actions $X_{{\sf t}+1} = {\cal F}_{{\sf t}+1}(X',Z_{\sf t},{\cal A}_{\sf t},{\sf t})$, for which we would later attribute reward ${\cal R}_{{\sf t}}$.
+A Markov Decision Process (MDP) defines an algorithm in which the agent uses a single state measurement vector and its given policy $\pi$ to draw actions ${\cal A}_{\sf t}$ at timestep ${\sf t}$. It then performs these actions in its environment, which we have previously formalised through defining the iteration $X_{{\sf t}+1} = {\cal F}_{{\sf t}+1}(X',Z_{\sf t},{\cal A}_{\sf t},{\sf t})$. In order to assess the quality of an agent's actions, we might later attribute a reward value $r_{{\sf t}}$ for actions that were taken at timestep ${\sf t}$. Using a series of these rewards, a return value $R$ can also be computed using a future discount factor $\gamma$ like so 
+%%
+\begin{align}
+R &= \sum_{{\sf t}=0}^\infty \gamma^{\sf t}r_{\sf t} \,.
+\end{align}
+%%
+A state-value function $V_\pi$ is defined as the expectation (under policy $\pi$) of return $R$, given state vector $s$, i.e.,
+%%
+\begin{align}
+V_\pi (s) = {\rm E}_\pi (R\vert s) \,.
+\end{align}
+%%
+Similarly, an action-value function $Q_\pi$ is defined as the expectation (again, under policy $\pi$) of return $R$, given state vector $s$ and action vector $a$, i.e.,
+%%
+\begin{align}
+Q_\pi (s,a) = {\rm E}_\pi (R\vert s,a) \,.
+\end{align}
+%%
