@@ -9,8 +9,8 @@ Let's start by considering how we might adapt the mathematical formalism we have
 During a timestep over which actions are performed by the agent, the stochadex state update formula can be extended to look like this system of equations
 %%
 \begin{align}
-Z_{{\sf t}+1}^i &= G_{{\sf t}+1}^i(Z_{{\sf t}}, {\cal A}_{{\sf t}+1}, {\sf t}) \label{eq:generalised-param-actions} \\
-X_{{\sf t}+1}^i &= H^i_{{\sf t}+1}[F_{\sf t}(X', Z_{{\sf t}+1}, {\sf t}), {\cal A}_{{\sf t}+1}, {\sf t}] \label{eq:generalised-state-actions} \,,
+Z_{{\sf t}+1}^i &= G_{{\sf t}+1}^i(Z_{{\sf t}}, {\cal A}_{{\sf t}+1}) \label{eq:generalised-param-actions} \\
+X_{{\sf t}+1}^i &= H^i_{{\sf t}+1}[F_{\sf t}(X', Z_{{\sf t}+1}, {\sf t}), {\cal A}_{{\sf t}+1}] \label{eq:generalised-state-actions} \,,
 \end{align}
 %%
 where we have also introduced the concept of the `actions' performed ${\cal A}_{{\sf t}+1}$ on the system; some vector of parameters which define what actions are taken at timestep ${\sf t}+1$.
@@ -18,7 +18,7 @@ where we have also introduced the concept of the `actions' performed ${\cal A}_{
 In Eqs.~(\ref{eq:generalised-param-actions}) and~(\ref{eq:generalised-state-actions}), notice that we have replaced the constant vector of parameters $z$ (as in the stochadex formalism) for a time-dependent vector $Z_{{\sf t}}$ of parameters that can be updated by $G_{\sf t}$ at any (but not necessarily every) timestep. From the perspective of the whole matrix $X$ update step; $G_{\sf t}$ and $H_{\sf t}$ combine to become technically equivalent to applying this formal composition of functions
 %%
 \begin{align}
-X^i_{{\sf t}+1} &= H^i_{{\sf t}+1}(F_{\sf t}(X', G_{{\sf t}+1}^i(Z_{{\sf t}}, {\cal A}_{{\sf t}+1}, {\sf t}), {\sf t}), {\cal A}_{{\sf t}+1}, {\sf t}) = {\cal F}^i_{{\sf t}+1}(X', Z_{{\sf t}}, {\cal A}_{{\sf t}+1}, {\sf t}) \label{eq:action-iteration-formula}\,,
+X^i_{{\sf t}+1} &= H^i_{{\sf t}+1}(F_{\sf t}(X', G_{{\sf t}+1}^i(Z_{{\sf t}}, {\cal A}_{{\sf t}+1}), {\sf t}), {\cal A}_{{\sf t}+1}) = {\cal F}^i_{{\sf t}+1}(X', Z_{{\sf t}}, {\cal A}_{{\sf t}+1}, {\sf t}) \label{eq:action-iteration-formula}\,,
 \end{align}
 %%
 which looks like an absolute mess! However, it illustrates how ${\cal F}$, which refers to a modified version of the $F$ function, contains our actions but no other new parameters need be specified; only function operations. Hence, while we have provided two distinct ways one might encode actions to manipulate a stochastic phenomenon, we shall often just refer to them together as `taking an action' ${\cal A}_{{\sf t}+1}$ at timestep ${\sf t}+1$ --- because the parameters which define either type of action at this timestep should all be stored within ${\cal A}_{{\sf t}+1}$ anyway. It is, however, important not to forget the full mathematical formulation when performing calculations. 
@@ -37,22 +37,15 @@ func IterationFormulaWithActions(
     timeStepNumber int,
 ) StateVector {
     // taking a parametric action
-    newestOtherParams := TakeParametricAction(
-        otherParams, 
-        actions,
-        timeStepNumber,
-    )
+    newestOtherParams := TakeParametricAction(otherParams, actions)
+    // iterating the system as normal
     newestStateVector := IterationFormula(
         stateHistory, 
         otherParams,
         timeStepNumber,
     )
     // taking a state action
-    newestStateVector = TakeStateAction(
-        newestStateVector,
-        actions,
-        timeStepNumber,
-    )
+    newestStateVector = TakeStateAction(newestStateVector, actions)
     return newestStateVector
 }
 \end{lstlisting}

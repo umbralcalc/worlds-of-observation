@@ -9,13 +9,15 @@ Up to this point, we have only considered actions which were either scheduled up
 Let's now define the concept of a `measured state' ${\cal S}_{{\sf t}+1}$ of the system at timestep ${\sf t}+1$; this is a new vector that doesn't have to share the same length as $X_{{\sf t}+1}$. We can then say generally that this measured state is `observed' using the following measurement function
 %%
 \begin{align}
-{\cal S}_{{\sf t}+1}^i &= M_{{\sf t}+1}^i(X,{\sf t}+1) \label{eq:generalised-state-measurement} \,.
+{\cal S}_{{\sf t}+1}^i &= M_{{\sf t}+1}^i(X',{\cal Z}_{{\sf t}+1},{\sf t}) \label{eq:generalised-state-measurement} \,,
 \end{align}
 %%
+where we have also introduced a new vector ${\cal Z}_{{\sf t}+1}$ which we will use to store all of the relevant parameters to the agent\footnote{This vector is intended to include parameters for measurement, policy specification and ultimately the learning algorithm as well.} at timestep ${\sf t}+1$.
+
 If we are now given the conditional probability that an action vector element ${\cal A}_{{\sf t}+1}=a$ is chosen given that state vector ${\cal S}_{{\sf t}+1}=s$ has been measured $\pi (a,s) = p(a\vert s)$, we can use this to draw new actions for the agent with a newly defined action-generating function
 %%
 \begin{align}
-{\cal A}_{{\sf t}+1}^i &= \Pi_{{\sf t}+1}^i({\cal S}_{{\sf t}+1}, {\sf t}+1) \label{eq:action-generating-function} \,.
+{\cal A}_{{\sf t}+1}^i &= \Pi_{{\sf t}+1}^i({\cal S}_{{\sf t}+1}, {\cal Z}_{{\sf t}+1}) \label{eq:action-generating-function} \,.
 \end{align}
 %%
 From this point on we'll call $\pi (a,s)$ the `policy' adoped by the agent. A Markov Decision Process (MDP) defines an algorithm in which the agent uses a single state measurement vector and its given policy $\pi$ to draw actions ${\cal A}_{{\sf t}+1}$ at timestep ${{\sf t}+1}$. It then performs these actions in its environment, which we have previously formalised through defining the iteration $X_{{\sf t}+1} = {\cal F}_{{\sf t}+1}(X',Z_{\sf t},{\cal A}_{{\sf t}+1},{\sf t})$. 
