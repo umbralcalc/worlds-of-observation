@@ -40,7 +40,7 @@ P^1_{{\sf t}+1} = \frac{ \frac{1}{\tau}P^1_{{\sf t}} + \lambda_{\rm pos}(X_{\sf 
 
 Before we move on to other details, it's quite important to recognise that because our process is defined in continuous time, the possession change rate may well vary continuously (this will be especially true when we talk about, e.g., player fatigue). Hence, Eq.~(\ref{eq:match-state-transition-probs}) is only an \emph{approximation} of the true underlying dynamics that we are trying to simulate --- and this approximation will only be accurate if $\tau$ is small. The reader may recall that we discussed this same issue from the point of view of simulating time-inhomogeneous Poisson processes with the rejection method when we were building the stochadex in an earlier chapter. 
 
-While these match state transitions and possession changes are taking place, we also need to come up with a model for how the ball location $L_{{\sf t}}$ changes during the course of a game, and as a function of the current game state. Note that, because the ball location is a part of the overall game state, it will be included as information contained within some elements of $X_{{\sf t}}$ as well. To make this explicit, we can simply set $X^2_{{\sf t}}=L^{\rm lon}_{{\sf t}}$ and $X^3_{{\sf t}}=L^{\rm lat}_{{\sf t}}$ --- where $L^{\rm lon}_{{\sf t}}$ denotes the longitudinal component (lengthwise along the pitch) and $L^{\rm lat}_{{\sf t}}$ denotes the lateral component (widthwise across the pitch). If we associate every state on the event graph with a single change in spatial location of the ball on the pitch, we then need to construct a process which makes `jumps' in 2-dimensional space each time a state transition occurs. To keep things simple and intuitive, we will say that movements of the ball are only allowed to occur during either a {\sf Run Phase} or a {\sf Kick Phase}. 
+While these match state transitions and possession changes are taking place, we also need to come up with a model for how the ball location $L_{{\sf t}}$ changes during the course of a game, and as a function of the current game state. Note that, because the ball location is a part of the overall game state, it will be included as information contained within some elements of $X_{{\sf t}}$ as well. To make this explicit, we can simply set $X^2_{{\sf t}}=L^{\rm lon}_{{\sf t}}$ and $X^3_{{\sf t}}=L^{\rm lat}_{{\sf t}}$ --- where $L^{\rm lon}_{{\sf t}}$ denotes the longitudinal component (lengthwise along the pitch) and $L^{\rm lat}_{{\sf t}}$ denotes the lateral component (widthwise across the pitch). If we associate every state on the event graph with a single change in spatial location of the ball on the pitch, we then need to construct a process which makes `jumps' in 2-dimensional space each time a state transition occurs. To keep things simple and intuitive, we will say that movements of the ball are only allowed to occur during either a {\sf Run Phase} or a {\sf Kick Phase}. In most cases this restriction makes sense given the real-world game patterns, but perhaps the only clear exception is the {\sf Penalty} $\longrightarrow$ {\sf Goal} transition; which is easier to think of as a kind of `{\sf Kick Phase} transition' anyway. 
 
 In the case of a {\sf Run Phase}, let's choose the longitudinal component of the ball location $L^{\rm lon}_{{\sf t}}$ to be updated by the difference between samples drawn from two exponential distributions (one associated to each team). Hence, the probability density $P_{{\sf t}+1}(\ell )$ of $L^{\rm lon}_{{\sf t}+1}-L^{\rm lon}_{{\sf t}}=\ell$, evolves according to
 %%
@@ -56,7 +56,32 @@ P_{{\sf t}+1}(w) = {\sf NormalPDF}(w; 0, \sigma_{\rm run}^2) \label{eq:lateral-m
 %%
 where $\sigma_{\rm run}$ is the typical jump in lateral motion (the standard deviation parameter of the normal distribution).
 
-Turning our attention to the {\sf Kick Phase}; the longitudinal component is only realistically controlled by the attacking team. There's also an angular component to this motion which is associated to the direction that the kicker is orientating their kick. Let's begin by defining the chosen angle $\theta$ of the attacking team player who is kicking (where straight ahead is defined as $\theta = 0$) such that
+Turning our attention to the {\sf Kick Phase}; the longitudinal and lateral components are only realistically controlled by the attacking team --- specifically, by the player who is currently the kicker. Referring back to the state transitions which precede a {\sf Kick Phase} in Fig.~\ref{fig:event-graph}, we note that there are several types of kick which can dictate what the mechanics of the process should look like. To keep things simple, we can cluster these types of event into the following categories
+%%
+\begin{enumerate}
+\item Kicks at the goalposts for points:
+\begin{itemize}
+    \item {\sf Penalty} $\longrightarrow$ {\sf Goal}
+    \item {\sf Kick Phase} $\longrightarrow$ {\sf Drop Goal}
+\end{itemize}
+\item Kicks in the general field of play where the ball does not leave the field:
+\begin{itemize}
+    \item {\sf Kick Phase} $\longrightarrow$ {\sf Try}
+    \item {\sf Kick Phase} $\longrightarrow$ {\sf Run Phase}
+    \item {\sf Kick Phase} $\longrightarrow$ {\sf Knock-on}
+    \item {\sf Kick Phase} $\longrightarrow$ {\sf Ruck}
+    \item {\sf Kick Phase} $\longrightarrow$ {\sf Maul}
+\end{itemize} 
+\item Kicks to the touchline where the ball leaves the field:
+\begin{itemize}
+    \item {\sf Kick Phase} $\longrightarrow$ {\sf Lineout}
+\end{itemize}  
+\end{enumerate}
+%%
+
+\textcolor{red}{Need to figure out what models to use for each case from here...}
+
+There's also an angular component to this motion which is associated to the direction that the kicker is orientating their kick. Let's begin by defining the chosen angle $\theta$ of the attacking team player who is kicking (where straight ahead is defined as $\theta = 0$) such that
 %%
 \begin{align}
 L^{\rm lon}_{{\sf t}+1}-L^{\rm lon}_{{\sf t}}&=\ell \cos \theta + w \sin \theta \\
@@ -91,22 +116,21 @@ In Fig.~\ref{fig:player-abilities} we have begun by separating playing positions
 
 Let's now say that $z$ contains all of these parameters for all of the players on both sides, and also whether or not each player is actively playing or on the bench. With this information, and the knowledge of which team is in possession from $X^1_{\sf t}$, it should be simple to create a vector-valued function $a_{\rm pos}(X_{\sf t}, z)$ which returns all of the possession attacking attributes that are associated to match state $X^0_{\sf t}$ and an analogous one $d_{\rm pos}(X_{\sf t}, z)$ for the possession defending attributes. The dependencies of these functions on the ball possession state $X^1_{\sf t}$ comes from the fact that when, e.g., the {\sf Home Team} has possession of the ball it will be their possession attacking attributes that are returned by $a_{\rm pos}(X_{\sf t}, z)$ and the {\sf Away Team}'s possession defending attributes that are returned by $d_{\rm pos}(X_{\sf t}, z)$.
 
-In order to model the effect of player fatigue over the course of a match, we can add some vectors of player fatigue values $f$ and times at which each player started playing $t_{\rm start}$ into the collection of parameters that are contained within $z$. These new parameters can then be used to define a formula for the decline of each attribute over the course of a match. Let's assign these declining values to be part of the overall match state like so
+In order to model the effect of player fatigue over the course of a match, we can add some vectors of player fatigue values $f$ and times at which each player started playing $t_{\rm start}$ into the collection of parameters that are contained within $z$. These new parameters can then be used to define a formula for the decline of each attribute over the course of a match. Let's redefine these declining values as
 %%
 \begin{align}
-X^j_{\sf t} &= a^j_{\rm pos}(X_{\sf t}, z)e^{-f^j[t({\sf t})-t^j_{\rm start}]} \label{eq:att-player-fatigue} \\
-X^k_{\sf t} &= d^k_{\rm pos}(X_{\sf t}, z)e^{-f^k[t({\sf t})-t^k_{\rm start}]} \label{eq:def-player-fatigue} \,,
+a^i_{\rm pos}(X_{\sf t}, z, {\sf t}) &= a^i_{\rm pos}(X_{\sf t}, z)e^{-f^i[t({\sf t})-t^i_{\rm start}]} \label{eq:att-player-fatigue} \\
+d^i_{\rm pos}(X_{\sf t}, z, {\sf t}) &= d^i_{\rm pos}(X_{\sf t}, z)e^{-f^i[t({\sf t})-t^i_{\rm start}]} \label{eq:def-player-fatigue} \,.
 \end{align}
 %%
-where the $j$ and $k$ each index the range of indices in the overall match state which correspond to the attacking and defending team player states, respectively.
 
 So how does each player affect the events of a match? In our model, we would argue that players should be able to directly influence the possession change rate $\lambda_{\rm pos}(X_{\sf t}, z, {\sf t})$ through a balance of attacking and defensive attributes in the following relation
 %%
 \begin{align}
-\lambda_{\rm pos}(X_{\sf t}, z, {\sf t}) &= \frac{\lambda^*_{\rm pos}\sum_{\forall k}X^k_{{\sf t}}}{\sum_{\forall j}X^j_{{\sf t}} + \sum_{\forall k}X^k_{{\sf t}}}\,,
+\lambda_{\rm pos}(X_{\sf t}, z, {\sf t}) &= \frac{\lambda^*_{\rm pos}\sum_{\forall i}d^i_{\rm pos}(X_{\sf t}, z, {\sf t})}{\sum_{\forall i}a^i_{\rm pos}(X_{\sf t}, z, {\sf t}) + \sum_{\forall i}d^i_{\rm pos}(X_{\sf t}, z, {\sf t})}\,,
 \end{align}
 %%
-where $\lambda^*_{\rm pos}$ is the maximum rate that is physically possible and the $\forall j$ and $\forall k$ in the summations indicate summing over all attacking and defending player attributes, respectively. In addition to this possession change influence, players who have {\sf Run Phase} and {\sf Kick Phase} longitudinal scale attributes may affect the gain in distance that each state translates to on the pitch. In a similar way, the same players will be able to influence the accuracy of their {\sf Kick Phase} or the lateral distance travelled by the ball in the {\sf Run Phase} given their associated attributes --- as is hopefully quite clear from Fig.~\ref{fig:player-abilities}. 
+where $\lambda^*_{\rm pos}$ is the maximum rate that is physically possible and the $\forall i$ in the summations indicates summing over all attacking or defending player attributes of the vector in each instance. In addition to this possession change influence, players who have {\sf Run Phase} and {\sf Kick Phase} longitudinal scale attributes may affect the gain in distance that each state translates to on the pitch. In a similar way, the same players will be able to influence the accuracy of their {\sf Kick Phase} or the lateral distance travelled by the ball in the {\sf Run Phase} given their associated attributes --- as is hopefully quite clear from Fig.~\ref{fig:player-abilities}. 
 
 Let's first describe how we intend the {\sf Run Phase} to work. Every time the match state transitions into a {\sf Run Phase}, an individual player on the attacking side is chosen at random (uniformally across the team\footnote{This uniform sampling could be refined later to associate sampling probabilities with game state and player roles.}) to be the the nominal `attacker'. At the same time, an individual player on the defending side is chosen at random (again, uniformally across the team) to be the the nominal `defender'. Once these players have been chosen (and hence the $a_{\rm run}$ and $d_{\rm run}$ parameters have been determined), the longitudinal motion update we described in Eq.~(\ref{eq:longitudinal-motion-rugby}) can then be applied. Note that the $a_{\rm run}$ and $d_{\rm run}$ parameters should also receive a fatigue decrement depending on the time that each player has remained on the pitch, much like the exponential factors we applied in Eqs.~(\ref{eq:att-player-fatigue}) and~(\ref{eq:def-player-fatigue}).
 
