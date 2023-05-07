@@ -79,9 +79,7 @@ Turning our attention to the {\sf Kick Phase}; the longitudinal and lateral comp
 \end{enumerate}
 %%
 
-\textcolor{red}{Need to figure out what models to use for each case from here...}
-
-There's also an angular component to this motion which is associated to the direction that the kicker is orientating their kick. Let's begin by defining the chosen angle $\theta$ of the attacking team player who is kicking (where straight ahead is defined as $\theta = 0$) such that
+To model, e.g., case 1. above, the simplest option would be to associate the attempt at goal to have a kicking success probability which depends on the location on the pitch from which the kick is taken. Instead of this top-down perspective, however, we will unify the mathematical descriptions between all of the cases such that the longitudinal and lateral updates to the ball location on the pitch are translated into radial and angular components (from which a kicking success probability could be derived). To do this, let's begin by defining the chosen kicking angle $\theta$ of the attacking team player who is kicking (where straight ahead is defined as $\theta = 0$) such that
 %%
 \begin{align}
 L^{\rm lon}_{{\sf t}+1}-L^{\rm lon}_{{\sf t}}&=\ell \cos \theta + w \sin \theta \\
