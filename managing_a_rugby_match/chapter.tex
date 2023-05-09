@@ -6,7 +6,7 @@
 
 Since the basic state manipulation framework and simulation engine will run using \href{https://github.com/umbralcalc/dexetera}{dexetera}, the mathematical novelties in this project are all in the design of the rugby match model itself. And, as ever, we're not especially keen on spending a lot of time doing detailed data analysis to come up with the most realistic values for the parameters that are dreamed up here. Even though this would also be interesting.\footnote{One could do this data analysis, for instance, by scraping player-level performance data from one of the excellent websites that collect live commentary data such as \href{https://www.rugbypass.com/}{rugbypass.com} or \href{https://www.espn.co.uk/rugby/}{espn.co.uk/rugby}.}
 
-Let's begin by specifying an appropriate state space to live in when simulating a rugby match. It is important at this level that events are defined in quite broadly applicable terms, as it will define the state space available to our stochastic sampler and hence the simulated game will never be allowed to exist outside of it. It seems reasonable to characterise a rugby union match by the following set of states: {\sf Penalty}, {\sf Free Kick} (the punitive states); {\sf Penalty Goal}, {\sf Drop Goal}, {\sf Try} (the scoring states); {\sf Kickoff}, {\sf Kick Phase}, {\sf Run Phase}, {\sf Knock-on}, {\sf Scrum}, {\sf Lineout}, {\sf Maul} and {\sf Ruck} (the general play states). Using this set of states, in Fig.~\ref{fig:event-graph} we have summarised our approach to match state transitions into a single event graph. In order to capture the fully detailed range of events that are possible in a real-world match, we've needed to be a little imaginative in how we define the kinds of state transitions which occur. In other words; it's fair to say that our simplified model here represents just a subset of states that a real rugby match could exist in.
+Let's begin by specifying an appropriate state space to live in when simulating a rugby match. It is important at this level that events are defined in quite broadly applicable terms, as it will define the state space available to our stochastic sampler and hence the simulated game will never be allowed to exist outside of it. It seems reasonable to characterise a rugby union match by the following set of states: {\sf Penalty}, {\sf Free Kick} (the punitive states); {\sf Penalty Goal}, {\sf Drop Goal}, {\sf Try} (the scoring states); {\sf Kickoff}, {\sf Kick Phase}, {\sf Run Phase}, {\sf Knock-on}, {\sf Scrum}, {\sf Lineout}, {\sf Maul} and {\sf Ruck} (the general play states). Using this set of states, in Fig.~\ref{fig:event-graph} we have summarised our approach to match state transitions into a single event graph. In order to capture the fully detailed range of events that are possible in a real-world match, we've needed to be a little imaginative in how we define the kinds of state transitions which occur.\footnote{It's also fair to say that our simplified model here represents just a subset of states that a real rugby match could exist in.} For example, kickoffs, 22m dropouts and goal line dropouts are all modelled here as a {\sf Kickoff} state but with different initial ball locations on the pitch (we'll get to how ball location changes later on).
 
 \begin{figure}[h]
 \includegraphics[width=14cm]{images/trywizard-event-graph.drawio.png}
@@ -79,26 +79,19 @@ Turning our attention to the {\sf Kick Phase}; the longitudinal and lateral comp
 \end{enumerate}
 %%
 
-To model, e.g., case 1. above, the simplest option would be to associate the attempt at goal with a kicking success probability which depends on the location on the pitch from which the kick is taken. Instead of this top-down perspective, however, we will unify the mathematical descriptions between all of the cases above such that the longitudinal and lateral updates to the ball location on the pitch are translated into radial and angular components (from which a kicking success probability could be derived). To do this, let's begin by defining the chosen kicking angle $\theta$ of the attacking team player who is kicking (where straight ahead is defined as $\theta = 0$) such that
+To model case 1. above, the simplest option would be to associate the attempt at goal with a goal success probability for the kicker $p_{\rm goal}(X_{\sf t})$ which also depends on the location on the pitch from which the kick is taken. 
+
+Lastly, to model case 3. above, the event has determined that the ball will leave the field of play and so the remaining unknowns that need to be determined are: which side of the field this occurred (we'll just give this a binomial probability of 0.5 for either side), the longitudinal distance of the kick and whether or not the ball bounced before leaving the field. For simplicity, let's determine the last of these through another kind of kick accuracy probability $p_{\rm kick}$ associated to the kicker. This just leaves the longitudinal distance that the kick achieved along the touchline; in this case we'll just assign the probability density $P_{{\sf t}+1}(\ell )$ of $L^{\rm lon}_{{\sf t}+1}-L^{\rm lon}_{{\sf t}}=\ell$ to
 %%
 \begin{align}
-L^{\rm lon}_{{\sf t}+1}-L^{\rm lon}_{{\sf t}}&=\ell \cos \theta + w \sin \theta \\
-L^{\rm lat}_{{\sf t}+1}-L^{\rm lat}_{{\sf t}}&=\ell \sin \theta + w \cos \theta \,.
-\end{align} 
-%%
-Therefore, the probability density of $P_{{\sf t}+1}(\ell )$ will evolve according to
-%%
-\begin{align}
-P_{{\sf t}+1}(\ell ) = {\sf ExponentialPDF}(\ell; a_{\rm kick}) \label{eq:longitudinal-motion-rugby-kicking} \,,
+P_{{\sf t}+1}(\ell ) = {\sf NormalPDF}[\ell; \mu_{\rm kick}(X_{\sf t})-L^{\rm lon}_{{\sf t}}, \sigma_{\rm kick}^2(X_{\sf t})] \label{eq:longitudinal-kick-rugby} \,,
 \end{align}
 %%
-where $a_{\rm kick}$ this time is the exponential scale parameter for the attacking team player who is kicking. Similarly, the lateral component for a {\sf Kick Phase} is only going to be controlled by the accuracy of the kicker. Therefore, the corresponding update to the probability density is
-%%
-\begin{align}
-P_{{\sf t}+1}(w) = {\sf NormalPDF}(w;0, \sigma_{\rm kick}^2) \label{eq:lateral-motion-rugby-kicking} \,,
-\end{align}
-%%
-with a standard deviation $\sigma_{\rm kick}$, and its interpretation now being the accuracy of the kicker.
+where $\mu_{\rm kick}(X_{\sf t})$ and $\sigma_{\rm kick}(X_{\sf t})$ are parameters which can vary with location of the ball on the pitch and can be determined by general trends in the tactical patterns of a rugby match.
+
+Generally, the proceeding {\sf Lineout} will be taken with the opposition team (to the kicker) in possession at the point where the ball left the field. However, there are two notable exceptions to this rule. The first is if the ball does not bounce before leaving the field of play and the player is outside of their team's 22m line --- the {\sf Lineout} then must occur where the ball was last kicked from with the opposition team in possession. The second exception is if the ball bounces into touch when the player who kicked it was inside their team's half of the pitch --- the {\sf Lineout} then occurs where the ball left the field but is taken with the kicker's team in possession. 
+
+Before moving on to player states and abilities it's important to note that, in addition to the other state variables we have discussed above, the score of the match obviously needs to be recorded in the overall match state $X_{\sf t}$ as well. To be explicit, we'll say that $X^4_{\sf t}=$ {\sf Home Team Score} and $X^5_{\sf t}=$ {\sf Away Team Score}, recalling that kicks at goal from a {\sf Penalty Goal} or {\sf Drop Goal} are worth 3 points, a ${\sf Try}$ is worth 5 points and if this is proceeded by a conversion (another kick at goal taken laterally inline with where the {\sf Try} was scored across the pitch) then this is worth an additional 2 points.
 
 \section{\sffamily Associating events to player states and abilities}
 
