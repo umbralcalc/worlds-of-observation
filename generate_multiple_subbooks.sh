@@ -6,10 +6,10 @@ declare -a filenames=(
     "simulating_a_financial_market/chapter" \
     "quantum_jumps_on_generic_networks/chapter" \
     "empirical_dynamical_emulators/chapter" \
+    "generalised_statistical_inference_tools/chapter" \
     "inferring_dynamical_2d_maps/chapter" \
     "learning_from_ants_on_curved_surfaces/chapter" \
     "a_world_of_hydrodynamic_ensembles/chapter" \
-    "generalised_statistical_inference_tools/chapter" \
     "interacting_with_systems_in_general/chapter" \
     "angling_for_freshwater_fish/chapter" \
     "managing_a_rugby_match/chapter" \
@@ -24,6 +24,15 @@ counter=0
 for filename in "${filenames[@]}"
 do
    rm $filename.pdf
+   rm $filename.xdv
+   rm $filename.bbl
+   rm $filename.blg
+   rm $filename.log
+   rm $filename.out
+   rm $filename.aux
+   rm $filename.fdb_latexmk
+   rm $filename.fls
+   rm $filename.synctex.gz
    export CHAPTER_NUMBER=$counter
    export CHAPTER_TO_COMPILE=$filename
    export CHAPTER_FRONTPAGE="images/page-design-$((counter+1)).png"
