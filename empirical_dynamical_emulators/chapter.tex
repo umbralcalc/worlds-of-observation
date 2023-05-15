@@ -1,15 +1,143 @@
 \chapter{\sffamily Empirical dynamical emulators}
 
-{\bfseries\sffamily Concept.} To leverage the probabilistic formalism that we developed in the previous chapter to be able to empirically emulate the real-world data for a wide variety stochastic phenomena within a generalised framework. This chapter will then explore how the mathematics fits as code within the stochadex and follows this up with some simple examples. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be adapted to focus on dynamical process emulation. For the programmers, we will be creating some new modules in the stochadex public Git repository: \href{https://github.com/umbralcalc/stochadex}{https://github.com/umbralcalc/stochadex}.
+{\bfseries\sffamily Concept.} Leveraging the formalism that we developed in the previous chapter to be able to empirically emulate real-world data in a probabilistic way. This technique should enable a researcher to model complex trends in the data dynamically very well; at the cost of making the abstract interpretation of the model less immediately comprehensible in comparison to the statistical inference models of the next chapter. As our generalised framework applies to a wide variety stochastic phenomena, our emulator will be applicable to a great breadth of data modeling problems as well. In this chapter, we will also explore some examples which illustrate how our empirical emulator should be applied in practice and then follow this up with how the code is designed and implemented within the stochadex. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on probabilistic dynamical process emulation. For the programmers, we will be creating some new modules in the stochadex public Git repository: \href{https://github.com/umbralcalc/stochadex}{https://github.com/umbralcalc/stochadex}.
 
 \section{\sffamily Probabilistic formalism}
 
-The key distinction between the methods that we will develop in this chapter and the ones in the next chapter (on statistical inference tools) is in their utility when faced with the problem of attempting to model real-world data. In the proceeding chapter, we shall describe some powerful techniques that can be used most effectively when the researcher is aware of the family of models that generated the data. In the present chapter, we will go into the details of how a more 'empirical' approach can be derived for dynamical process modelling in a probabilistic framework which locally adapts the model to the data through time. This technique enables the researcher to model complex trends in the data dynamically very well; at the cost of making the abstract interpretation of the model less immediately comprehensible.
+The key distinction between the methods that we will develop in this chapter and the ones in the next chapter (on statistical inference tools) is in their utility when faced with the problem of attempting to model real-world data. In the proceeding chapter, we shall describe some powerful techniques that can be used most effectively when the researcher is aware of the family of models that generated the data. In the present chapter, we will go into the details of how a more `empirical' approach can be derived for dynamical process modeling in a probabilistic framework which locally adapts the model to the data through time. 
 
-To begin with we want to...
+In this chapter, while we think that it's worth going into some mathematical detail to give a better sense of where our formalism comes from; we want to emphasise that the framework we discuss here is not especially new to the technical literature. We shall be using  well-known techniques, such as Gaussian processes~\cite{murphy2012machine}, and our overall framework is comparable to that of Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, or perhaps some classic nonparametric local regression techniques such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} as well. The novelties here, instead, lie more in the specifics of how we combine some of these ideas together when referencing the stochadex formalism, and how this manifests in designing more generally-applicable software for the user.
 
-\href{https://en.wikipedia.org/wiki/Empirical_dynamic_modeling#:~:text=Empirical%20dynamic%20modeling%20(EDM)%20is,Robert%20May%20and%20George%20Sugihara.}{reference this}
+So, how do we begin? The general stochastic process, which we defined with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$ in the first chapter of this book, also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x)$ of the most recent matrix row $x=X_{{\sf t}+1}$ at time ${\sf t}$. This can be written as
+%%
+\begin{align}
+P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:master-x-cont} \,,
+\end{align}
+%%
+where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
 
-\href{https://en.wikipedia.org/wiki/Gaussian_process#:~:text=In%20probability%20theory%20and%20statistics,of%20them%20is%20normally%20distributed.}{and this}
+The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation factor --- this just normalises the sum of all probabilities to 1 given that there is a sum over ${\sf t}'$. Note that, if the process is defined over continuous time, we would need to replace 
+%%
+\begin{align}
+\frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} \rightarrow \frac{1}{t({\sf t})}\sum_{{\sf t}'=0}^{{\sf t}}\delta t({\sf t}') \,.
+\end{align}
+%% 
+But what is $\omega_{\sf t}$? You can think of this as just the domain of possible $x'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
 
-\href{https://en.wikipedia.org/wiki/Local_regression}{and also this}
+\begin{figure}[h]
+\centering
+\includegraphics[width=8cm]{images/master-eq-graph.drawio.png}
+\caption{Graph representation of Eq.~(\ref{eq:master-x-cont}).}
+\label{fig:master-eqn}
+\end{figure}
+
+What if we wanted the joint distribution of both rows $P_{({\sf t}+1){\sf t}'}(x,x')$? One way to obtain this would be to extend Eq.~(\ref{eq:master-x-cont}) such that both matrix rows are marginalised over separately like so
+%%
+\begin{align}
+&P_{({\sf t}+1){\sf t}'}(x,x') = \nonumber \\
+&\qquad \frac{1}{({\sf t}'-1){\sf t}}\sum_{{\sf t}''=0}^{{\sf t}}\sum_{{\sf t}'''=0}^{{\sf t}'-1}\int_{\omega_{{\sf t}''}}{\rm d}x''\int_{\omega_{{\sf t}'''}}{\rm d}x''' P_{{\sf t}''{\sf t}'''}(x'', x''') P_{({\sf t}+1){\sf t}''}(x\vert x'')P_{{\sf t}'{\sf t}'''}(x'\vert x''') \label{eq:joint-master-x-cont} \,.
+\end{align}
+%%
+Given Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:joint-master-x-cont}) it's also possible to work out what the conditional probabilities would look like using the simple relation
+%%
+\begin{align}
+P_{({\sf t}+1){\sf t}'}(x\vert x') &= \frac{P_{({\sf t}+1){\sf t}'}(x,x')}{P_{{\sf t}'}(x')} \label{eq:cond-master-x-cont} \,.
+\end{align}
+%%
+
+The implicit notation in Eq.~(\ref{eq:master-x-cont}) can hide some staggering complexity. To analyse the system in more detail, we can also do a kind of Kramers-Moyal expansion~\cite{kramers1940brownian,moyal1949stochastic} for each point in time to approximate the overall equation like this
+%%
+\begin{align}
+P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}P_{{\sf t}'}(x) - \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\sum_{i=1}^d\frac{\partial}{\partial x^i}\big[ \alpha^i_{({\sf t}+1){\sf t}'}(x)P_{{\sf t}'}(x)\big] \nonumber \\
+& \qquad + \frac{1}{2{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\sum_{i=1}^d\sum_{j=1}^d\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\big[ \beta^{ij}_{({\sf t}+1){\sf t}'}(x)P_{{\sf t}'}(x)\big] + \dots \label{eq:master-x-cont-kramers-moyal} \,,
+\end{align}
+%%
+in which we have assumed that the state space is $d$-dimensional. In this expansion, we also needed to define these new integrals
+%%
+\begin{align}
+\alpha^i_{({\sf t}+1){\sf t}'}(x) &=\int_{\omega_{{\sf t}'}} {\rm d}x'(x'-x)^iP_{({\sf t}+1){\sf t}'}(x'\vert x) \\
+\beta^{ij}_{({\sf t}+1){\sf t}'}(x) &= \int_{\omega_{{\sf t}'}} {\rm d}x'(x'-x)^i(x'-x)^jP_{({\sf t}+1){\sf t}'}(x'\vert x) \,.
+\end{align}
+%%
+So the matrix notation of Eq.~(\ref{eq:master-x-cont}) can indeed hide a very complicated calculation. Truncating the expansion at second-order, Eq.~(\ref{eq:master-x-cont-kramers-moyal}) tells us that there can be first and second derivatives contributing to the flow of probability to each element of the row $x=X_{{\sf t}+1}$ which depend on every element of the matrix $X'$. The probability does indeed \emph{flow}, in fact. We can define a quantity known as the `probability current' $J_{({\sf t}+1){\sf t}'}(x)$ from ${\sf t}'$ to $({\sf t}+1)$ which illustrates this through the following continuity relation
+%%
+\begin{align}
+P_{{\sf t}+1}(x) - \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}P_{{\sf t}'}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\big[ P_{{\sf t}+1}(x) - P_{{\sf t}'}(x)\big] = - \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}J_{({\sf t}+1){\sf t}'}(x) \,.
+\end{align}
+%%
+By inspection of Eq.~(\ref{eq:master-x-cont-kramers-moyal}) we can therefore also deduce that
+%%
+\begin{align}
+J^i_{({\sf t}+1){\sf t}'}(x) &= \alpha^i_{({\sf t}+1){\sf t}'}(x)P_{{\sf t}'}(x) - \frac{1}{2}\sum_{j=1}^d\frac{\partial}{\partial x^j}\big[ \beta^{ij}_{({\sf t}+1){\sf t}'}(x)P_{{\sf t}'}(x)\big] + \dots \,.
+\end{align}
+%%
+
+What would happen if we assumed that $\alpha$ and $\beta$ were just arbitrary time-dependent functions? For example, let's make the following assumptions
+%%
+\begin{align}
+\alpha^i_{({\sf t}+1){\sf t}'}(x) &= \mu^i({\sf t}')-x^i \\
+\beta^{ij}_{({\sf t}+1){\sf t}'}(x) &= 2\Sigma^{ij}(\theta, {\sf t}') \,,
+\end{align}
+%%
+where $\mu ({\sf t}')$ is an arbitrary vector-valued function of the timestep and $\Sigma (\theta ,{\sf t}')$ is an arbitrary matrix (often known as the `diffusion tensor') which depends on both the timestep and a set of hyperparameters $\theta$. If we now also assume stationarity of $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for any ${\sf t}'$ and ${\sf t}''$ such that
+%%
+\begin{align}
+P_{{\sf t}+1}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} P_{{\sf t}'}(x) \,,
+\end{align}
+%%
+we can solve Eq.~(\ref{eq:master-x-cont-kramers-moyal}) to obtain the following stationary solution
+%%
+\begin{align}
+P_{{\sf t}'}(x) &= {\sf MultivariateNormalPDF}[x;\mu ({\sf t}'),\Sigma (\theta , {\sf t}')]\label{eq:stat-sol-kramers-moyal}\,.
+\end{align}
+%%
+Note in that last step the solution also required the identification that the flow of probability between timesteps vanishes uniquely for each and every ${\sf t}'$ such that $J_{({\sf t}+1){\sf t}'}(x)=0$. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=8cm]{images/gp-like-diag.drawio.png}
+\caption{Graph representation of the generative process implied by Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}).}
+\label{fig:stat-sol-kramers-moyal-cond}
+\end{figure}
+
+It's possible to take this derivation a bit further by expanding Eq.~(\ref{eq:joint-master-x-cont}) in a similar fashion, truncating it to second-order, assuming only time-dependent terms and then solving it in the stationary limit. By plugging this solution (and its corresponding marginal distribution equivalent) into Eq.~(\ref{eq:cond-master-x-cont}), it's possible to get something that looks like this conditional distribution
+%%
+\begin{align}
+P_{({\sf t}+1){\sf t}'}(x\vert x') &\propto {\rm exp}\bigg\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}\big[ x-f({\sf t}+1)\big]^i [K^{-1}(\theta , {\sf t}+1,{\sf t}+1)]^{ij}\big[ x-f({\sf t}+1)\big]^j \nonumber \\
+& \qquad \qquad + \sum^d_{i=1}\sum^d_{j=1}\big[ x-f({\sf t}+1)\big]^i [K^{-1}(\theta , {\sf t}+1,{\sf t}')]^{ij}\big[ x'-f({\sf t}')\big]^j  \bigg\} \label{eq:stat-sol-kramers-moyal-cond}\,,
+\end{align}
+%%
+where $K(\theta , {\sf t}+1,{\sf t}')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}(\theta , {\sf t}+1,{\sf t}')$ denotes taking its inverse. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which we've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though.
+
+What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
+%%
+\begin{align}
+P_{{\sf t}+1}(x) &= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x') P_{({\sf t}+1){\sf t}}(x\vert x') \label{eq:master-x-cont-markov} \,.
+\end{align}
+%%
+It's also easy to show that Eq.~(\ref{eq:master-x-cont-kramers-moyal}) naturally simplifies into the more usually applied Kramers-Moyal expansion when considering a Markovian process --- you just remove the sum over ${\sf t}'$ and the $1/{\sf t}$ normalisation factor. 
+
+Note that an analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
+%%
+\begin{align}
+P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t}\sum_{\omega_{{\sf t}'}} P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x \vert x') \label{eq:master-x-disc} \,,
+\end{align}
+%%
+where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}. Because the state space is now discrete, we cannot immediately intuit an approximative expansion from this expression. 
+
+Ok, as a brief mathematical aside; if one is really determined to use a similar approach to the one we derived above, it's quite straightforward to rewrite it in terms of continuous-valued characteristic functions like so
+%%
+\begin{align}
+\varphi_{{\sf t}+1}(s) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t}\int_{\ell_{{\sf t}'}}{\rm d}s' {\cal C}(s') \varphi_{{\sf t}'}(s') \varphi_{({\sf t}+1){\sf t}'}(s \vert s') \label{eq:master-x-disc-char} \\
+{\cal C}(s') &= \frac{1}{(2\pi )^d}\sum_{\omega_{{\sf t}'}}e^{-i(s'\cdot x')} \,,
+\end{align}
+%%
+where $\ell_{{\sf t}'}$ defines all the continuous values that the vector $s'$ can possibly have at time ${\sf t}'$. In the expression above, ${\cal C}(s')$ acts like is a kind of comb\footnote{This is very similar to how a `Dirac comb' works in signal processing~\cite{brandwood2012fourier}.} to map the continuous frequency domain of $s'$ onto the discrete state space of $x'$. Note also that ${\cal C}(s')$ uses the imaginary number $i$ and, to be visually tidier, the dot product notation $a\cdot b$ just means the sum of vector elements: $a\cdot b = \sum_{\forall k}a^kb^k$. In principle, one can perform an approximative expansion on Eq.~(\ref{eq:master-x-disc-char}) like we did for continuous state spaces. This isn't always the most practical way of analysing the system though. 
+
+We have one more important example to discuss and then we can cap off this more mathematical section. In the even-simpler case where $x$ is just a vector of binary `on' or `off' states, Eq.~(\ref{eq:master-x-disc}) reduces to
+%%
+\begin{align}
+P^i_{{\sf t}+1} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{{\sf t}'} P^{ij}_{({\sf t}+1){\sf t}'} = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d \big[ P^j_{{\sf t}'} A^{ij}_{({\sf t}+1){\sf t}'} + (1-P^j_{{\sf t}'}) B^{ij}_{({\sf t}+1){\sf t}'} \big] \label{eq:master-x-disc-binary}\,,
+\end{align}
+%% 
+where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$. The matrices $A$ and $B$ are defined as conditional probabilities where the previous state in time $P^j_{{\sf t}'}$ was either `on' or `off', respectively.
