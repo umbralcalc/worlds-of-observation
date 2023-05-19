@@ -48,7 +48,8 @@ func StateVectorProbability(
     for t := 0; t < timeStepNumber; t++ {
         // loop over the randomly-drawn possible state vectors 
         // for this previous timestep
-        for _, possibleStateVector := range RandomPossibleStateVectors(t) {
+        possibleStateVectors := RandomPossibleStateVectors(t)
+        for _, possibleStateVector := range possibleStateVectors {
             // note the recursion
             prob += StateVectorProbability(possibleStateVector, t)*
                 StateVectorConditionalProbability(
@@ -58,7 +59,10 @@ func StateVectorProbability(
                     t,
                 )
         }
+        // normalisation for the Monte Carlo integration
+        prob /= float64(len(possibleStateVectors))
     }
+    // timestep normalisation
     prob /= float64(timeStepNumber)
     return prob
 }
