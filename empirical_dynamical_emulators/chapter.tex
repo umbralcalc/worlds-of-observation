@@ -1,6 +1,6 @@
 \chapter{\sffamily Empirical dynamical emulators}
 
-{\bfseries\sffamily Concept.} To extend the formalism that we developed in previous chapters to enable the empirical emulation of real-world data in a probabilistic way. This technique should enable a researcher to model complex dynamical trends in the data very well; at the cost of making the abstract interpretation of the model less immediately comprehensible than the statistical inference models in some proceeding chapters. As our generalised framework applies to a wide variety stochastic phenomena, our emulator will be applicable to a great breadth of data modeling problems as well. We will also explore some examples which illustrate how our empirical emulator should be applied in practice and then follow this up with how the code is designed and implemented as part of a new software package called `magics'. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on probabilistic dynamical process emulation. For the programmers, the software described in this chapter lives in the public Git repository: \href{https://github.com/umbralcalc/magics}{https://github.com/umbralcalc/magics}.
+{\bfseries\sffamily Concept.} To extend the formalism that we developed in previous chapters to enable the empirical emulation of real-world data in a probabilistic way. This technique should enable a researcher to model complex dynamical trends in the data very well; at the cost of making the abstract interpretation of the model less immediately comprehensible than the statistical inference models in some proceeding chapters. As our generalised framework applies to a wide variety stochastic phenomena, our emulator will be applicable to a great breadth of data modeling problems as well. We will also explore some examples which illustrate how our empirical emulator should be applied in practice and then follow this up with how the code is designed and implemented as part of a new software package called `learnadex'. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on probabilistic dynamical process emulation. For the programmers, the software described in this chapter lives in the public Git repository: \href{https://github.com/umbralcalc/learnadex}{https://github.com/umbralcalc/learnadex}.
 
 \section{\sffamily Probabilistic formalism}
 
@@ -16,7 +16,53 @@ So, how do we begin? In the first chapter, we defined the general stochastic pro
 P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
+where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}. Let's say we also wanted to program what this equation is saying as a function in Go. Using a Monte Carlo approximation for the integral domain, the code might look something like this.
+
+\begin{lstlisting}[language=Go]
+type StateVector  []float64
+
+// returns a random draw of the possible state vectors at this timestep
+func RandomPossibleStateVectors(timeStepNumber int) []StateVector {
+    // return a slice of randomly-drawn possible state vectors 
+    // corresponding to the integral domain at this timestep
+}
+
+// returns the conditional probability of the state vector at this timestep 
+// given the value that the state vector had on a previous timestep
+func StateVectorConditionalProbability(
+    stateVector StateVector,
+    timeStepNumber int,
+    previousStateVector StateVector,
+    previousTimeStepNumber int,
+) float64 {
+    // return the conditional probability value
+}
+
+// returns the probability of the state vector at this timestep
+func StateVectorProbability(
+    stateVector StateVector, 
+    timeStepNumber int,
+) float64 {
+    prob := 0.0
+    // loop over all the possible previous timesteps
+    for t := 0; t < timeStepNumber; t++ {
+        // loop over the randomly-drawn possible state vectors 
+        // for this previous timestep
+        for _, possibleStateVector := range RandomPossibleStateVectors(t) {
+            // note the recursion
+            prob += StateVectorProbability(possibleStateVector, t)*
+                StateVectorConditionalProbability(
+                    stateVector,
+                    timeStepNumber,
+                    possibleStateVector, 
+                    t,
+                )
+        }
+    }
+    prob /= float64(timeStepNumber)
+    return prob
+}
+\end{lstlisting}
 
 The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation factor --- this just normalises the sum of all probabilities to 1 given that there is a sum over ${\sf t}'$. Note that, if the process is defined over continuous time, we would need to replace 
 %%
@@ -154,3 +200,6 @@ P^i_{{\sf t}+1} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{
 \end{align}
 %% 
 where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$. The matrices $A$ and $B$ are defined as conditional probabilities where the previous state in time $P^j_{{\sf t}'}$ was either `on' or `off', respectively.
+
+\section{\sffamily Software design}
+
