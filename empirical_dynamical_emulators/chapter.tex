@@ -205,5 +205,27 @@ P^i_{{\sf t}+1} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{
 %% 
 where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$. The matrices $A$ and $B$ are defined as conditional probabilities where the previous state in time $P^j_{{\sf t}'}$ was either `on' or `off', respectively.
 
+\section{\sffamily Algorithm concept}
+
+The parametric algorithm simply needs the $K$-functions to be specified and then an optimiser can run over the data values to simultaneously attempt to obtain $\theta$ and $f$ values.
+
+For the full non-parametric algorithm, the best idea here is probably to write a kind of Expectation-Maximisation (EM) algorithm. This would be...
+
+Estimating what $K(\theta , {\sf t}, {\sf t}')$, $K(\theta , {\sf t}, {\sf t}', {\sf t}'')$ and $K(\theta , {\sf t}, {\sf t}', {\sf t}'', {\sf t}''')$ should all look like based on a history of data values $y,y',\dots$ measured at times $t,t',\dots$ and a proposed set of $f,f'.\dots$ function values where we are using, e.g., $t'=t({\sf t}')$ and $f'=f({\sf t}')$ as a shorthand for convenience. We can do this using estimates for the 2, 3 and 4-point temporal correlation coefficients, which are
+%%
+\begin{align}
+{\rm Corr}(y,y') &= \frac{{\rm E}[(y-f)(y'-f')]}{[{\rm Var}(y){\rm Var}(y')]^{1/2}} \\
+{\rm Corr}(y,y',y'') &= \frac{{\rm E}[(y-f)(y'-f')(y''-f'')]}{[{\rm Var}(y){\rm Var}(y'){\rm Var}(y'')]^{1/3}} \\
+{\rm Corr}(y,y',y'',y''') &= \frac{{\rm E}[(y-f)(y'-f')(y''-f'')(y'''-f''')]}{{[{\rm Var}(y){\rm Var}(y'){\rm Var}(y''){\rm Var}(y''')]^{1/4}}} \,.
+\end{align}
+%%
+And then using these correlation coefficients as weightings to non-parametrically construct a set of $K$-functions. Hyperparameters to help with learning on this step include the order $K$-function to go up to (maximum of 4th order) and also maybe a minimum value for the correlation coefficient in order for it to be included? This concludes the `Expectation' step.
+
+Once the $K$-functions have been estimated for this step, an optimiser algorithm can be run using them and the formula for the log-likelihood to find out what the optimal $f$ value is as a function of $t({\sf t})$. This is the `Maximisation' step.
+
+The steps above are then run in an alternating fashion until convergence. 
+
+Helpful to write the basic structure out in Go.
+
 \section{\sffamily Software design}
 
