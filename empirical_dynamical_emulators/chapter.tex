@@ -159,7 +159,67 @@ P_{({\sf t}+1){\sf t}'}(x\vert x') &\propto {\rm exp}\bigg\{ -\frac{1}{2}\sum^d_
 & \qquad \qquad + \sum^d_{i=1}\sum^d_{j=1}\big[ x-f({\sf t}+1)\big]^i [K^{-1}(\theta , {\sf t}+1,{\sf t}')]^{ij}\big[ x'-f({\sf t}')\big]^j  \bigg\} \label{eq:stat-sol-kramers-moyal-cond}\,,
 \end{align}
 %%
-where $K(\theta , {\sf t}+1,{\sf t}')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}(\theta , {\sf t}+1,{\sf t}')$ denotes taking its inverse. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which we've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though.
+where $K(\theta , {\sf t}+1,{\sf t}')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}(\theta , {\sf t}+1,{\sf t}')$ denotes taking its inverse. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which we've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though. 
+
+Written in Go, the conditional probability in Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) could be computed by performing the summations over each element of the state vectors. We've given a rough idea of what this code would look like below.
+
+\begin{lstlisting}[language=Go]
+import "math"
+
+type KernelParams []float64
+
+// returns the f function value for a given timestep
+func F(timestepNumber int) []float64 {
+    // return value
+}
+
+// returns the inverse-K matrix for the input timesteps and 
+// params (theta in the text)
+func inverseK(
+    params KernelParams,
+    timestepNumber int, 
+    previousTimeStepNumber int,
+) [][]float64 {
+    // return value
+}
+
+// returns the conditional probability of the state vector at this timestep 
+// given the value that the state vector had on a previous timestep
+func StateVectorConditionalProbability(
+    stateVector StateVector,
+    timeStepNumber int,
+    previousStateVector StateVector,
+    previousTimeStepNumber int,
+) float64 {
+    // set the params from somewhere
+    var kernelParams KernelParams
+    
+    // get the f-function values for both timesteps
+    f := F(timeStepNumber)
+    previousF := F(previousTimeStepNumber)
+    
+    // get the inverse-K matrices for the latest timestep
+    // and also when both timesteps are input
+    invK := inverseK(kernelParams, timeStepNumber, timeStepNumber)
+    bothInvK := inverseK(
+        kernelParams, 
+        timeStepNumber, 
+        previousTimeStepNumber,
+    )
+
+    // loop over terms to add to the log-probability
+    logProbability := 0.0
+    for i := range stateVector {
+        for j := range stateVector {
+            logProbability += -(stateVector[i] - f[i])*
+                invK[i][j]*(stateVector[j] - f[j])/2.0
+            logProbability += (stateVector[i] - f[i])*
+                bothInvK[i][j]*(previousStateVector[j] - previousF[j])
+        }
+    }
+    return math.Exp(logProbability)
+}
+\end{lstlisting}
 
 By extending the procedure which expands Eq.~(\ref{eq:joint-master-x-cont}) and uses Eq.~(\ref{eq:cond-master-x-cont}) to higher and higher orders of joint distribution $P_{({\sf t}+1){\sf t}'{\sf t}''}(x, x', x'')$, $P_{({\sf t}+1){\sf t}'{\sf t}''{\sf t}'''}(x, x', x'', x''')$, etc. you can derive equations for conditional distributions like $P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x', x'')$ which are able to describe higher-order correlations between state vectors. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) can hence be thought of as the second-order truncation of a more general expansion formula, similar to that of the Gram-Charlier A series, Edgeworth series~\cite{kolassa2006series} or DALI method~\cite{sellentin2014breaking, dali}, but comprising out-of-time-order correlations in a similar fashion to those studied in quantum mechanics~\cite{hashimoto2017out,García-Mata:2023} (though we are obviously only talking about a classical statistical analogue in this case). Hence, if $K(\theta, {\sf t}+1, {\sf t}')$ is a matrix which encodes second-order (pairwise) out-of-time order correlations, we shall denote the higher-rank\footnote{By `higher-rank' here we specifically mean objects which have more indices than just a matrix $M^{ij}\rightarrow M^{ijk\dots}$.} objects which encode higher-order correlations between state vectors at different time points as
 %%
@@ -204,6 +264,8 @@ P^i_{{\sf t}+1} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{
 \end{align}
 %% 
 where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$. The matrices $A$ and $B$ are defined as conditional probabilities where the previous state in time $P^j_{{\sf t}'}$ was either `on' or `off', respectively.
+
+In this section, we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to developing a concept algorithm for our emulator. So let's go!
 
 \section{\sffamily Algorithm concept}
 
