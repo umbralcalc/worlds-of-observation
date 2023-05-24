@@ -130,7 +130,7 @@ What would happen if we assumed that $\alpha$ could be defined with just an arbi
 \alpha^i_{({\sf t}+1){\sf t}'}(x) &= f^i({\sf t}')-x^i \,,
 \end{align}
 %%
-where $f({\sf t}')=f'$ is an arbitrary vector-valued function of the timestep. Using this function, we might then try to approximate $\beta^{ij}_{({\sf t}+1){\sf t}'}(x) \simeq \beta^{ij}_{({\sf t}+1){\sf t}'}(f') = 2K(\theta , {\sf t}' \vert f')$ with the matrix $K$, which depends on both the timestep and a set of hyperparameters $\theta$. If we now also assume stationarity of $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for any ${\sf t}'$ and ${\sf t}''$ such that
+where $f({\sf t}')=f'$ is an arbitrary vector-valued function of the timestep. Using this function, we might then try to approximate $\beta^{ij}_{({\sf t}+1){\sf t}'}(x) \simeq \beta^{ij}_{({\sf t}+1){\sf t}'}(f') = 2K(\theta , {\sf t}' ; f')$ with the matrix $K$, which depends on both the timestep and a set of hyperparameters $\theta$. If we now also assume stationarity of $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for any ${\sf t}'$ and ${\sf t}''$ such that
 %%
 \begin{align}
 P_{{\sf t}+1}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} P_{{\sf t}'}(x) \,,
@@ -139,7 +139,7 @@ P_{{\sf t}+1}(x) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} P_{{\sf t}'}(x) 
 we can solve Eq.~(\ref{eq:master-x-cont-kramers-moyal}) to obtain the following stationary solution
 %%
 \begin{align}
-P_{{\sf t}'}(x) &= {\sf MultivariateNormalPDF}[x;f',K(\theta , {\sf t}' \vert f')]\label{eq:stat-sol-kramers-moyal}\,.
+P_{{\sf t}'}(x) &= {\sf MultivariateNormalPDF}[x;f',K(\theta , {\sf t}' ; f')]\label{eq:stat-sol-kramers-moyal}\,.
 \end{align}
 %%
 Note in that last step the solution also required the identification that the flow of probability between timesteps vanishes uniquely for each and every ${\sf t}'$ such that $J_{({\sf t}+1){\sf t}'}(x)=0$. 
@@ -154,11 +154,11 @@ Note in that last step the solution also required the identification that the fl
 It's possible to take this derivation a bit further by expanding Eq.~(\ref{eq:joint-master-x-cont}) in a similar fashion, truncating it to second-order, assuming only time-dependent terms and then solving it in the stationary limit. By plugging this solution (and its corresponding marginal distribution equivalent) into Eq.~(\ref{eq:cond-master-x-cont}), you can get something that looks like this conditional distribution
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}'}(x\vert x') &\propto {\rm exp}\bigg\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}(x-f)^i \big[K^{-1}(\theta , {\sf t}+1,{\sf t}+1\vert f,f)\big]^{ij}(x-f)^j \nonumber \\
-& \qquad \qquad + \sum^d_{i=1}\sum^d_{j=1}(x-f)^i \big[ K^{-1}(\theta , {\sf t}+1,{\sf t}'\vert f,f')\big]^{ij}(x'-f')^j  \bigg\} \label{eq:stat-sol-kramers-moyal-cond}\,,
+P_{({\sf t}+1){\sf t}'}(x\vert x') &\propto {\rm exp}\bigg\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}(x-f)^i \big[K^{-1}(\theta , {\sf t}+1,{\sf t}+1; f,f)\big]^{ij}(x-f)^j \nonumber \\
+& \qquad \qquad + \sum^d_{i=1}\sum^d_{j=1}(x-f)^i \big[ K^{-1}(\theta , {\sf t}+1,{\sf t}'; f,f')\big]^{ij}(x'-f')^j  \bigg\} \label{eq:stat-sol-kramers-moyal-cond}\,,
 \end{align}
 %%
-where $f({\sf t}+1)=f$ and $K(\theta , {\sf t}+1,{\sf t}'\vert f,f')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}$ denotes taking its inverse. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which we've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though. 
+where $f({\sf t}+1)=f$ and $K(\theta , {\sf t}+1,{\sf t}'; f,f')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}$ denotes taking its inverse. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which we've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though. 
 
 Written in Go, the conditional probability in Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) could be computed by performing the summations over each element of the state vectors. We've given a rough idea of what this code would look like below.
 
@@ -220,28 +220,33 @@ func StateVectorConditionalProbability(
 }
 \end{lstlisting}
 
-By extending the procedure which obtains the joint distribution update in Eq.~(\ref{eq:joint-master-x-cont}) and uses Eq.~(\ref{eq:cond-master-x-cont}) to higher and higher orders of joint distribution $P_{({\sf t}+1){\sf t}'{\sf t}''}(x, x', x'')$, $P_{({\sf t}+1){\sf t}'{\sf t}''{\sf t}'''}(x, x', x'', x''')$, etc. you can derive equations for conditional distributions like $P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x', x'')$ which are able to describe higher-order correlations between state vectors. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) can hence be thought of as the second-order truncation of a more general expansion formula, similar to that of the Gram-Charlier A series, Edgeworth series~\cite{kolassa2006series}. The problem you have to look out for when using the higher-order terms in these series is that it's quite possible to define a probability distribution with them that does not converge to a finite normalisation when integrating over its entire domain. To avoid this issue, the kind of expansion that we shall perform instead leverages a derivative approximation of $K$ and is known as the DALI method~\cite{sellentin2014breaking, dali}. In our case, this derivative approximation manifests as an expansion of $K$ to include higher-order dependencies on $x''$ and $x'''$ like so\footnote{Another way of thinking about this approximation is that it is a `mean-field' expansion of the covariance matrix to include higher-order terms.}
+In Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) we are implicitly approximating $\beta^{ij}_{({\sf t}+1){\sf t}'}(x,x') \simeq \beta^{ij}_{({\sf t}+1){\sf t}'}(f,f')$, which can also be thought of as a zeroth-order `mean-field' expansion (here just a Taylor series in $x$ and $x'$) of the covariance matrix. If we were to continue this approximation up to second order, we would obtain 
 %%
 \begin{align}
-& K(\theta , {\sf t}+1, {\sf t}', {\sf t}'', {\sf t}'''\vert f,f',x'',x''') \simeq \nonumber \\
-& K + \sum_{i=1}^d(x''-f'')^i\frac{\partial K}{(\partial x'')^i} + \sum_{i=1}^d(x'''-f''')^i\frac{\partial K}{(\partial x''')^i} + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d (x''-f'')^i\frac{\partial^2 K}{(\partial x'')^i(\partial x'')^j}(x''-f'')^j \nonumber \\
-&+ \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d (x'''-f''')^i\frac{\partial^2 K}{(\partial x''')^i(\partial x''')^j}(x'''-f''')^j + \sum_{i=1}^d\sum_{j=1}^d (x''-f'')^i\frac{\partial^2 K}{(\partial x'')^i(\partial x''')^j}(x'''-f''')^j \,,
+& K(\theta , {\sf t}+1, {\sf t}'; x,x') \simeq \nonumber \\
+& K + \sum_{i=1}^d(x-f)^i\frac{\partial K}{(\partial x)^i} + \sum_{i=1}^d(x'-f')^i\frac{\partial K}{(\partial x')^i} + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d (x-f)^i\frac{\partial^2 K}{(\partial x)^i(\partial x)^j}(x-f)^j \nonumber \\
+&+ \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d (x'-f')^i\frac{\partial^2 K}{(\partial x')^i(\partial x')^j}(x'-f')^j + \sum_{i=1}^d\sum_{j=1}^d (x-f)^i\frac{\partial^2 K}{(\partial x)^i(\partial x')^j}(x'-f')^j \label{eq:dali-covariance}\,.
 \end{align}
 %%
-where all of the references to `$K$' above are evaluated using $x=f$, $x'=f'$, $x''=f''$ and $x'''=f'''$ after any derivatives of the variable have been taken.
+where all of the references to `$K$' above are evaluated using $x=f$ and $x'=f'$ after any derivatives of the variable have been taken. This kind of derivative approximation of $K$ is known in other contexts as the DALI method~\cite{sellentin2014breaking, dali}. In our case, this derivative approximation manifests as an expansion of $K$ to include terms which extend the powers of $x$ and $x'$ all the way up to fourth-order when applied to Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}). The benefit of this expansion in Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) as opposed to approximating the probability distribution through Gram-Charlier A series or Edgeworth series~\cite{kolassa2006series}, is that in the latter cases it is much more difficult to ensure that the probability distribution is properly normalised.
 
-Note that that the version of the DALI method that we have described here is in a different context to where it has been employed in the literature. In our case, the probability distribution that we are trying to approximate contains out-of-time-order correlations in a similar fashion to those studied in quantum mechanics~\cite{hashimoto2017out,García-Mata:2023} (though we are obviously only talking about a classical statistical analogue in this case). 
-
-Hence, if $K(\theta, {\sf t}+1, {\sf t}')$ is a matrix which encodes second-order (pairwise) out-of-time order correlations, we shall denote the higher-rank\footnote{By `higher-rank' here we specifically mean objects which have more indices than just a matrix $M^{ij}\rightarrow M^{ijk\dots}$.} objects which encode higher-order correlations between state vectors at different time points as
+By extending the procedure which obtains the joint distribution update in Eq.~(\ref{eq:joint-master-x-cont}) and uses Eq.~(\ref{eq:cond-master-x-cont}) to higher and higher orders of joint distribution $P_{({\sf t}+1){\sf t}'{\sf t}''}(x, x', x'')$, $P_{({\sf t}+1){\sf t}'{\sf t}''{\sf t}'''}(x, x', x'', x''')$, etc. you can derive equations for conditional distributions like $P_{({\sf t}+1){\sf t}'{\sf t}''}(x; x', x'')$ which are able to describe higher-order correlations between state vectors. If we apply the DALI expansion of $K$ to include higher-order dependencies on $x''$ and $x'''$, we obtain this monster expression
 %%
 \begin{align}
-\ K(\theta , {\sf t}+1, {\sf t}', {\sf t}'') \quad &\text{with elements} \quad K^{ijk}(\theta , {\sf t}+1, {\sf t}', {\sf t}'') \label{eq:third-prob-kernel} \\
-\ K(\theta , {\sf t}+1, {\sf t}', {\sf t}'', {\sf t}'''') \quad &\text{with elements} \quad K^{ijk\ell}(\theta , {\sf t}+1, {\sf t}', {\sf t}'', {\sf t}''') \label{eq:fourth-prob-kernel} \,,
+& K(\theta , {\sf t}+1, {\sf t}', {\sf t}'', {\sf t}'''; x,x',x'',x''') \simeq \nonumber \\
+& K + \sum_{i=1}^d(x-f)^i\frac{\partial K}{(\partial x)^i} + \sum_{i=1}^d(x'-f')^i\frac{\partial K}{(\partial x')^i} + \sum_{i=1}^d(x''-f'')^i\frac{\partial K}{(\partial x'')^i} + \sum_{i=1}^d(x'''-f''')^i\frac{\partial K}{(\partial x''')^i} \nonumber \\
+& + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d (x-f)^i\frac{\partial^2 K}{(\partial x)^i(\partial x)^j}(x-f)^j + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d (x'-f')^i\frac{\partial^2 K}{(\partial x')^i(\partial x')^j}(x'-f')^j \nonumber \\
+&+ \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d (x''-f'')^i\frac{\partial^2 K}{(\partial x'')^i(\partial x'')^j}(x''-f'')^j + \frac{1}{2}\sum_{i=1}^d\sum_{j=1}^d (x'''-f''')^i\frac{\partial^2 K}{(\partial x''')^i(\partial x''')^j}(x'''-f''')^j \nonumber \\
+&+ \sum_{i=1}^d\sum_{j=1}^d (x-f)^i\frac{\partial^2 K}{(\partial x)^i(\partial x')^j}(x'-f')^j + \sum_{i=1}^d\sum_{j=1}^d (x-f)^i\frac{\partial^2 K}{(\partial x)^i(\partial x'')^j}(x''-f'')^j \nonumber \\
+&+ \sum_{i=1}^d\sum_{j=1}^d (x-f)^i\frac{\partial^2 K}{(\partial x)^i(\partial x''')^j}(x'''-f''')^j + \sum_{i=1}^d\sum_{j=1}^d (x'-f')^i\frac{\partial^2 K}{(\partial x')^i(\partial x'')^j}(x''-f'')^j \nonumber \\
+&+ \sum_{i=1}^d\sum_{j=1}^d (x'-f')^i\frac{\partial^2 K}{(\partial x')^i(\partial x''')^j}(x'''-f''')^j + \sum_{i=1}^d\sum_{j=1}^d (x''-f'')^i\frac{\partial^2 K}{(\partial x'')^i(\partial x''')^j}(x'''-f''')^j \label{eq:dali-covariance-higher}\,,
 \end{align}
 %%
-and so on until the desired order of truncation is reached.
+where, once again, all of the references to `$K$' above are evaluated using $x=f$, $x'=f'$, $x''=f''$ and $x'''=f'''$ after any derivatives of the variable have been taken. Note also, in the expression above, we have extended the shorthand notation to include $f({\sf t}'')=f''$ and $f({\sf t}''')=f'''$.
 
-Despite these expressions appearing as more complex than the second-order version, the methology for using them in a generative model like Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}), or for levering them to infer the $f({\sf t})$ function (as is done in Gaussian process inference) is much the same. 
+\textcolor{red}{Text needs reworking below here}
+
+The DALI method that we have used in Eq.~(\ref{eq:dali-covariance}) is in a different context to where it was employed in Refs.~\cite{sellentin2014breaking, dali}. In our case, the probability distribution that we are trying to approximate contains out-of-time-order correlations in a similar fashion to those studied in quantum mechanics~\cite{hashimoto2017out,García-Mata:2023} (though we are obviously only talking about a classical statistical analogue in this case). Hence, if $K(\theta, {\sf t}+1, {\sf t}';f,f')$ is a matrix which encodes second-order (pairwise) out-of-time order correlations, the derivatives of this matrix in Eq.~(\ref{eq:dali-covariance}) are higher-rank\footnote{By `higher-rank' here we specifically mean objects which have more indices than just a matrix $M^{ij}\rightarrow M^{ijk\dots}$.} objects which encode higher-order correlations between state vectors at different time points. Despite these expressions appearing as more complex than the second-order version, the methology for using them in a generative model like Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}), or for levering them to infer the $f({\sf t})$ function (as is done in Gaussian process inference) can be much the same, but we'll get into all this in the next section. 
 
 What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
