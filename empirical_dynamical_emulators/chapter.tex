@@ -158,7 +158,9 @@ P_{({\sf t}+1){\sf t}'}(x\vert x') &\propto {\rm exp}\bigg\{ -\frac{1}{2}\sum^d_
 & \qquad \qquad + \sum^d_{i=1}\sum^d_{j=1}(x-f)^i \big[ K^{-1}(\theta , {\sf t}+1,{\sf t}'; f,f')\big]^{ij}(x'-f')^j  \bigg\} \label{eq:stat-sol-kramers-moyal-cond}\,,
 \end{align}
 %%
-where $f({\sf t}+1)=f$ and $K(\theta , {\sf t}+1,{\sf t}'; f,f')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}$ denotes taking its inverse. Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which we've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though. 
+where $f({\sf t}+1)=f$ and $K(\theta , {\sf t}+1,{\sf t}'; f,f')$ is some arbitrary covariance matrix that encodes how the correlation structure varies with the between compared states at two different timesteps and $K^{-1}$ denotes taking its inverse. Note also that the inequality $({\sf t}+1)>{\sf t}'$ must always hold.
+
+Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) may look a bit familiar to some readers who like using Gaussian processes from the machine learning literature~\cite{murphy2012machine} --- this version implies a \emph{generative} model for a future $x$ value (which we've illustrated in Fig~\ref{fig:stat-sol-kramers-moyal-cond}), in contrast to the more standard equation used to \emph{infer} values of $f$. These are two sides of the same coin though. 
 
 Written in Go, the conditional probability in Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}) could be computed by performing the summations over each element of the state vectors. We've given a rough idea of what this code would look like below.
 
@@ -242,11 +244,9 @@ By extending the procedure which obtains the joint distribution update in Eq.~(\
 &+ \sum_{i=1}^d\sum_{j=1}^d (x'-f')^i\frac{\partial^2 K}{(\partial x')^i(\partial x''')^j}(x'''-f''')^j + \sum_{i=1}^d\sum_{j=1}^d (x''-f'')^i\frac{\partial^2 K}{(\partial x'')^i(\partial x''')^j}(x'''-f''')^j \label{eq:dali-covariance-higher}\,,
 \end{align}
 %%
-where, once again, all of the references to `$K$' above are evaluated using $x=f$, $x'=f'$, $x''=f''$ and $x'''=f'''$ after any derivatives of the variable have been taken. Note also, in the expression above, we have extended the shorthand notation to include $f({\sf t}'')=f''$ and $f({\sf t}''')=f'''$.
+where, once again, all of the references to `$K$' above are evaluated using $x=f$, $x'=f'$, $x''=f''$ and $x'''=f'''$ after any derivatives of the variable have been taken. Note also in the expression above, we have extended the shorthand notation to include $f({\sf t}'')=f''$ and $f({\sf t}''')=f'''$, where these new timesteps must also fit into the general inequality $({\sf t}+1)>{\sf t}'>{\sf t}''>{\sf t}'''$.
 
-\textcolor{red}{Text needs reworking below here}
-
-The DALI method that we have used in Eq.~(\ref{eq:dali-covariance}) is in a different context to where it was employed in Refs.~\cite{sellentin2014breaking, dali}. In our case, the probability distribution that we are trying to approximate contains out-of-time-order correlations in a similar fashion to those studied in quantum mechanics~\cite{hashimoto2017out,García-Mata:2023} (though we are obviously only talking about a classical statistical analogue in this case). Hence, if $K(\theta, {\sf t}+1, {\sf t}';f,f')$ is a matrix which encodes second-order (pairwise) out-of-time order correlations, the derivatives of this matrix in Eq.~(\ref{eq:dali-covariance}) are higher-rank\footnote{By `higher-rank' here we specifically mean objects which have more indices than just a matrix $M^{ij}\rightarrow M^{ijk\dots}$.} objects which encode higher-order correlations between state vectors at different time points. Despite these expressions appearing as more complex than the second-order version, the methology for using them in a generative model like Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}), or for levering them to infer the $f({\sf t})$ function (as is done in Gaussian process inference) can be much the same, but we'll get into all this in the next section. 
+We've already mentioned that the derivative expansion (or DALI method) used in Eqs.~(\ref{eq:dali-covariance}) and~(\ref{eq:dali-covariance-higher}) is in a different context to where it was employed in Refs.~\cite{sellentin2014breaking, dali}. In our case, the probability distribution that we are trying to approximate contains out-of-time-order correlations in a similar fashion to those studied in quantum mechanics~\cite{hashimoto2017out,García-Mata:2023} (though we are obviously only talking about a classical statistical analogue in this case). Hence, if $K$ is a matrix which encodes second-order (pairwise) out-of-time order correlations, the derivatives of this matrix in Eq.~(\ref{eq:dali-covariance}) are higher-rank\footnote{By `higher-rank' here we specifically mean objects which have more indices than just a matrix $M^{ij}\rightarrow M^{ijk\dots}$.} objects which encode higher-order correlations between state vectors at different time points. Despite these expressions appearing as more complex than the second-order version, the methodology for using them in a generative model like Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}), or for leveraging them to infer the $f({\sf t})$ function (as is done in Gaussian process inference) can be much the same. We'll get into all how this could be done in the next section. 
 
 What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
@@ -287,30 +287,13 @@ In this section, we looked into how the mathematical formalism used in the stoch
 
 Plan of action for this section.
 \begin{itemize}
-\item{Introduce the concept of retrieving state data through measurements $Y^i_{{\sf t}+1} = M^i_{{\sf t}+1}(X_{{\sf t}+1},z,{\sf t})$.}
-\item{Parametric algorithm will be available up to 4th order expansion. This should just be a straightforward optimisation.}
-\item{Non-parametric algorithm concept will be just for Gaussian processes and will use a secondary kernel applied to the non-parametric kernel shape + EM algorithm.}
+\item{Introduce the concept of retrieving state data through a measurement function $Y^i_{{\sf t}+1} = M^i_{{\sf t}+1}(X_{{\sf t}+1},z,{\sf t})$.}
+\item{Parametric algorithm is the only one that will be available up to 4th order expansion. This should just be a straightforward optimisation.}
 \end{itemize}
 
 The parametric algorithm simply needs the $K$-functions to be specified and then an optimiser can run over the data values to simultaneously attempt to obtain $\theta$ and $f$ values.
 
-For the full non-parametric algorithm, the best idea here is probably to write a kind of Expectation-Maximisation (EM) algorithm. This would be...
-
-Estimating what $K(\theta , {\sf t}, {\sf t}')$, $K(\theta , {\sf t}, {\sf t}', {\sf t}'')$ and $K(\theta , {\sf t}, {\sf t}', {\sf t}'', {\sf t}''')$ should all look like based on a history of data values $y,y',\dots$ measured at times $t,t',\dots$ and a proposed set of $f,f'.\dots$ function values where we are using, e.g., $t'=t({\sf t}')$ and $f'=f({\sf t}')$ as a shorthand for convenience. We can do this using estimates for the 2, 3 and 4-point temporal correlation coefficients, which are
-%%
-\begin{align}
-{\rm Corr}(y,t;y',t') &= \frac{{\rm E}[(y-f)(y'-f')]}{[{\rm Var}(y){\rm Var}(y')]^{1/2}} \\
-{\rm Corr}(y,t;y',t';y'',t'') &= \frac{{\rm E}[(y-f)(y'-f')(y''-f'')]}{[{\rm Var}(y){\rm Var}(y'){\rm Var}(y'')]^{1/3}} \\
-{\rm Corr}(y,t;y',t';y'',t'';y''',t''') &= \frac{{\rm E}[(y-f)(y'-f')(y''-f'')(y'''-f''')]}{{[{\rm Var}(y){\rm Var}(y'){\rm Var}(y''){\rm Var}(y''')]^{1/4}}} \,.
-\end{align}
-%%
-And then using these correlation coefficients as weightings to non-parametrically construct a set of $K$-functions. Hyperparameters to help with learning on this step include the order $K$-function to go up to (maximum of 4th order) and also maybe a minimum value for the correlation coefficient in order for it to be included? This concludes the `Expectation' step.
-
-Once the $K$-functions have been estimated for this step, an optimiser algorithm can be run using them and the formula for the log-likelihood to find out what the optimal $f$ value is as a function of $t({\sf t})$. This is the `Maximisation' step.
-
-The steps above are then run in an alternating fashion until convergence. 
-
-Helpful to write the basic structure out in Go.
+Helpful to write the basic structure of algorithm out in Go.
 
 \section{\sffamily Software design}
 
