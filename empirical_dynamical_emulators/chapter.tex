@@ -288,7 +288,8 @@ In this section, we looked into how the mathematical formalism used in the stoch
 Plan of action for this section.
 \begin{itemize}
 \item{Introduce the concept of retrieving state data through a measurement function $Y^i_{{\sf t}+1} = M^i_{{\sf t}+1}(X_{{\sf t}+1},z,{\sf t})$.}
-\item{Parametric algorithm is the only one that will be available up to 4th order expansion. This should just be a straightforward optimisation.}
+\item{Parametric algorithm where the emulator is learned first as a Gaussian process and then correction coefficients at higher orders are learned afterwards.}
+\item{In order to stabilise the algorithm to sample size fluctuations, a stochastic gradient descent method to optimize would work well with the ${\rm E}[\ln {\cal L}]$ so the expectation values like ${\rm E}[(x-f)(x'-f')(x''-f'')]$ end up being used directly in the optimisation!}
 \end{itemize}
 
 The parametric algorithm simply needs the $K$-functions to be specified and then an optimiser can run over the data values to simultaneously attempt to obtain $\theta$ and $f$ values.

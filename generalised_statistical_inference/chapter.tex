@@ -1,0 +1,14 @@
+\chapter{\sffamily Generalised statistical inference}
+
+{\bfseries\sffamily Concept.} The idea here is to extend the stochadex with tools for very generalised statistical inference of an explicit model that will work in nearly every situation where the user knows the model space. Probably need to exploit the phase space analogy of the formalism. For the mathematically-inclined, this chapter will... For the programmers, the software described in this chapter lives in the public Git repository: \href{https://github.com/umbralcalc/learnadex}{https://github.com/umbralcalc/learnadex}.
+
+
+\section{\sffamily Methodology}
+
+Should be easy enough to use the Gaussian process emulator from the previous chapter to learn the data likelihood directly or use some known distributions. Once you have a data likelihood, then inference should proceed on the sampling domain side of things. Options should be
+\begin{itemize}
+\item{Use a specific known distribution to approximate the sampling domain like a log-Gaussian and combine this with EM.}
+\item{Learn to approximate the sampling domain distribution as well using a Gaussian process and then leverage this to optimize choose better points to try - this is known as Bayesian optimization.} 
+\end{itemize}
+
+Reference the contrast to ABC methods here, which involve approximating the data likelihood with a simple proximity function with a tolerance $\epsilon$. Also talk about the BOLFI method.
