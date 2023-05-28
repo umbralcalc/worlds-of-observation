@@ -248,6 +248,8 @@ where, once again, all of the references to `$K$' above are evaluated using $x=f
 
 We've already mentioned that the derivative expansion (or DALI method) used in Eqs.~(\ref{eq:dali-covariance}) and~(\ref{eq:dali-covariance-higher}) is in a different context to where it was employed in Refs.~\cite{sellentin2014breaking, dali}. In our case, the probability distribution that we are trying to approximate contains out-of-time-order correlations in a similar fashion to those studied in quantum mechanics~\cite{hashimoto2017out,García-Mata:2023} (though we are obviously only talking about a classical statistical analogue in this case). Hence, if $K$ is a matrix which encodes second-order (pairwise) out-of-time order correlations, the derivatives of this matrix in Eq.~(\ref{eq:dali-covariance}) are higher-rank\footnote{By `higher-rank' here we specifically mean objects which have more indices than just a matrix $M^{ij}\rightarrow M^{ijk\dots}$.} objects which encode higher-order correlations between state vectors at different time points. Despite these expressions appearing as more complex than the second-order version, the methodology for using them in a generative model like Eq.~(\ref{eq:stat-sol-kramers-moyal-cond}), or for leveraging them to infer the $f({\sf t})$ function (as is done in Gaussian process inference) can be much the same. We'll get into all how this could be done in the next section. 
 
+\textcolor{red}{From here, derive the Mat\'{e}rn kernel probably by deriving its power spectral density, but make sure to specify \emph{which} specific spatial stochastic process is the starting point.}
+
 What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
 \begin{align}
@@ -285,10 +287,26 @@ In this section, we looked into how the mathematical formalism used in the stoch
 
 \section{\sffamily Emulator algorithms}
 
+Somr simple, common types of second-order kernel are the square-exponential
+%%
+\begin{align}
+K(\theta , {\sf t}+1, {\sf t}'; f, f') &= C {\rm exp}\bigg\{ -\frac{[t({\sf t}+1)-t({\sf t}')]^2}{2\tau^2}\bigg\} \,, 
+\end{align}
+%%
+or Ornstein-Uhlenbeck kernel
+%%
+\begin{align}
+K(\theta , {\sf t}+1, {\sf t}'; f, f') &= C {\rm exp}\bigg\{ -\frac{\vert t({\sf t}+1)-t({\sf t}')\vert}{\tau}\bigg\} \,,
+\end{align}
+%%
+where $C$ is some covariance matrix.
+
+
+
 Plan of action for this section.
 \begin{itemize}
 \item{Algorithm where the emulator is learned first as a Gaussian process and then correction coefficients at higher orders are learned afterwards with parametric kernels defined over the correction to the covariance kernel.}
-\item{In order to stabilise the algorithm to sample size fluctuations, a stochastic gradient descent method to optimize would work well with ${\rm E}[\ln P_{({\sf t}+1){\sf t}',{\sf t}'',{\sf t}'''}(x\vert x', x'', x''')]$ so the expectation values like ${\rm E}[(x-f)(x'-f')(x''-f'')]$ end up being used directly in the optimisation anyway!}
+\item{In order to stabilise the algorithm to sample size fluctuations, a stochastic gradient descent method to optimize would work well with ${\rm E}[\ln P_{({\sf t}+1){\sf t}'{\sf t}''{\sf t}'''}(x\vert x', x'', x''')]$ so the expectation values like ${\rm E}[(x-f)(x'-f')(x''-f'')]$ end up being used directly in the optimisation anyway!}
 \item{Investigate how the learned kernel shapes end up looking compared to the binned raw data.}
 \end{itemize}
 
