@@ -10,7 +10,7 @@ While we think that it's worth going into some mathematical detail to give a bet
 
 Before we are able to develop this empirical emulator, we need to return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. However, when trying robustly assess how far a model is from accurately describing a set of real-world data, trying to use only generated samples of the model process can be diffcult. Instead, in this section, we are going to extend this formalism to look at how probability theory can help with this data comparison problem in a systematic way.
 
-So, how do we begin? In the first chapter, we defined the general stochastic process with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$. This equation also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x)$ of the most recent matrix row $x=X_{{\sf t}+1}$ at time ${\sf t}$. This can be written as
+So, how do we begin? In the first chapter, we defined the general stochastic process with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$. This equation also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x)$ of the next matrix row being $x=X_{{\sf t}+1}$. This can be written as
 %%
 \begin{align}
 P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:master-x-cont} \,,
@@ -83,22 +83,28 @@ But what is $\omega_{\sf t}$? You can think of this as just the domain of possib
 \label{fig:master-eqn}
 \end{figure} 
 
-If we wanted to compute the mean of the distribution ${\rm E}_{{\sf t}+1}(x)$ in Eq.~(\ref{eq:master-x-cont}), it would be straightforward to just multiply both sides of the expression by $x$ and integrate over ${\rm d}x$ in the $\omega_{{\sf t}}$ domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical emulator. If the probability distribution is \emph{stationary} --- meaning that $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for all ${\sf t}'$ and ${\sf t}''$ --- it's possible to derive\footnote{To see that this is true, first note that the joint distribution $P_{({\sf t}+1){\sf t}'}(x,x')=P_{({\sf t}+1){\sf t}'}(x\vert x')P_{{\sf t}'}(x')$. Secondly, note that joint distributions always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}'}(x,x')=P_{{\sf t}'({\sf t}+1)}(x',x)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ means 
-$${\rm E}_{{\sf t}+1}(x)=\int {\rm d}x\int {\rm d}x' \, x\,P_{({\sf t}+1){\sf t}'}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x)\,,$$
+If we wanted to compute the mean of the distribution $M_{{\sf t}+1}$ in Eq.~(\ref{eq:master-x-cont}), it would be straightforward to just multiply both sides of the expression by $x$ and integrate over ${\rm d}x$ in the $\omega_{{\sf t}}$ domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical emulator. If the probability distribution is \emph{stationary} --- meaning that $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for all ${\sf t}'$ and ${\sf t}''$ --- it's possible to derive\footnote{To see that this is true, first note that the joint distribution $P_{({\sf t}+1){\sf t}'}(x,x')=P_{({\sf t}+1){\sf t}'}(x\vert x')P_{{\sf t}'}(x')$. Secondly, note that joint distributions always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}'}(x,x')=P_{{\sf t}'({\sf t}+1)}(x',x)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ means 
+$$M_{{\sf t}+1}=\int {\rm d}x\int {\rm d}x' \, x\,P_{({\sf t}+1){\sf t}'}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x)\,,$$
 where we've used the trivial variable swap to get to the last equality, and the domain references $\omega_{{\sf t}'}$ in the integrals are implicitly defined.} 
 %%
 \begin{align}
-{\rm E}_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, x' \, P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \,.
+M_{{\sf t}+1} = \int_{\omega_{{\sf t}+1}}{\rm d}x \,x\,P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, x' \, P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:stationary-mean-estimator}\,.
 \end{align}
 %%
 
-In order to encode higher-order correlations between previous state vectors, we can extend Eq.~(\ref{eq:master-x-cont}) to consider a joint distribution in the past like this
+In order to encode higher-order out-of-time-order correlations; we can also consider using the statistical moments computed from joint distributions like these
 %%
 \begin{align}
-P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\frac{1}{{\sf t}'}\sum_{{\sf t}''=0}^{{\sf t}'}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}''}}{\rm d}x'' P_{{\sf t}'{\sf t}''}(x', x'') P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x', x'') \label{eq:master-x-cont-joint-pair} \,.
+P_{({\sf t}+1){\sf t}'}(x, x') &= P_{({\sf t}+1){\sf t}'}(x\vert x')P_{{\sf t}'}(x') \label{eq:2nd-joint-dist}\\
+P_{({\sf t}+1){\sf t}'{\sf t}''}(x, x', x'') &= P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x', x'')P_{{\sf t}'{\sf t}''}(x'\vert x'')P_{{\sf t}''}(x'') \label{eq:3rd-joint-dist}\,.
 \end{align}
 %%
-This equation would apply if we wanted to retrieve how the out-of-time-order pairwise correlations between past values $x'$ at timestep ${\sf t}'$ and $x''$ at timestep ${\sf t}''$ affect the probability of the matrix row being $x$ at timestep ${\sf t}+1$.
+For example, Eq.~(\ref{eq:2nd-joint-dist}) would apply if we wanted to retrieve the out-of-time-order pairwise correlations between $x$ at timestep ${\sf t}+1$ and $x'$ at timestep ${\sf t}'$. Using this pairwise relationship we can also derive an equation for the stationary out-of-time-order covariance matrix elements
+%%
+\begin{align}
+C_{({\sf t}+1){\sf t}'}^{ij} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \,(x-M_{{\sf t}+1})^i(x'-M_{{\sf t}'})^j P_{({\sf t}+1){\sf t}'}(x, x') \label{eq:stationary-covariance-estimator} \,.
+\end{align}
+%%
 
 What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
