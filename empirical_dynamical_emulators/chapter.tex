@@ -91,18 +91,25 @@ where we've used the trivial variable swap to get to the last equality, and the 
 M_{{\sf t}+1} = \int_{\omega_{{\sf t}+1}}{\rm d}x \,x\,P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, x' \, P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:stationary-mean-estimator}\,.
 \end{align}
 %%
+The standard covariance matrix elements can also be computed in a similar fashion
+%%
+\begin{align}
+C^{ij}_{{\sf t}+1} &= \int_{\omega_{{\sf t}+1}}{\rm d}x \,(x-M_{{\sf t}+1})^i(x-M_{{\sf t}+1})^jP_{{\sf t}+1}(x) \nonumber \\
+&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, (x'-M_{{\sf t}+1})^i(x'-M_{{\sf t}+1})^j P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:stationary-covariance-estimator}\,.
+\end{align}
+%%
 
-In order to encode higher-order out-of-time-order correlations; we can also consider using the statistical moments computed from joint distributions like these
+In order to study higher-order out-of-time-order correlations, we can also consider using the statistical moments computed from joint distributions like these
 %%
 \begin{align}
 P_{({\sf t}+1){\sf t}'}(x, x') &= P_{({\sf t}+1){\sf t}'}(x\vert x')P_{{\sf t}'}(x') \label{eq:2nd-joint-dist}\\
 P_{({\sf t}+1){\sf t}'{\sf t}''}(x, x', x'') &= P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x', x'')P_{{\sf t}'{\sf t}''}(x'\vert x'')P_{{\sf t}''}(x'') \label{eq:3rd-joint-dist}\,.
 \end{align}
 %%
-For example, Eq.~(\ref{eq:2nd-joint-dist}) would apply if we wanted to retrieve the out-of-time-order pairwise correlations between $x$ at timestep ${\sf t}+1$ and $x'$ at timestep ${\sf t}'$. Using this pairwise relationship we can also derive an equation for the stationary out-of-time-order covariance matrix elements
+For example, Eq.~(\ref{eq:2nd-joint-dist}) would apply if we wanted to retrieve the out-of-time-order pairwise correlations between $x$ at timestep ${\sf t}+1$ and $x'$ at timestep ${\sf t}'$. Using this pairwise relationship we can also derive an equation for the out-of-time-order covariance matrix elements
 %%
 \begin{align}
-C_{({\sf t}+1){\sf t}'}^{ij} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \,(x-M_{{\sf t}+1})^i(x'-M_{{\sf t}'})^j P_{({\sf t}+1){\sf t}'}(x, x') \label{eq:stationary-covariance-estimator} \,.
+C_{({\sf t}+1){\sf t}'}^{ij} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \,(x-M_{{\sf t}+1})^i(x'-M_{{\sf t}'})^j P_{({\sf t}+1){\sf t}'}(x, x') \label{eq:out-of-time-order-covariance-estimator} \,.
 \end{align}
 %%
 
