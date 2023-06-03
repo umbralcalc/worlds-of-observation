@@ -16,7 +16,9 @@ So, how do we begin? In the first chapter, we defined the general stochastic pro
 P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}. Let's say we also wanted to program what this equation is saying as a function in Go. Using a Monte Carlo approximation for the integral domain, the code might look something like this.
+where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}. 
+
+Let's say we also wanted to program what this equation is saying as a function in Go. Using a Monte Carlo approximation for the integral domain, the code might look something like this.
 
 \begin{lstlisting}[language=Go]
 type StateVector  []float64
@@ -84,8 +86,8 @@ But what is $\omega_{\sf t}$? You can think of this as just the domain of possib
 \end{figure} 
 
 If we wanted to compute the mean of the distribution $M_{{\sf t}+1}$ in Eq.~(\ref{eq:master-x-cont}), it would be straightforward to just multiply both sides of the expression by $x$ and integrate over ${\rm d}x$ in the $\omega_{{\sf t}}$ domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical emulator. If the probability distribution is \emph{stationary} --- meaning that $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for all ${\sf t}'$ and ${\sf t}''$ --- it's possible to derive\footnote{To see that this is true, first note that the joint distribution $P_{({\sf t}+1){\sf t}'}(x,x')=P_{({\sf t}+1){\sf t}'}(x\vert x')P_{{\sf t}'}(x')$. Secondly, note that joint distributions always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}'}(x,x')=P_{{\sf t}'({\sf t}+1)}(x',x)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ means 
-$$M_{{\sf t}+1}=\int {\rm d}x\int {\rm d}x' \, x\,P_{({\sf t}+1){\sf t}'}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x)\,,$$
-where we've used the trivial variable swap to get to the last equality, and the domain references $\omega_{{\sf t}'}$ in the integrals are implicitly defined.} 
+$$\int {\rm d}x\int {\rm d}x' \, x\,P_{({\sf t}+1){\sf t}'}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x)\,,$$
+where we've used the trivial variable swap to get to the last equality, and the domain references $\omega$ in the integrals are implicitly defined.} 
 %%
 \begin{align}
 M_{{\sf t}+1} = \int_{\omega_{{\sf t}+1}}{\rm d}x \,x\,P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, x' \, P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:stationary-mean-estimator}\,.
@@ -137,7 +139,20 @@ In this section, we looked into how the mathematical formalism used in the stoch
 
 \section{\sffamily Emulator algorithms}
 
+The empirical emulator algorithms that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use, we need to connect values of $x$ in our emulator to the data from which it will be learning. 
+
+\textcolor{red}{Need to go through the basic types of data distribution here... Exponential, Poisson, Binomial, Gaussian, Gamma, Negative Binomial, ...}
+
+One clear, and generally applicable, option for the conditional probability is that of a Gaussian process 
+%%
+\begin{align}
+P_{({\sf t}+1){\sf t}'}(x\vert x') &= \frac{{\rm exp}\left\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}(x-f)^i \big[ K^{-1}(\theta , {\sf t}+1,{\sf t}')\big]^{ij}(x'-f')^j  \right\}}{\vert 2\pi K(\theta , {\sf t}+1,{\sf t}') \vert^{\frac{1}{2}}} \label{eq:gaussian-process-cond-prob}\,,
+\end{align}
+%%
+where $\vert A\vert$ denotes computing the determinant of matrix $A$.
+
 Helpful to write the basic structure of algorithm out in Go.
 
 \section{\sffamily Software design}
 
+Diagrams would help here.
