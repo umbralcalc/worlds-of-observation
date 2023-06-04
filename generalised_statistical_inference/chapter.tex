@@ -5,16 +5,9 @@
 
 \section{\sffamily Methodology}
 
-First there's the problem of knowing what the likelihood of the data is.
-%%
-\begin{itemize}
-\item{The measurements $y, y', y'', \dots$ have either a known distribution which the user specifies or the generalised algorithm approximates their distribution with a Gaussian process...}
-\end{itemize}
-%%
-Once you have a data likelihood, then inference should proceed on the sampling domain side of things. Options should be
-\begin{itemize}
-\item{Use a specific known distribution to approximate the sampling domain like a log-Gaussian and combine this with EM.}
-\item{Learn to approximate the sampling domain distribution as well using a Gaussian process and then leverage this to optimize choose better points to try - this is known as Bayesian optimization.} 
-\end{itemize}
+First there's the problem of knowing what the likelihood of the data is. The measurements $y, y', y'', \dots$ have either a known distribution which the user specifies or the emulator algorithm runs on this to get the data likelihood.
 
-Reference the contrast to ABC methods here, which involve approximating the data likelihood with a simple proximity function with a tolerance $\epsilon$. Also talk about the BOLFI method.
+Once you have a data likelihood, then inference should proceed on the sampling domain side of things where the emulator algorithm is used again! This time with a tunable conditional probability that is a gaussian with mean and variance estimated directly from the history (don't optimise it like in Bayesian optimisation!) with a tunable exponential timestep kernel (timestep being the optimiser step here) and the resulting function can be optimised (or draw monte-carlo samples from) in an EM algorithm approach. The resulting Gaussian function could also exploit gradients for SGD.
+
+Reference the contrast to ABC methods here, which involve approximating the data likelihood with a simple proximity function with a tolerance $\epsilon$. Also talk about the BOLFI method which does indeed use the full Bayesian optimisation as it goes.
+
