@@ -6,7 +6,7 @@
 
 The key distinction between the methods that we will develop in this chapter and the ones in the proceeding chapters is in their utility when faced with the problem of attempting to model real-world data. In the proceeding chapter, we shall describe some powerful techniques that can be used most effectively when the researcher is aware of the family of models that generated the data. In the present chapter, we will go into the details of how a more `empirical' approach can be derived for dynamical process modeling in a probabilistic framework which locally adapts the model to the data through time. 
 
-While we think that it's worth going into some mathematical detail to give a better sense of where our formalism comes from; we want to emphasise that the framework we discuss here is not especially new to the technical literature. Our overall framework draws on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and perhaps Gaussian processes~\cite{murphy2012machine} as well. The novelties here, instead, lie more in the specifics of how we combine some of these ideas together when referencing the stochadex formalism, and how this manifests in designing more generally-applicable software for the user.
+While we think that it's worth going into some mathematical detail to give a better sense of where our formalism comes from; we want to emphasise that the framework we discuss here is not especially new to the technical literature. Our overall framework draws on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and also Gaussian processes~\cite{murphy2012machine} as well. The novelties here, instead, lie more in the specifics of how we combine some of these ideas together when referencing the stochadex formalism, and how this manifests in designing more generally-applicable software for the user.
 
 Before we are able to develop this empirical emulator, we need to return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. However, when trying robustly assess how far a model is from accurately describing a set of real-world data, trying to use only generated samples of the model process can be diffcult. Instead, in this section, we are going to extend this formalism to look at how probability theory can help with this data comparison problem in a systematic way.
 
@@ -135,24 +135,32 @@ P^i_{{\sf t}+1} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{
 %% 
 where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$. The matrices $A$ and $B$ are defined as conditional probabilities where the previous state in time $P^j_{{\sf t}'}$ was either `on' or `off', respectively.
 
-In this section, we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to designing the algorithms for our emulator. So let's go!
+In this section, we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to designing the algorithm for our emulator. So let's go!
 
-\section{\sffamily Emulator algorithms}
+\section{\sffamily Generalised emulator algorithm}
 
-The empirical emulator algorithms that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use, we need to connect values of $x$ in our emulator to the data from which it will be learning. 
+The empirical emulator algorithm that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use, we need to connect values of $x$ in our emulator to the data from which it will be learning. If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x')$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (or covariance between multivariate implementations) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that you want.
 
-\textcolor{red}{Need to go through the basic types of data distribution here... Exponential, Poisson, Binomial, Gaussian, Gamma, Negative Binomial, ...}
-
-One clear, and generally applicable, option for the conditional probability is that of a Gaussian process 
+We should probably make what we've just said a little more mathematically concrete. Let's define a data vector $y$ at time ${\sf t}+1$, which shares the same length as $x$, and represents a specific observation of $x$ at this point in a real dataset. At this point in time, we can define a distribution $P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots )$ which represents the likelihood of $y$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately define an overall objective function (an overall log-likelihood) that we might seek to optimise over for a given dataset 
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}'}(x\vert x') &= \frac{{\rm exp}\left\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}(x-f)^i \big[ K^{-1}(\theta , {\sf t}+1,{\sf t}')\big]^{ij}(x'-f')^j  \right\}}{\vert 2\pi K(\theta , {\sf t}+1,{\sf t}') \vert^{\frac{1}{2}}} \label{eq:gaussian-process-cond-prob}\,,
+\ln {\cal L} = \sum_{\forall (y',{\sf t}')} \ln P_{{\sf t}'}(y';M_{{\sf t}'},C_{{\sf t}'},\dots ) \,, \label{eq:log-likelihood-emulator}
 \end{align}
 %%
-where $\vert A\vert$ denotes computing the determinant of matrix $A$.
+where $\forall (y',{\sf t}')$ symbolises all tuples of datapoint and timestep, respectively. 
 
-Helpful to write the basic structure of algorithm out in Go.
+In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is, it's quite commmon to define a number of new hyperparameters. For example; one clear, and generally applicable, option for the conditional probability is that of a Gaussian process 
+%%
+\begin{align}
+P_{({\sf t}+1){\sf t}'}(x\vert x') &= \frac{{\rm exp}\left\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}[x-f({\sf t}+1)]^i \big[ K^{-1}(\theta , {\sf t}+1,{\sf t}')\big]^{ij}[x'-f({\sf t}')]^j  \right\}}{\vert 2\pi K(\theta , {\sf t}+1,{\sf t}') \vert^{\frac{1}{2}}} \label{eq:gaussian-process-cond-prob}\,,
+\end{align}
+%%
+where $K$ is a covariance matrix; $f$ is a function in time and $\theta$ represents a set of hyperparameters which are both typically learned by optimisation of the corresponding likelihood function of the data; and $\vert A\vert$ denotes computing the determinant of matrix $A$. By optimising Eq.~(\ref{eq:log-likelihood-emulator}) with respect to all of these hyperparameters which are defined with $P_{({\sf t}+1){\sf t}'}(x\vert x')$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}.
+
+\textcolor{red}{Talk about other kernels?}
+
+\textcolor{red}{Helpful to also write the basic structure of algorithm out in Go.}
 
 \section{\sffamily Software design}
 
-Diagrams would help here.
+\textcolor{red}{Diagrams would help here.}
