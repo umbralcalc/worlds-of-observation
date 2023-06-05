@@ -5,9 +5,9 @@
 
 \section{\sffamily Methodology}
 
-First there's the problem of knowing what the likelihood of the data is. The measurements $y, y', y'', \dots$ have either a known distribution which the user specifies or the emulator algorithm runs on this to get the data likelihood.
+First there's the problem of knowing what the likelihood of the data is. The measurements $y, y', y'', \dots$ have either a known distribution which the user specifies or the filtering algorithm runs on this to get the data likelihood.
 
-Once you have a data likelihood, then inference should proceed on the sampling domain side of things where the emulator algorithm is used again! This time with a tunable conditional probability that is a gaussian with mean and variance estimated directly from the history (don't optimise it like in Bayesian optimisation!) with a tunable exponential timestep kernel (timestep being the optimiser step here) and the resulting function can be optimised (or draw monte-carlo samples from) in an EM algorithm approach. The resulting Gaussian function could also exploit gradients for SGD.
+Once you have a data likelihood, then inference should proceed on the sampling domain side of things where the filtering algorithm is used again! This time with a tunable conditional probability that is a gaussian with mean and variance estimated directly from the history (don't optimise it like in Bayesian optimisation!) with a tunable exponential timestep kernel (timestep being the optimiser step here) and the resulting function can be optimised (or draw monte-carlo samples from) in an EM algorithm approach. The resulting Gaussian function could also exploit gradients for SGD.
 
 Reference the contrast to ABC methods here, which involve approximating the data likelihood with a simple proximity function with a tolerance $\epsilon$. Also talk about the BOLFI method which does indeed use the full Bayesian optimisation as it goes.
 
