@@ -141,7 +141,9 @@ In this section, we looked into how the mathematical formalism used in the stoch
 
 \section{\sffamily Generalised filtering algorithm}
 
-As we discussed in the previous section, the empirical probabilistic filtering algorithm that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use, we need to connect values of $x$ in our filter to the data from which it will be learning. If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x')$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (or covariance between multivariate implementations) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that you want.
+As we discussed in the previous section, the empirical probabilistic filtering algorithm that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use, we need to connect values of $x$ in our filter to the data from which it will be learning. 
+
+If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x')$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (or covariance between multivariate implementations) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that you want.
 
 We should probably make what we've just said a little more mathematically concrete. Let's define a data vector $y$ at time ${\sf t}+1$, which shares the same length as $x$, and represents a specific observation of $x$ at this point in a real dataset. At this point in time, we can define a distribution $P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots )$ which represents the likelihood of $y$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately define an overall objective function (an overall log-likelihood) that we might seek to optimise over for a given dataset 
 %%
@@ -159,9 +161,30 @@ P_{({\sf t}+1){\sf t}'}(x\vert x') &= \frac{{\rm exp}\left\{ -\frac{1}{2}\sum^d_
 %%
 where $K$ is a covariance matrix; $f$ is a function in time and $\theta$ represents a set of hyperparameters which are both typically learned by optimisation of the corresponding likelihood function of the data; and $\vert A\vert$ denotes computing the determinant of matrix $A$. By optimising Eq.~(\ref{eq:log-likelihood-filter}) with respect to all of these hyperparameters which are defined with $P_{({\sf t}+1){\sf t}'}(x\vert x')$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}.
 
-\textcolor{red}{Talk about other kernels?}
+We might think of the overall generalised filtering algorithm as the following Go code.
 
-\textcolor{red}{Helpful to also write the basic structure of algorithm out in Go.}
+\begin{lstlisting}[language=Go]
+type DataVector  []float64
+type Hyperparams []float64
+type DataHistory []DataVector
+
+// compute the log-likelihood for one point in the data history
+func LogLikelihood(
+    dataHistory DataHistory, 
+    hyperparams Hyperparams,
+    timeStepNumber int,
+) float64 {
+    // return the log-likelihood value
+}
+
+
+
+
+\end{lstlisting}
+
+\textcolor{red}{Complete code above}
+
+The optimisation approach that one chooses to use for obtaining the best hyperparameters in the conditional probability of Eq.~(\ref{eq:log-likelihood-filter}) will depend on a few factors. For example, if the number of hyperparameters is relatively low, but their gradients are difficult to calculate exactly; then a gradient-free optimiser (such as the Nelder-Mead~\cite{nelder1965simplex} or particle swarm~\cite{kennedy1995particle, shi1998modified} method) would likely be the most effective choice. On the other hand, when the number of hyperparameters ends up being relatively large, it's usually quite desriable to utilise the gradients in algorithms like vanilla Stochastic Gradient Descent~\cite{robbins1951stochastic} (SGD) or Adam~\cite{kingma2014adam}.
 
 \section{\sffamily Software design}
 
