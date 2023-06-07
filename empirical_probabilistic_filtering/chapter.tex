@@ -164,25 +164,69 @@ where $K$ is a covariance matrix; $f$ is a function in time and $\theta$ represe
 We might think of the overall generalised filtering algorithm as the following Go code.
 
 \begin{lstlisting}[language=Go]
-type DataVector  []float64
-type Hyperparams []float64
-type DataHistory []DataVector
+type MeanVector   []float64
+type DataVector   []float64
+type Hyperparams  []float64
+type DataHistory  []DataVector
 
-// compute the log-likelihood for one point in the data history
+// return the conditional probability of the 'dataVector' 
+// given the 'givenDataVector'
+func ConditionalProbability(
+    dataVector DataVector, 
+    givenDataVector DataVector,
+) float64 {
+    // return the conditional probability
+}
+
+// returns the current mean given a conditional probability weighting over 
+// past data vectors in the input history
+func ComputeFilteredMean(dataHistory DataHistory) MeanVector {
+    cumulativeWeightsSum := 0.0
+    meanVector := make([]float64, len(dataVector[0]))
+    for i, dataVector := range dataHistory {
+        // ignore first (most recent) value in the history as this is the one 
+        // we want to compare to in the log-likelihood
+        if i == 0 {
+            continue
+        }
+        weight := ConditionalProbability(dataHistory[0], dataVector)
+        cumulativeWeightsSum += weight
+        for j := range meanVector {
+            meanVector[j] += weight * dataVector[j] 
+        } 
+    }
+    // normalise the weights derived from the conditional probability
+    for j := range meanVector {
+        meanVector[j] /= cumulativeWeightsSum 
+    }
+    return meanVector 
+}
+
+// generates a log-probability for the current vector datapoint
+// given the statistics produced by the probabilistic filter
+// where inputs could be extended to include, e.g., the filtered
+// covariance matrix
+func DataLinkingLogProbability(
+    dataVector DataVector, 
+    filteredMean MeanVector,
+) float64 {
+    // return a log-probability from, e.g., a Poisson distribution
+}
+
+// compute the overall log-likelihood for the most recent point found in the 
+// input the data history
 func LogLikelihood(
     dataHistory DataHistory, 
     hyperparams Hyperparams,
     timeStepNumber int,
 ) float64 {
-    // return the log-likelihood value
+    // get the most recent point in the data history
+    dataVector := dataHistory[0]
+    mean := ComputeFilteredMean(dataHistory)
+    logLikelihood := DataLinkingLogProbability(dataVector, mean)
+    return logLikelihood
 }
-
-
-
-
 \end{lstlisting}
-
-\textcolor{red}{Complete code above}
 
 The optimisation approach that one chooses to use for obtaining the best hyperparameters in the conditional probability of Eq.~(\ref{eq:log-likelihood-filter}) will depend on a few factors. For example, if the number of hyperparameters is relatively low, but their gradients are difficult to calculate exactly; then a gradient-free optimiser (such as the Nelder-Mead~\cite{nelder1965simplex} or particle swarm~\cite{kennedy1995particle, shi1998modified} method) would likely be the most effective choice. On the other hand, when the number of hyperparameters ends up being relatively large, it's usually quite desriable to utilise the gradients in algorithms like vanilla Stochastic Gradient Descent~\cite{robbins1951stochastic} (SGD) or Adam~\cite{kingma2014adam}.
 
