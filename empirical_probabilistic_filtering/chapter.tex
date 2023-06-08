@@ -6,7 +6,7 @@
 
 The key distinction between the methods that we will develop in this chapter and the ones in the proceeding chapters is in their utility when faced with the problem of attempting to model real-world data. In the proceeding chapter, we shall describe some powerful techniques that can be used most effectively when the researcher is aware of the family of models that generated the data. In the present chapter, we will go into the details of how a more `empirical' approach can be derived for dynamical process modeling in a probabilistic framework which locally adapts the model to the data through time. 
 
-While we think that it's worth going into some mathematical detail to give a better sense of where our formalism comes from; we want to emphasise that the framework we discuss here is not especially new to the technical literature. Our overall framework draws on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and also Gaussian processes~\cite{murphy2012machine} as well. The novelties here, instead, lie more in the specifics of how we combine some of these ideas together when referencing the stochadex formalism, and how this manifests in designing more generally-applicable software for the user.
+While we think that it's worth going into some mathematical detail to give a better sense of where our formalism comes from; we want to emphasise that the framework we discuss here is not new to the technical literature at all. Our overall framework draws on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and also Gaussian processes~\cite{murphy2012machine} as well. The novelties here, instead, lie more in the specifics of how we combine some of these ideas together when referencing the stochadex formalism, and how this manifests in designing more generally-applicable software for the user.
 
 Before we are able to develop this empirical filtering algorithm, we need to return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. However, when trying robustly assess how far a model is from accurately describing a set of real-world data, trying to use only generated samples of the model process can be diffcult. Instead, in this section, we are going to extend this formalism to look at how probability theory can help with this data comparison problem in a systematic way.
 
@@ -141,9 +141,9 @@ In this section, we looked into how the mathematical formalism used in the stoch
 
 \section{\sffamily Generalised filtering algorithm}
 
-As we discussed in the previous section, the empirical probabilistic filtering algorithm that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use, we need to connect values of $x$ in our filter to the data from which it will be learning. 
+The empirical probabilistic filtering algorithm that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use in the filter, we need to connect values of $x$ in our filter to the data from which it will be learning. 
 
-If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x')$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (or covariance between multivariate implementations) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that you want.
+If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x')$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (and/or covariance) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that a researcher might need.
 
 We should probably make what we've just said a little more mathematically concrete. Let's define a data vector $y$ at time ${\sf t}+1$, which shares the same length as $x$, and represents a specific observation of $x$ at this point in a real dataset. At this point in time, we can define a distribution $P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots )$ which represents the likelihood of $y$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately define an overall objective function (an overall log-likelihood) that we might seek to optimise over for a given dataset 
 %%
@@ -159,9 +159,9 @@ In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is, it's quite com
 P_{({\sf t}+1){\sf t}'}(x\vert x') &= \frac{{\rm exp}\left\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}[x-f({\sf t}+1)]^i \big[ K^{-1}(\theta , {\sf t}+1,{\sf t}')\big]^{ij}[x'-f({\sf t}')]^j  \right\}}{\vert 2\pi K(\theta , {\sf t}+1,{\sf t}') \vert^{\frac{1}{2}}} \label{eq:gaussian-process-cond-prob}\,,
 \end{align}
 %%
-where $K$ is a covariance matrix; $f$ is a function in time and $\theta$ represents a set of hyperparameters which are both typically learned by optimisation of the corresponding likelihood function of the data; and $\vert A\vert$ denotes computing the determinant of matrix $A$. By optimising Eq.~(\ref{eq:log-likelihood-filter}) with respect to all of these hyperparameters which are defined with $P_{({\sf t}+1){\sf t}'}(x\vert x')$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}.
+where $K$ is a covariance matrix; $f$ is a function in time and $\theta$ represents a set of hyperparameters which are both typically learned by optimisation of the corresponding likelihood function of the data; and $\vert A\vert$ denotes computing the determinant of matrix $A$. 
 
-We might think of the overall generalised filtering algorithm as the following Go code.
+By optimising Eq.~(\ref{eq:log-likelihood-filter}) with respect to all of these hyperparameters which are defined with $P_{({\sf t}+1){\sf t}'}(x\vert x')$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}. We might think of the overall generalised filtering algorithm as the following Go code.
 
 \begin{lstlisting}[language=Go]
 type MeanVector   []float64
@@ -174,22 +174,30 @@ type DataHistory  []DataVector
 func ConditionalProbability(
     dataVector DataVector, 
     givenDataVector DataVector,
+    hyperparams Hyperparams,
 ) float64 {
     // return the conditional probability
 }
 
-// returns the current mean given a conditional probability weighting over 
-// past data vectors in the input history
-func ComputeFilteredMean(dataHistory DataHistory) MeanVector {
+// returns the current mean given a conditional probability weighting
+// over past data vectors in the input history
+func ComputeFilteredMean(
+    dataHistory DataHistory, 
+    hyperparams Hyperparams,
+) MeanVector {
     cumulativeWeightsSum := 0.0
     meanVector := make([]float64, len(dataVector[0]))
     for i, dataVector := range dataHistory {
-        // ignore first (most recent) value in the history as this is the one 
-        // we want to compare to in the log-likelihood
+        // ignore first (most recent) value in the history as this 
+        // is the one we want to compare to in the log-likelihood
         if i == 0 {
             continue
         }
-        weight := ConditionalProbability(dataHistory[0], dataVector)
+        weight := ConditionalProbability(
+            dataHistory[0], 
+            dataVector, 
+            hyperparams,
+        )
         cumulativeWeightsSum += weight
         for j := range meanVector {
             meanVector[j] += weight * dataVector[j] 
@@ -209,12 +217,13 @@ func ComputeFilteredMean(dataHistory DataHistory) MeanVector {
 func DataLinkingLogProbability(
     dataVector DataVector, 
     filteredMean MeanVector,
+    hyperparams Hyperparams,
 ) float64 {
     // return a log-probability from, e.g., a Poisson distribution
 }
 
-// compute the overall log-likelihood for the most recent point found in the 
-// input the data history
+// compute the overall log-likelihood for the most recent point found
+// in the input the data history
 func LogLikelihood(
     dataHistory DataHistory, 
     hyperparams Hyperparams,
@@ -222,14 +231,22 @@ func LogLikelihood(
 ) float64 {
     // get the most recent point in the data history
     dataVector := dataHistory[0]
-    mean := ComputeFilteredMean(dataHistory)
-    logLikelihood := DataLinkingLogProbability(dataVector, mean)
+    mean := ComputeFilteredMean(dataHistory, hyperparams)
+    logLikelihood := DataLinkingLogProbability(
+        dataVector, 
+        mean, 
+        hyperparams,
+    )
     return logLikelihood
 }
 \end{lstlisting}
+
+In the case of Eq.~(\ref{eq:gaussian-process-cond-prob}) above, the hyperparameters that would be optimised will not just include $\theta$; but also a set of values for $f$ at different timesteps. This would essentially equate our optimised filter to be the equivalent to the maximum a posteriori (MAP) of the Gaussian process in this instance. The only difference here is that by passing in sufficient statistics of this process to some data-linking distribution, we enable many different kinds of data to be described by the same underlying conditional probability-based filter. A Gaussian process also only represents one choice in the unlimited number of possible filters we are able to try in the very simple framework we're describing. 
+
+As another form of flexibility, one might also wish to try adapting the data-linking distributions to include an intercept term and linear coefficients for the statistics which are passed to it. These could hence be treated as additional hyperparameters and optimised jointly with the others if there is sufficient constraining power in the data.
 
 The optimisation approach that one chooses to use for obtaining the best hyperparameters in the conditional probability of Eq.~(\ref{eq:log-likelihood-filter}) will depend on a few factors. For example, if the number of hyperparameters is relatively low, but their gradients are difficult to calculate exactly; then a gradient-free optimiser (such as the Nelder-Mead~\cite{nelder1965simplex} or particle swarm~\cite{kennedy1995particle, shi1998modified} method) would likely be the most effective choice. On the other hand, when the number of hyperparameters ends up being relatively large, it's usually quite desriable to utilise the gradients in algorithms like vanilla Stochastic Gradient Descent~\cite{robbins1951stochastic} (SGD) or Adam~\cite{kingma2014adam}.
 
 \section{\sffamily Software design}
 
-\textcolor{red}{Diagrams would help here.}
+\textcolor{red}{Some diagrams would help here of the typing structures, the algorithm running flow and how it links to the stochadex software...}
