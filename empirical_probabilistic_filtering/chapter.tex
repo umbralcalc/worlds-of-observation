@@ -249,9 +249,9 @@ The optimisation approach that one chooses to use for obtaining the best hyperpa
 
 \section{\sffamily Software design}
 
-Let's now take a step back from the specifics of the probabilistc filtering algorithm to introduce our new sofware package for this part of the book: the `learnadex'. At its core, the learnadex algorithm adapts the stochadex iteration engine to iterate through streams of data in order to accumulate a global objective function value with respect to that data. The user may then choose which optimisation algorithm (or write their own) to use in order to leverage this objective for learning a better representation of the data. The readers with some familiarity of machine learning concepts will note that this design of algorithm should enable either `offline' or `online' learning algorithms to work.
+Let's now take a step back from the specifics of the probabilistc filtering algorithm to introduce our new sofware package for this part of the book: the `learnadex'. At its core, the learnadex algorithm adapts the stochadex iteration engine to iterate through streams of data in order to accumulate a global objective function value with respect to that data. The user may then choose which optimisation algorithm (or write their own) to use in order to leverage this objective for learning a better representation of the data. Readers with some familiarity of machine learning concepts will note that this design should enable either `offline' or `online' learning algorithms to work.
 
-Using the iteration engine of the stochadex makes neat use of software which has already been designed and tested in earlier chapters of this book. However, in order to fully achieve this, a few minor extensions to the typing structures and code abstractions will be necessary. We'll now discuss these in more detail.
+Using the iteration engine of the stochadex makes neat use of software which has already been designed and tested in earlier chapters of this book. However, in order to fully achieve this, a few minor extensions to the typing structures and code abstractions are necessary; as we show in Fig.~\ref{fig:learnadex-data-types-design}. To start with, we separate out `learning' from the kind of optimiser in the overall config so as to enable multiple optimisation algorithms to be used for the same learning problem. The hyperparameters that define that optimisation problem domain are also mapped to a format that any algorithm can use via a `translator' abstraction that is specified by the user as well.
 
 \begin{figure}[h]
 \centering
@@ -260,6 +260,7 @@ Using the iteration engine of the stochadex makes neat use of software which has
 \label{fig:learnadex-data-types-design}
 \end{figure}
 
+On the learning side; in order to define a specific objective for each data iterator to compute while the data streams through it, we have abstracted a `log-likelihood' type. Similarly, each iterator also gets a data streamer configuration which defines where the data is streaming from --- e.g., from a file on disk, from a local database instance or maybe via a network socket --- and also some inherited abstractions from the stochadex which define the time stepping function and when the data stream ends. In Fig.~\ref{fig:learnadex-data-iterator} below, we provide a schematic of the method calls of (and within) each data iterator.
 
 \begin{figure}[h]
 \centering
