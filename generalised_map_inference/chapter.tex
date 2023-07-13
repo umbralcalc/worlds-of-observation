@@ -20,10 +20,10 @@ So we need to now specify in a little more detail how Eq.~(\ref{eq:bayes-rule}) 
 If we now apply Bayes' rule to the likelihood itself in Eq.~(\ref{eq:bayes-rule}), we can easily find the following proportionality relationship
 %%
 \begin{align}
-{\cal L}_{{\sf t}+1}(y, y',y'', \dots\vert z) \propto P_{{\sf t}+1}(z\vert y, y',y'')P(y, y',y'') \label{eq:likelihood-prop-y}\,.
+{\cal L}_{{\sf t}+1}(y, y',y'', \dots\vert z) \propto P(z\vert y, y',y'')P(y, y',y'') \label{eq:likelihood-prop-y}\,.
 \end{align}
 %%
-Every model one can specify in the stochadex can be represented by some process which stochastically maps $z$ onto a set of comparable measurements $(y_z, y'_z,y''_z)$. Given this identification, we may generally assert that $P_{{\sf t}+1}(z\vert y, y',y'')=P_{{\sf t}+1}(y_z, y'_z,y''_z\vert y, y',y'')$. As we demonstrated in the previous chapter, we can optimise a probability distribution $P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots )$ for each step in time to match the statistics of the measurements $(y, y', y'', \dots)$ as well as possible, given some statistics $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. With both of these changes, our likelihood in Eq.~(\ref{eq:likelihood-prop-y}) can be rewritten in the following form
+Every model one can specify in the stochadex can be represented by some process which stochastically maps $z$ onto a set of comparable measurements $(y_z, y'_z,y''_z)$. Given this identification, we may generally assert that $P(z\vert y, y',y'')=P(y_z, y'_z,y''_z\vert y, y',y'')$. As we demonstrated in the previous chapter, we can optimise a probability distribution $P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots )$ for each step in time to match the statistics of the measurements $(y, y', y'', \dots)$ as well as possible, given some statistics $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. With both of these changes, our likelihood in Eq.~(\ref{eq:likelihood-prop-y}) can be rewritten in the following form
 %%
 \begin{align}
 \ln {\cal L}_{{\sf t}+1}(y, y',y'', \dots\vert z) = {\rm const.} + \ln P_{{\sf t}+1}(y_z;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) + \ln P_{{\sf t}}(y'_z;M_{{\sf t}},C_{{\sf t}},\dots ) + \dots \label{eq:data-likelihood-for-model} \,.
