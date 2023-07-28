@@ -21,21 +21,21 @@ declare -a filenames=(
 
 ## declare chapter frontpage sizes
 declare -a frontpagesizes=(
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "10cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm"
+    "7cm" \
+    "7cm" \
+    "7cm" \
+    "7cm" \
+    "5cm" \
+    "7cm" \
+    "7cm" \
+    "7cm" \
+    "7cm" \
+    "7cm" \
+    "7cm" \
+    "7cm" \
+    "7cm" \
+    "7cm" \
+    "7cm"
 )
 
 ## loop through filenames
