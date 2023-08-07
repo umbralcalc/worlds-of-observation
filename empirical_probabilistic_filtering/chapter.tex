@@ -10,65 +10,20 @@ While we think that it's worth going into some mathematical detail to give a bet
 
 Before we are able to develop this empirical filtering algorithm, we need to return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. However, when trying robustly assess how far a model is from accurately describing a set of real-world data, trying to use only generated samples of the model process can be diffcult. Instead, in this section, we are going to extend this formalism to look at how probability theory can help with this data comparison problem in a systematic way.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=8cm]{images/chapter-4-master-eq-graph.drawio.png}
+\caption{Graph representation of Eq.~(\ref{eq:master-x-cont}).}
+\label{fig:master-eqn}
+\end{figure} 
+
 So, how do we begin? In the first chapter, we defined the general stochastic process with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$. This equation also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x)$ of the next matrix row being $x=X_{{\sf t}+1}$. This can be written as
 %%
 \begin{align}
 P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}. 
-
-Let's say we also wanted to program what this equation is saying as a function in Go. Using a Monte Carlo approximation for the integral domain, the code might look something like this.
-
-\begin{lstlisting}[language=Go]
-type StateVector  []float64
-
-// returns a random draw of the possible state vectors at this timestep
-func RandomPossibleStateVectors(timeStepNumber int) []StateVector {
-    // return a slice of randomly-drawn possible state vectors 
-    // corresponding to the integral domain at this timestep
-}
-
-// returns the conditional probability of the state vector at this timestep 
-// given the value that the state vector had on a previous timestep
-func StateVectorConditionalProbability(
-    stateVector StateVector,
-    timeStepNumber int,
-    previousStateVector StateVector,
-    previousTimeStepNumber int,
-) float64 {
-    // return the conditional probability value
-}
-
-// returns the probability of the state vector at this timestep
-func StateVectorProbability(
-    stateVector StateVector, 
-    timeStepNumber int,
-) float64 {
-    prob := 0.0
-    // loop over all the possible previous timesteps
-    for t := 0; t < timeStepNumber; t++ {
-        // loop over the randomly-drawn possible state vectors 
-        // for this previous timestep
-        possibleStateVectors := RandomPossibleStateVectors(t)
-        for _, possibleStateVector := range possibleStateVectors {
-            // note the recursion
-            prob += StateVectorProbability(possibleStateVector, t)*
-                StateVectorConditionalProbability(
-                    stateVector,
-                    timeStepNumber,
-                    possibleStateVector, 
-                    t,
-                )
-        }
-        // normalisation for the Monte Carlo integration
-        prob /= float64(len(possibleStateVectors))
-    }
-    // timestep normalisation
-    prob /= float64(timeStepNumber)
-    return prob
-}
-\end{lstlisting}
+where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
 
 The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation factor --- this just normalises the sum of all probabilities to 1 given that there is a sum over ${\sf t}'$. Note that, if the process is defined over continuous time, we would need to replace 
 %%
@@ -77,13 +32,6 @@ The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation fac
 \end{align}
 %% 
 But what is $\omega_{\sf t}$? You can think of this as just the domain of possible $x'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=8cm]{images/master-eq-graph.drawio.png}
-\caption{Graph representation of Eq.~(\ref{eq:master-x-cont}).}
-\label{fig:master-eqn}
-\end{figure} 
 
 If we wanted to compute the mean of the distribution $M_{{\sf t}+1}$ in Eq.~(\ref{eq:master-x-cont}), it would be straightforward to just multiply both sides of the expression by $x$ and integrate over ${\rm d}x$ in the $\omega_{{\sf t}}$ domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical filter. If the probability distribution is \emph{stationary} --- meaning that $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for all ${\sf t}'$ and ${\sf t}''$ --- it's possible to derive\footnote{To see that this is true, first note that the joint distribution $P_{({\sf t}+1){\sf t}'}(x,x')=P_{({\sf t}+1){\sf t}'}(x\vert x')P_{{\sf t}'}(x')$. Secondly, note that joint distributions always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}'}(x,x')=P_{{\sf t}'({\sf t}+1)}(x',x)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ means 
 $$\int {\rm d}x\int {\rm d}x' \, x\,P_{({\sf t}+1){\sf t}'}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x)\,,$$
@@ -153,6 +101,13 @@ We should probably make what we've just said a little more mathematically concre
 %%
 where the summation continues until all of the past measurements have been taken into account.
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=8cm]{images/chapter-4-prob-filter-code.drawio.png}
+\caption{Code schematic of the probability filter optimisation.}
+\label{fig:prob-filter-code}
+\end{figure} 
+
 In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is, it's quite commmon to define a number of new hyperparameters. For example; one clear, and generally applicable, option for the conditional probability is that of a Gaussian process 
 %%
 \begin{align}
@@ -161,85 +116,7 @@ P_{({\sf t}+1){\sf t}'}(x\vert x') &= \frac{{\rm exp}\left\{ -\frac{1}{2}\sum^d_
 %%
 where $K$ is a covariance matrix; $f$ is a function in time and $\theta$ represents a set of hyperparameters which are both typically learned by optimisation of the corresponding likelihood function of the data; and $\vert A\vert$ denotes computing the determinant of matrix $A$. 
 
-By optimising Eq.~(\ref{eq:log-likelihood-filter}) with respect to all of these hyperparameters which are defined with $P_{({\sf t}+1){\sf t}'}(x\vert x')$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}. We might think of the overall generalised filtering algorithm as the following Go code.
-
-\begin{lstlisting}[language=Go]
-type MeanVector   []float64
-type DataVector   []float64
-type Hyperparams  []float64
-type DataHistory  []DataVector
-
-// return the conditional probability of the 'dataVector' 
-// given the 'givenDataVector'
-func ConditionalProbability(
-    dataVector DataVector, 
-    givenDataVector DataVector,
-    hyperparams Hyperparams,
-) float64 {
-    // return the conditional probability
-}
-
-// returns the current mean given a conditional probability weighting
-// over past data vectors in the input history
-func ComputeFilteredMean(
-    dataHistory DataHistory, 
-    hyperparams Hyperparams,
-) MeanVector {
-    cumulativeWeightsSum := 0.0
-    meanVector := make([]float64, len(dataVector[0]))
-    for i, dataVector := range dataHistory {
-        // ignore first (most recent) value in the history as this 
-        // is the one we want to compare to in the log-likelihood
-        if i == 0 {
-            continue
-        }
-        weight := ConditionalProbability(
-            dataHistory[0], 
-            dataVector, 
-            hyperparams,
-        )
-        cumulativeWeightsSum += weight
-        for j := range meanVector {
-            meanVector[j] += weight * dataVector[j] 
-        } 
-    }
-    // normalise the weights derived from the conditional probability
-    for j := range meanVector {
-        meanVector[j] /= cumulativeWeightsSum 
-    }
-    return meanVector 
-}
-
-// generates a log-probability for the current vector datapoint
-// given the statistics produced by the probabilistic filter
-// where inputs could be extended to include, e.g., the filtered
-// covariance matrix
-func DataLinkingLogProbability(
-    dataVector DataVector, 
-    filteredMean MeanVector,
-    hyperparams Hyperparams,
-) float64 {
-    // return a log-probability from, e.g., a Poisson distribution
-}
-
-// compute the overall log-likelihood for the most recent point found
-// in the input the data history
-func LogLikelihood(
-    dataHistory DataHistory, 
-    hyperparams Hyperparams,
-    timeStepNumber int,
-) float64 {
-    // get the most recent point in the data history
-    dataVector := dataHistory[0]
-    mean := ComputeFilteredMean(dataHistory, hyperparams)
-    logLikelihood := DataLinkingLogProbability(
-        dataVector, 
-        mean, 
-        hyperparams,
-    )
-    return logLikelihood
-}
-\end{lstlisting}
+By optimising Eq.~(\ref{eq:log-likelihood-filter}) with respect to all of these hyperparameters which are defined with $P_{({\sf t}+1){\sf t}'}(x\vert x')$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}. We might think of the overall generalised filtering algorithm as the code schematic in Fig.~\ref{fig:prob-filter-code}.
 
 In the case of Eq.~(\ref{eq:gaussian-process-cond-prob}) above, the hyperparameters that would be optimised will not just include $\theta$; but also a set of values for $f$ at different timesteps. This would essentially equate our optimised filter to be the equivalent to the maximum a posteriori (MAP) of the Gaussian process in this instance. The only difference here is that by passing in sufficient statistics of this process to some data-linking distribution, we enable many different kinds of data to be described by the same underlying conditional probability-based filter. A Gaussian process also only represents one choice in the unlimited number of possible filters we are able to try in the very simple framework we're describing. 
 
@@ -255,7 +132,7 @@ Using the iteration engine of the stochadex makes neat use of software which has
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=13cm]{images/learnadex-data-types.drawio.png}
+\includegraphics[width=13cm]{images/chapter-4-learnadex-data-types.drawio.png}
 \caption{A relational summary of the core data types in the learnadex.}
 \label{fig:learnadex-data-types-design}
 \end{figure}
@@ -264,7 +141,7 @@ On the learning side; in order to define a specific objective for each data iter
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=13cm]{images/learnadex-data-iterator.drawio.png}
+\includegraphics[width=13cm]{images/chapter-4-learnadex-data-iterator.drawio.png}
 \caption{A schematic of the basic data iterator struct in the learnadex.}
 \label{fig:learnadex-data-iterator}
 \end{figure}

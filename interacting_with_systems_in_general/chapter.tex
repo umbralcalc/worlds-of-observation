@@ -23,29 +23,11 @@ X^i_{{\sf t}+1} &= H^i_{{\sf t}+1}(F_{\sf t}(X', G_{{\sf t}+1}^i(Z_{{\sf t}}, {\
 %%
 which looks like an absolute mess! However, it illustrates how ${\cal F}$, which refers to a modified version of the $F$ function, contains our actions but no other new parameters need be specified; only function operations. Hence, while we have provided two distinct ways one might encode actions to manipulate a stochastic phenomenon, we shall often just refer to them together as `taking an action' ${\cal A}_{{\sf t}+1}$ at timestep ${\sf t}+1$ --- because the parameters which define either type of action at this timestep should all be stored within ${\cal A}_{{\sf t}+1}$ anyway. It is, however, important not to forget the full mathematical formulation when performing calculations. 
 
-In Go, the code for the new iteration formula given by Eq.~(\ref{eq:action-iteration-formula}), which includes taking actions in the same timestep, would look something like this.
+The code for the new iteration formula given by Eq.~(\ref{eq:action-iteration-formula}), which includes taking actions in the same timestep, would look something like Fig.~\ref{fig:iterations-with-actions}.
 
-\begin{lstlisting}[language=Go]
-type ActionsVector       []float64
-
-// iterate the state history forward in time by one step
-// with actions in the process
-func IterationFormulaWithActions(
-    stateHistory StateHistory, 
-    otherParams  OtherParams,
-    actions ActionsVector,
-    timeStepNumber int,
-) StateVector {
-    // taking a parametric action
-    newestOtherParams := TakeParametricAction(otherParams, actions)
-    // iterating the system as normal
-    newestStateVector := IterationFormula(
-        stateHistory, 
-        otherParams,
-        timeStepNumber,
-    )
-    // taking a state action
-    newestStateVector = TakeStateAction(newestStateVector, actions)
-    return newestStateVector
-}
-\end{lstlisting}
+\begin{figure}[h]
+\centering
+\includegraphics[width=11cm]{images/chapter-9-iterations-with-actions.drawio.png}
+\caption{Code schematic of Eq.~(\ref{eq:action-iteration-formula}).}
+\label{fig:iterations-with-actions}
+\end{figure}

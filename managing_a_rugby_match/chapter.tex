@@ -9,7 +9,7 @@ Since the basic state manipulation framework and simulation engine will run usin
 Let's begin by specifying an appropriate state space to live in when simulating a rugby match. It is important at this level that events are defined in quite broadly applicable terms, as it will define the state space available to our stochastic sampler and hence the simulated game will never be allowed to exist outside of it. It seems reasonable to characterise a rugby union match by the following set of states: {\sf Penalty}, {\sf Free Kick} (the punitive states); {\sf Penalty Goal}, {\sf Drop Goal}, {\sf Try} (the scoring states); {\sf Kickoff}, {\sf Kick Phase}, {\sf Run Phase}, {\sf Knock-on}, {\sf Scrum}, {\sf Lineout}, {\sf Maul} and {\sf Ruck} (the general play states). Using this set of states, in Fig.~\ref{fig:event-graph} we have summarised our approach to match state transitions into a single event graph. In order to capture the fully detailed range of events that are possible in a real-world match, we've needed to be a little imaginative in how we define the kinds of state transitions which occur.\footnote{It's also fair to say that our simplified model here represents just a subset of states that a real rugby match could exist in.} For example, kickoffs, 22m dropouts and goal line dropouts are all modelled here as a {\sf Kickoff} state but with different initial ball locations on the pitch (we'll get to how ball location changes later on).
 
 \begin{figure}[h]
-\includegraphics[width=14cm]{images/trywizard-event-graph.drawio.png}
+\includegraphics[width=14cm]{images/chapter-11-trywizard-event-graph.drawio.png}
 \caption{Simplified event graph of a rugby union match.}
 \label{fig:event-graph}
 \end{figure}
@@ -102,7 +102,7 @@ In the last section we introduced a continuous-time event-based simulation model
 In Fig.~\ref{fig:player-abilities} we have begun by separating playing positions on the rugby field into their usual descriptions and then associating each player type with a short list of simplified attributes. Note that our model associates a player with an `possession attacking' and `possession defending' ability which corresponds to each of their possession attributes that are indicated by the diagram. For example, a Front Row Forward will have 10 possession abilities associated to them: 2 for each of their {\sf Scrum}, {\sf Lineout}, {\sf Ruck}, {\sf Maul} and {\sf Run} attributes.
 
 \begin{figure}[h]
-\includegraphics[width=15cm]{images/rugby-player-abilities.drawio.png}
+\includegraphics[width=15cm]{images/chapter-11-rugby-player-abilities.drawio.png}
 \caption{Associated playing abilities for each position type.}
 \label{fig:player-abilities}
 \end{figure}
