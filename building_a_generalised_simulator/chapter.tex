@@ -19,12 +19,12 @@ where: $i$ is an index for the dimensions of the `state' space; ${\sf t}$ is the
 \label{fig:fundamental-loop}
 \end{figure}
 
-The basic computational idea here is illustrated in Fig.~\ref{fig:fundamental-loop}; we iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. In code you could easily write something with the same idea in it, and it would probably look something like the method diagram in Fig.~\ref{fig:fundamental-loop-code}.
+The basic computational idea here is illustrated in Fig.~\ref{fig:fundamental-loop}; we iterate the matrix $X$ forward in time by a row, and use its previous version $X'$ as an entire matrix input into a function which populates the elements of its latest rows. In pseudocode you could easily write something with the same idea in it, and it would probably look something like the method diagram in Fig.~\ref{fig:fundamental-loop-code}.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=10cm]{images/chapter-1-fundamental-loop-code.drawio.png}
-\caption{Code representation of Eq.~(\ref{eq:x-step-def}).}
+\caption{Pseudocode representation of Eq.~(\ref{eq:x-step-def}).}
 \label{fig:fundamental-loop-code}
 \end{figure}
 
@@ -65,7 +65,7 @@ One draws the increments $W^i_{{\sf t}+1}-W^i_{\sf t}$ from a normal distributio
 P^i_{{\sf t}+1}(x) &= {\sf NormalPDF}[x^i;0,\delta t({\sf t}+1)] \,.
 \end{align}
 %%
-Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension. In code, the Wiener process is schematically represented by Fig.~\ref{fig:wiener-process}.
+Note that for state spaces with dimensions $>1$, we could also allow for non-trivial cross-correlations between the noises in each dimension. In pseudocode, the Wiener process is schematically represented by Fig.~\ref{fig:wiener-process}.
 
 \begin{figure}[h]
 \centering
@@ -80,7 +80,7 @@ In another example, to model \emph{geometric Brownian motion noise} we would sim
 & S^{i}_{{\sf t}+1}(X',z,{\sf t}) = X^i_{\sf t}(W^i_{{\sf t}+1}-W^i_{\sf t})\label{eq:gbm} \,.
 \end{align}
 %%
-Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{{\sf t}+1}(X',z,{\sf t}) = (X^i_{{\sf t}+1}+X^i_{\sf t})(W^i_{{\sf t}+1}-W^i_{\sf t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}. The Go code for any of these should hoepfully be fairly straightforward to deduce based on the lines we've already written above.
+Here we have implicitly adopted the Itô interpretation to describe this stochastic integration. Given a carefully-defined integration scheme other interpretations of the noise would also be possible with our formalism too, e.g., Stratonovich\footnote{Which would implictly give $S^{i}_{{\sf t}+1}(X',z,{\sf t}) = (X^i_{{\sf t}+1}+X^i_{\sf t})(W^i_{{\sf t}+1}-W^i_{\sf t}) / 2$ for Eq.~(\ref{eq:gbm}).} or others within the more general `$\alpha$-family'~\cite{van1992stochastic,risken1996fokker,rog-will-2000}. The pseudocode for any of these should hoepfully be fairly straightforward to deduce based on the lines we've already written above.
 
 \begin{figure}[h]
 \centering
@@ -96,7 +96,7 @@ S^0_{{\sf t}+1}(X',z,{\sf t}) &= g[W^0_{{\sf t}+1},t({\sf t}+1)]-g[W^0_{\sf t}, 
 &= \bigg[ \frac{\partial g}{\partial t} + \frac{1}{2}\frac{\partial^2 g}{\partial x^2} \bigg] \delta t ({\sf t}+1) + \frac{\partial g}{\partial x} (W^0_{{\sf t}+1}-W^0_{\sf t}) \label{eq:general-wiener}\,,
 \end{align}
 %%
-where $g(x,t)$ is some continuous function of its arguments which has been expanded out with Itô's Lemma on the second line. Note also that the computations in Eq.~(\ref{eq:general-wiener}) could be performed with numerical derivatives in principle, even if the function were extremely complicated. This is unlikely to be the best way to describe the process of interest, however, the mathematical expressions above can still be made a bit more meaningful to the programmer in this way. The code in general would look something like Fig.~\ref{fig:ito-lemma}.
+where $g(x,t)$ is some continuous function of its arguments which has been expanded out with Itô's Lemma on the second line. Note also that the computations in Eq.~(\ref{eq:general-wiener}) could be performed with numerical derivatives in principle, even if the function were extremely complicated. This is unlikely to be the best way to describe the process of interest, however, the mathematical expressions above can still be made a bit more meaningful to the programmer in this way. The pseudocode in general would look something like Fig.~\ref{fig:ito-lemma}.
 
 Let's now look at a more complicated type of noise. For example, we might consider sampling from a \emph{fractional Brownian motion} process $[B_{H}]_{\sf t}$, where $H$ is known as the `Hurst exponent'. Following Ref.~\cite{decreusefond1999stochastic}, we can simulate this process in one of our state space dimensions by modifying the standard Wiener process by a fairly complicated integral factor which looks like this
 %%
@@ -149,7 +149,7 @@ S^{0}_{{\sf t}+1}(X',z,{\sf t}) &= \Lambda ({\sf t}+1) \\
 S^{1}_{{\sf t}+1}(X',z,{\sf t}) &= [N_{S^{0}_{{\sf t}+1}}]^i_{{\sf t}+1}-[N_{S^{0}_{{\sf t}}}]^i_{\sf t}\,.
 \end{align}
 %%
-This process could be simulated using the Go code we wrote for the time-inhomogeneous Poisson process above --- where we would just replace \texttt{EventRateLambdaFunction} with a function that generates the stochastic rate $\Lambda ({\sf t})$.
+This process could be simulated using the pseudocode we wrote for the time-inhomogeneous Poisson process previously --- where we would just replace \texttt{EventRateLambdaFunction} with a function that generates the stochastic rate $\Lambda ({\sf t})$.
 
 Another extension is \emph{compound Poisson process noise}, where it's the count values $[N_{\lambda}]^i_{\sf t}$ which are replaced by independent samples $[J_{\lambda}]^i_{\sf t}$ from another probability distribution, i.e.,
 %%
@@ -157,7 +157,7 @@ Another extension is \emph{compound Poisson process noise}, where it's the count
 S^{i}_{{\sf t}+1}(X',z,{\sf t}) &= [J_{\lambda}]^i_{{\sf t}+1}-[J_{\lambda}]^i_{\sf t}\,.
 \end{align}
 %%
-Note that the rejection method of Eq.~(\ref{eq:rejection}) can be employed effectively to simulate any of these extensions as long as a sufficiently small $\tau$ is chosen. Once again, the Go code we wrote above would be sufficient to simulate this process with one tweak: replace the allocation of the \texttt{element} variable to \texttt{element = 1.0} with the output of a function which generates the $[J_{\lambda}]^i_{\sf t}$ samples.
+Note that the rejection method of Eq.~(\ref{eq:rejection}) can be employed effectively to simulate any of these extensions as long as a sufficiently small $\tau$ is chosen. Once again, the pseudocode we wrote previously would be sufficient to simulate this process with one tweak: add into the \texttt{DrawNewEventIncrement} function the calling of a function which generates the $[J_{\lambda}]^i_{\sf t}$ samples and output these if the event occurs.
 
 All of the examples we have discussed so far are Markovian. Given that we have explicitly constructed the formalism to handle non-Markovian phenomena as well, it would be worthwhile going some examples of this kind of process too. \emph{Self-exciting process noises} would generally take the form
 %%
@@ -172,7 +172,7 @@ where the stochastic rate ${\cal I}_{{\sf t}+1} (X',z,{\sf t})$ now depends on t
 {\cal I}_{{\sf t}+1} (X',z,{\sf t}) &= \mu + \sum^{{\sf t}}_{{\sf t}'=0}\gamma [t({\sf t})-t({\sf t}')]S^{1}_{{\sf t}'} \,,
 \end{align}
 %%
-where $\gamma$ is the `exciting kernel' and $\mu$ is some constant background rate. In order to simulate a Hawkes process using our formalism, the code would be something like Fig.~\ref{fig:hawkes-process}.
+where $\gamma$ is the `exciting kernel' and $\mu$ is some constant background rate. In order to simulate a Hawkes process using our formalism, the pseudocode would be something like Fig.~\ref{fig:hawkes-process}.
 
 \begin{figure}[h]
 \centering
@@ -199,25 +199,49 @@ If we begin with the obvious first set of criteria; we want to be able to freely
 \begin{figure}[h]
 \centering
 \includegraphics[width=13cm]{images/chapter-1-stochadex-data-types.drawio.png}
-\caption{A relational summary of the core data types in the stochadex.}
+\caption{A relational summary of the configuration data types in the stochadex.}
 \label{fig:data-types-design}
 \end{figure}
 
-Once someone has written the code to create these functions for the stochadex, we want to then be able to recall them in future only with configuration files while maintaining the possibility of changing their simulation run parameters. This flexibility should facilitate our uses for the simulation later in the book, and from this perspective it also makes sense that the parameters should include the random seed and initial state value.
+Once the user has written the code to create these functions for the stochadex, we want to then be able to recall them in future only with configuration files while maintaining the possibility of changing their simulation run parameters. This flexibility should facilitate our uses for the simulation later in the book, and from this perspective it also makes sense that the parameters should include the random seed and initial state value.
 
 The state history matrix $X$ should be configurable in terms of its number of rows --- what we'll call the `state width' --- and its number of columns --- what we'll call the `state history depth'. If we were to keep increasing the state width up to millions of elements or more, it's likely that on most machines the algorithm performance would grind to a halt when trying to iterate over the resulting $X$ within a single thread. Hence, before the algorithm or its performance in any more detail, we can pre-empt the requirement that $X$ should represented in computer memory by a set of partitioned matrices which are all capable of communicating to one-another downstream. In this paradigm, we'd like the user to be able to configure which state partitions are able to communicate with each other without having to write any new code.
 
 For convenience, it seems sensible to also make the outputs from stochadex runs configurable. A user should be able to change the form of output that they want through, e.g., some specified function of $X$ at the time of outputting data. The times that the stochadex should output this data can also be decided by some user-specified condition so that the frequency of output is fully configurable as well. 
 
-In summary, we've put together a schematic of data types and their relationships in Fig.~\ref{fig:data-types-design}. In this diagram there is some indication of the data type that we propose to store each piece information in (in Go syntax), and the diagram as a whole should serve as a useful guide to the basic structure of configuration files for the stochadex.
+In summary, we've put together a schematic of configuration data types and their relationships in Fig.~\ref{fig:data-types-design}. In this diagram there is some indication of the data type that we propose to store each piece information in (in Go syntax), and the diagram as a whole should serve as a useful guide to the basic structure of configuration files for the stochadex.
+
+It's clear that in order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history. But let's now return to the point we made earlier about how the performance of such an algorithm will depend on the size of the state history matrix $X$. The key bit of the algorithm design that isn't so straightforward is: how do we sucessfully split this state history up into separate partitions in memory while still enabling them to communicate effectively with each other? Other generalised simulation frameworks --- such as SimPy~\cite{simpy}, StoSpa~\cite{stospa} and FLAME GPU~\cite{flamegpu} --- have all approached this problem in different ways, and with different software architectures. 
+
+In Fig.~\ref{fig:loop-design} we've illustrated what a loop involving separate state partitions looks like in the stochadex simulator. Each partition is handled by concurrently running execution threads of the same process, while a separate process may be used to handle the outputs from the algorithm. As the diagram shows, the main sequence of each loop iteration follows the pattern: 
+%%
+\begin{enumerate}
+\item{The \texttt{PartitionCoordinator} requests more iterations from each state partition by sending an \texttt{IteratorInputMessage} to a concurrently running goroutine.}
+\item{The \texttt{StateIterator} in each goroutine executes the iteration and stores the resulting state update in a variable.}
+\item{Once all of the iterations have been completed, the \texttt{PartitionCoordinator} then requests each goroutine to update its relevant partition of the state history by sending another \texttt{IteratorInputMessage} to each.}
+\end{enumerate}
+%%
+This pattern ensures that no partition has access to values in the state history which are out of sync with its current state in time, and hence prevents anachronisms from occuring in the overall state iteration. 
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=13cm]{images/chapter-1-stochadex-loop.drawio.png}
-\caption{A loop of the stochadex simulation algorithm with two state partitions.}
+\caption{Schematic for a step of the stochadex simulation algorithm.}
 \label{fig:loop-design}
 \end{figure}
 
-It's clear that in order to simulate Eq.~(\ref{eq:x-step-def}), we need an interative algorithm which reapplies a user-specified function to the continually-updated history. But let's now return to the point we made earlier about how the performance of such an algorithm will depend on the size of the state history matrix $X$. The key bit of the algorithm design that isn't so straightforward is: how do we sucessfully split this state history up into separate partitions in memory while still enabling them to communicate effectively with each other? Other generalised simulation frameworks --- such as SimPy~\cite{simpy}, StoSpa~\cite{stospa} and FLAME GPU~\cite{flamegpu} --- have all approached this problem in different ways, and with different software architectures. 
+It's worth noting that while Fig.~\ref{fig:loop-design} illustrates only a single process; it's obviously true that we may run many of these whole diagrams at once to parallelise generating independent realisations of the simulation, if necessary.
 
-In Fig.~\ref{fig:loop-design} we've illustrated what a loop involving separate state partitions looks like in the stochadex simulator. Each partition is handled by concurrently running execution threads of the same process, while a separate process may be used to handle the outputs from the algorithm. While this diagram illustrates only a single use for multiple processes, it's obviously true that we may run many of these whole diagrams at once on a multicore machine to generate a batch of independent ensembles if necessary.
+\textcolor{red}{
+\begin{itemize}
+\item{talk about the frontend here and its uses}
+\item{introduce and describe the schematic diagram for the main executable}
+\end{itemize}}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=9cm]{images/chapter-1-stochadex-main.drawio.png}
+\caption{A diagram of the main stochadex binary executable.}
+\label{fig:stochadex-main}
+\end{figure}
+
