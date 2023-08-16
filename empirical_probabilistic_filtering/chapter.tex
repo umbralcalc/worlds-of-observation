@@ -128,11 +128,11 @@ The optimisation approach that one chooses to use for obtaining the best hyperpa
 
 Let's now take a step back from the specifics of the probabilistic filtering algorithm to introduce our new sofware package for this part of the book: the `learnadex'. At its core, the learnadex algorithm adapts the stochadex iteration engine to iterate through streams of data in order to accumulate a global objective function value with respect to that data. The user may then choose which optimisation algorithm (or write their own) to use in order to leverage this objective for learning a better representation of the data. Readers with some familiarity of machine learning concepts will note that this design should enable either `offline' or `online' learning algorithms to work.
 
-Using the iteration engine of the stochadex makes neat use of software which has already been designed and tested in earlier chapters of this book. However, in order to fully achieve this, a few minor extensions to the typing structures and code abstractions are necessary; as we show in Fig.~\ref{fig:learnadex-data-types-design}. To start with, we separate out `learning' from the kind of optimiser in the overall config so as to enable multiple optimisation algorithms to be used for the same learning problem. The hyperparameters that define that optimisation problem domain are also mapped to a format that any algorithm can use via a `translator' abstraction that is specified by the user as well.
+Using the iteration engine of the stochadex makes neat use of software which has already been designed and tested in earlier chapters of this book. However, in order to fully achieve this, a few minor extensions to the typing structures and code abstractions are necessary; as we show in Fig.~\ref{fig:learnadex-data-types-design}. To start with, we separate out `learning' from the kind of optimiser in the overall config so as to enable multiple optimisation algorithms to be used for the same learning problem. The hyperparameters that define that optimisation problem domain can be determined by the user with an extension to the \texttt{OtherParams} object so that it includes some optional Boolean masks over the parameters, i.e., \texttt{OtherParams.FloatParamMask} and \texttt{OtherParams.IntParamMask}. These masks are used to extract the parameters of interest, which can then be flattened and formatted to fit into any generic optimisation algorithm.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=7cm]{images/chapter-4-learnadex-data-types.drawio.png}
+\includegraphics[width=12cm]{images/chapter-4-learnadex-data-types.drawio.png}
 \caption{A relational summary of the core data types in the learnadex.}
 \label{fig:learnadex-data-types-design}
 \end{figure}
