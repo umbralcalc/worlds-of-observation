@@ -122,9 +122,16 @@ In the case of Eq.~(\ref{eq:gaussian-process-cond-prob}) above, the hyperparamet
 
 As another form of flexibility, one might also wish to try adapting the data-linking distributions to include an intercept term and linear coefficients for the statistics which are passed to it. These could hence be treated as additional hyperparameters and optimised jointly with the others if there is sufficient constraining power in the data.
 
-The optimisation approach that one chooses to use for obtaining the best hyperparameters in the conditional probability of Eq.~(\ref{eq:log-likelihood-filter}) will depend on a few factors. For example, if the number of hyperparameters is relatively low, but their gradients are difficult to calculate exactly; then a gradient-free optimiser (such as the Nelder-Mead~\cite{nelder1965simplex} or particle swarm~\cite{kennedy1995particle, shi1998modified} method) would likely be the most effective choice. On the other hand, when the number of hyperparameters ends up being relatively large, it's usually quite desriable to utilise the gradients in algorithms like vanilla Stochastic Gradient Descent~\cite{robbins1951stochastic} (SGD) or Adam~\cite{kingma2014adam}.
+The optimisation approach that one chooses to use for obtaining the best hyperparameters in the conditional probability of Eq.~(\ref{eq:log-likelihood-filter}) will depend on a few factors. For example, if the number of hyperparameters is relatively low, but their gradients are difficult to calculate exactly; then a gradient-free optimiser (such as the Nelder-Mead~\cite{nelder1965simplex} method or something like a particle swarm~\cite{kennedy1995particle, shi1998modified}) would likely be the most effective choice. On the other hand, when the number of hyperparameters ends up being relatively large, it's usually quite desriable to utilise the gradients in algorithms like vanilla Stochastic Gradient Descent~\cite{robbins1951stochastic} (SGD) or Adam~\cite{kingma2014adam}.
 
-\textcolor{red}{I think there's something potentially generalised here that would be worth exploring by using the adjoint master equation to figure out gradients? }
+If the gradients of Eq.~(\ref{eq:log-likelihood-filter}) are needed, we can always factorise each derivative with respect to hyperparameter $z^i$ in the following way through the chain rule
+%%
+\begin{align}
+\frac{\partial}{\partial z^i}\ln {\cal L}_{{\sf t}+1} &= \frac{\partial M_{{\sf t}+1}}{\partial z^i}\frac{\partial}{\partial M_{{\sf t}+1}}\ln P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) \nonumber \\ 
+&\qquad + \frac{\partial C_{{\sf t}+1}}{\partial z^i}\frac{\partial }{\partial C_{{\sf t}+1}}\ln P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) + \dots  \,. \label{eq:log-likelihood-filter-grad}
+\end{align}
+%%
+By factoring derivatives in this manner, the computation can be separated into two parts: the derivatives with respect to $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$, which are typically quite straightforward; and the derivatives with respect to $z$ elements, which typically need a more involved calculation depending on the model. Incidentally, this separation also neatly lends itself to abstracting gradient calculations as having a simpler, general purpose component that can be built directly into a library of data models and a more complex, model-specific component that the user must specify.
 
 
 \section{\sffamily Software design}
@@ -144,7 +151,7 @@ On the learning side; in order to define a specific objective for each data iter
 
 \textcolor{red}{\begin{itemize}
 \item{describe the method calls diagram in more detail --- in particular, point out how it can replace the \texttt{Iteration.Iterate} method which is called when the \texttt{StateIterator} is asked for another iteration from the \texttt{PartitionCoordinator} of the stochadex}
-\item{then talk about the optimiser! starting with non-gradient-based: the two packages that are supported out of the box are gonum and gago (still need to do gago --- see here: github.com/maxhalford/eaopt) }
+\item{then talk about the optimiser! starting with non-gradient-based: the two packages that are supported out of the box are gonum and eaopt (still need to do gago --- see here: github.com/maxhalford/eaopt) }
 \item{then talk about the output - talk about the possibilities for output and what the default setting to json logs is for}
 \item{could also be written to, e.g., a locally-hosted database server and the best-suited would be a NoSQL document database, e.g., MongoDB~\cite{mongodb}, but building something bespoke and simpler is more aligned with the use-case here and with the principles of this book}
 \item{describe the need for log exploration and visualisation and then introduce logsplorer - a REST API for querying the json logs (with basic filtering and selection capabilities but could be extended to more advanced options) and optionally also launches a visualisation React app written in Typescript}

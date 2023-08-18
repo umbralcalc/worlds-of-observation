@@ -50,4 +50,3 @@ We now have an objective function to optimise values of $z$ with respect to but,
 If we now consider a tunable conditional probability that is a Gaussian with mean and variance estimated directly from the history (don't optimise it like in Bayesian optimisation!) with a tunable exponential timestep kernel (timestep being the optimiser step here) and the resulting function can be optimised (or draw monte-carlo samples from) in an EM algorithm approach. The resulting Gaussian function could also exploit gradients for SGD.
 
 Reference the contrast to ABC methods here, which involve approximating the data likelihood with a simple proximity function with a tolerance $\epsilon$. Also talk about the BOLFI method which does indeed use the full Bayesian optimisation as it goes.
-
