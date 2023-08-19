@@ -23,7 +23,13 @@ If we now apply Bayes' rule to the likelihood itself in Eq.~(\ref{eq:bayes-rule}
 {\cal L}_{{\sf t}+1}(y, y',y'', \dots\vert z) \propto P(z\vert y, y',y'', \dots)P(y, y',y'', \dots) \label{eq:likelihood-prop-y}\,.
 \end{align}
 %%
-Every model one can specify in the stochadex can be represented by some process which stochastically maps $z$ onto a set of comparable measurements $(y_z, y'_z,y''_z, \dots)$. Given this identification, we may generally assert that $P(z\vert y, y',y'', \dots)=P(y_z, y'_z,y''_z, \dots\vert y, y',y'', \dots)$. As we demonstrated in the previous chapter, we can also optimise a probability distribution $P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1}, \dots)$ for each step in time to match the statistics of the measurements $(y, y', y'', \dots)$ as well as possible, given some statistics $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. If we apply both of these changes, our likelihood in Eq.~(\ref{eq:likelihood-prop-y}) can be rewritten as
+Every model one can specify in the stochadex can be represented by some process which stochastically maps $z$ onto a set of comparable measurements $(y_z, y'_z,y''_z, \dots)$. Given this identification, we may generally assert that 
+%%
+\begin{align}
+P(z\vert y, y',y'', \dots) = P(y_z \vert y, y',y'', \dots)P(y'_z\vert y',y'', \dots)P(y''_z\vert y'', \dots)\,.
+\end{align}
+%%
+As we demonstrated in the previous chapter, we can also optimise a probability distribution $P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1}, \dots)$ for each step in time to match the statistics of the measurements $(y, y', y'', \dots)$ as well as possible, given some statistics $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. If we apply both of these changes, our likelihood in Eq.~(\ref{eq:likelihood-prop-y}) can be rewritten as
 %%
 \begin{align}
 \ln {\cal L}_{{\sf t}+1}(y, y',y'', \dots\vert z) = {\rm const.} + \ln P_{{\sf t}+1}(y_z;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) + \ln P_{{\sf t}}(y'_z;M_{{\sf t}},C_{{\sf t}},\dots ) + \dots \label{eq:data-likelihood-for-model} \,.
@@ -47,6 +53,22 @@ in Eq.~(\ref{eq:data-likelihood-for-model}). Once again, here, we would need to 
 
 We now have an objective function to optimise values of $z$ with respect to but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples $(y_z, y'_z, y''_z, \dots)$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter!
 
-If we now consider a tunable conditional probability that is a Gaussian with mean and variance estimated directly from the history (don't optimise it like in Bayesian optimisation!) with a tunable exponential timestep kernel (timestep being the optimiser step here) and the resulting function can be optimised (or draw monte-carlo samples from) in an EM algorithm approach. The resulting Gaussian function could also exploit gradients for SGD.
+Let's now consider a process which represents the progress made by an optimiser towards the optimum value, whose state is defined by the parameters $z$. If we assume that all the elements of $z$ are continuous\footnote{We can modify this expression to work for discrete variables too.} in their domain $\upsilon$, one representation of this process we might consider is
+%%
+\begin{align}
+{\cal P}^{n+1}_{{\sf t}+1}(z \vert y, y', y'', \dots) = \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, {\cal P}^{n'}_{{\sf t}+1}(z' \vert y, y', y'', \dots) \label{eq:posterior-process} \,,
+\end{align}
+%%
+where $n$ is the iteration number of the optimisation, and corresponds to a different candidate posterior distribution ${\cal P}^{n}_{{\sf t}+1}$ to one at any of the previous steps $n'$. Eq.~(\ref{eq:posterior-process}) can represent the convergence of a probabilistic optimisation algorithm --- represented in particular by $P^{(n+1)n'}(z\vert z')$ --- towards the true actual posterior distribution of $z$. 
 
-Reference the contrast to ABC methods here, which involve approximating the data likelihood with a simple proximity function with a tolerance $\epsilon$. Also talk about the BOLFI method which does indeed use the full Bayesian optimisation as it goes.
+At this point, readers may recognize that Eq.~(\ref{eq:posterior-process}) has the same structure as the generalised probabilistic description we introduced previously. This is a deliberate construction, since it enables us to reuse all of the exposition we provided for the probabilistic filter to recognize that the filter itself could serve as an algorithm to optimise the posterior.  
+
+\textcolor{red}{\begin{itemize}
+\item{Need to point out here that because we are only interested in the MAP, the algorithm can stop converging to the posterior and can exploit the function it creates to get to the optimum.}
+\item{consider a tunable conditional probability that is a Gaussian with mean and variance estimated directly from the history (don't optimise it like in Bayesian optimisation!) with a tunable exponential timestep kernel (timestep being the optimiser step here) and the resulting function can be optimised (or draw monte-carlo samples from) in an EM algorithm approach. The resulting Gaussian function could also exploit gradients for SGD.}
+\item{Illustrate the algorithm structure and describe the maths for it step-by-step as well: 1. choose random sampling for ${\cal P}^{n}_{{\sf t}+1}$ 2. alternate between using the probability filter for ${\cal P}^{n}_{{\sf t}+1}$ to sample and optimisation of the current posterior iteration with respect to $z$}
+\item{Reference the contrast to ABC methods here, which involve approximating the data likelihood with a simple proximity function with a tolerance $\epsilon$.}
+\item{Also talk about the BOLFI method which does indeed use the full Bayesian optimisation as it goes.}
+\item{Programming steps for this chapter: need to write a new OptimisationAlgorithm which implements this algorithm --- the rest should just be config}
+\end{itemize}}
+
