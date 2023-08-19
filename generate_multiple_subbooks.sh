@@ -19,25 +19,6 @@ declare -a filenames=(
     "quantum_system_control/chapter"
 )
 
-## declare chapter frontpage sizes
-declare -a frontpagesizes=(
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "10cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm" \
-    "14cm"
-)
-
 ## loop through filenames
 counter=0
 for filename in "${filenames[@]}"
@@ -54,8 +35,6 @@ do
    rm $filename.synctex.gz
    export CHAPTER_NUMBER=$counter
    export CHAPTER_TO_COMPILE=$filename
-   export CHAPTER_FRONTPAGE="images/page-design-$((counter+1)).png"
-   export CHAPTER_FRONTPAGE_SIZE=${frontpagesizes[$counter]}
    latexmk -xelatex -synctex=1 -interaction=nonstopmode -file-line-error -jobname="$filename" subbook.tex
    read -p "Compiled $filename as chapter $((counter+1)). Press Enter to resume ..."
    counter=$((counter+1))
