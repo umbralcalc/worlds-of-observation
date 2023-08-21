@@ -17,13 +17,13 @@ Before we are able to develop this empirical filtering algorithm, we need to ret
 \label{fig:master-eqn}
 \end{figure} 
 
-So, how do we begin? In the first chapter, we defined the general stochastic process with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$. This equation also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x)$ of the next matrix row being $x=X_{{\sf t}+1}$. This can be written as
+So, how do we begin? In the first chapter, we defined the general stochastic process with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$. This equation also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x\vert z)$ of the next matrix row being $x=X_{{\sf t}+1}$ given that the parameters of the process are $z$. This can be written as
 %%
 \begin{align}
-P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:master-x-cont} \,,
+P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
+where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$ and the parameters of the process were $z$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
 
 The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation factor --- this just normalises the sum of all probabilities to 1 given that there is a sum over ${\sf t}'$. Note that, if the process is defined over continuous time, we would need to replace 
 %%
@@ -33,70 +33,72 @@ The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation fac
 %% 
 But what is $\omega_{\sf t}$? You can think of this as just the domain of possible $x'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
 
-If we wanted to compute the mean of the distribution $M_{{\sf t}+1}$ in Eq.~(\ref{eq:master-x-cont}), it would be straightforward to just multiply both sides of the expression by $x$ and integrate over ${\rm d}x$ in the $\omega_{{\sf t}+1}$ domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical filter. If the probability distribution is \emph{stationary} --- meaning that $P_{{\sf t}'}(x)=P_{{\sf t}''}(x)$ for all ${\sf t}'$ and ${\sf t}''$ --- it's possible to derive\footnote{To see that this is true, first note that the joint distribution $P_{({\sf t}+1){\sf t}'}(x,x')=P_{({\sf t}+1){\sf t}'}(x\vert x')P_{{\sf t}'}(x')$. Secondly, note that joint distributions always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}'}(x,x')=P_{{\sf t}'({\sf t}+1)}(x',x)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ means 
-$$\int {\rm d}x\int {\rm d}x' \, x\,P_{({\sf t}+1){\sf t}'}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x')=\int {\rm d}x\int {\rm d}x'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x)\,,$$
+If we wanted to compute the mean of the distribution $M_{{\sf t}+1}(z)$ in Eq.~(\ref{eq:master-x-cont}), it would be straightforward to just multiply both sides of the expression by $x$ and integrate over ${\rm d}x$ in the $\omega_{{\sf t}+1}$ domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical filter. If the probability distribution is \emph{stationary} --- meaning that $P_{{\sf t}'}(x\vert z)=P_{{\sf t}''}(x\vert z)$ for all ${\sf t}'$ and ${\sf t}''$ --- it's possible to derive\footnote{To see that this is true, first note that the joint distribution $P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=P_{({\sf t}+1){\sf t}'}(x\vert x',z)P_{{\sf t}'}(x'\vert z)$. Secondly, note that joint distributions always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=P_{{\sf t}'({\sf t}+1)}(x',x\vert z)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ means 
+$$\int {\rm d}x\int {\rm d}x' \, x\,P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=\int {\rm d}x\int {\rm d}x'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x'\vert z)=\int {\rm d}x\int {\rm d}x'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x\vert z)\,,$$
 where we've used the trivial variable swap to get to the last equality, and the domain references $\omega$ in the integrals are implicitly defined.} 
 %%
 \begin{align}
-M_{{\sf t}+1} = \int_{\omega_{{\sf t}+1}}{\rm d}x \,x\,P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, x' \, P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:stationary-mean-estimator}\,.
+M_{{\sf t}+1}(z) = \int_{\omega_{{\sf t}+1}}{\rm d}x \,x\,P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, x' \, P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-mean-estimator}\,.
 \end{align}
 %%
 The standard covariance matrix elements can also be computed in a similar fashion
 %%
 \begin{align}
-C^{ij}_{{\sf t}+1} &= \int_{\omega_{{\sf t}+1}}{\rm d}x \,(x-M_{{\sf t}+1})^i(x-M_{{\sf t}+1})^jP_{{\sf t}+1}(x) \nonumber \\
-&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, (x'-M_{{\sf t}+1})^i(x'-M_{{\sf t}+1})^j P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x\vert x') \label{eq:stationary-covariance-estimator}\,.
+C^{ij}_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}x \,[x-M_{{\sf t}+1}(z)
+]^i[x-M_{{\sf t}+1}(z)]^jP_{{\sf t}+1}(x\vert z) \nonumber \\
+&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, [x'-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}+1}(z)]^j P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-covariance-estimator}\,.
 \end{align}
 %%
 
-While they look quite abstract, Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) express the core idea behind how our probabilistic filter will function. By assuming a stationary distribution, we gain the ability to directly estimate the statistics of the probability distribution $P_{{\sf t}+1}(x)$ from past samples it may have in empirical data; which are represented here by $P_{{\sf t}'}(x')$.
+While they look quite abstract, Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) express the core idea behind how our probabilistic filter will function. By assuming a stationary distribution, we gain the ability to directly estimate the statistics of the probability distribution $P_{{\sf t}+1}(x\vert z)$ from past samples it may have in empirical data; which are represented here by $P_{{\sf t}'}(x'\vert z)$.
 
 In order to study higher-order out-of-time-order correlations, we can also consider using the statistical moments computed from joint distributions like these
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}'}(x, x') &= P_{({\sf t}+1){\sf t}'}(x\vert x')P_{{\sf t}'}(x') \label{eq:2nd-joint-dist}\\
-P_{({\sf t}+1){\sf t}'{\sf t}''}(x, x', x'') &= P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x', x'')P_{{\sf t}'{\sf t}''}(x'\vert x'')P_{{\sf t}''}(x'') \label{eq:3rd-joint-dist}\,.
+P_{({\sf t}+1){\sf t}'}(x, x'\vert z) &= P_{({\sf t}+1){\sf t}'}(x\vert x',z)P_{{\sf t}'}(x'\vert z) \label{eq:2nd-joint-dist}\\
+P_{({\sf t}+1){\sf t}'{\sf t}''}(x, x', x''\vert z) &= P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x', x'', z)P_{{\sf t}'{\sf t}''}(x'\vert x'', z)P_{{\sf t}''}(x''\vert z) \label{eq:3rd-joint-dist}\,.
 \end{align}
 %%
 For example, Eq.~(\ref{eq:2nd-joint-dist}) would apply if we wanted to retrieve the out-of-time-order pairwise correlations between $x$ at timestep ${\sf t}+1$ and $x'$ at timestep ${\sf t}'$. Using this pairwise relationship we can also derive an equation for the out-of-time-order covariance matrix elements
 %%
 \begin{align}
-C_{({\sf t}+1){\sf t}'}^{ij} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \,(x-M_{{\sf t}+1})^i(x'-M_{{\sf t}'})^j P_{({\sf t}+1){\sf t}'}(x, x') \label{eq:out-of-time-order-covariance-estimator} \,.
+C_{({\sf t}+1){\sf t}'}^{ij}(z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \,[x-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}'}(z)]^j P_{({\sf t}+1){\sf t}'}(x, x'\vert z) \label{eq:out-of-time-order-covariance-estimator} \,.
 \end{align}
 %%
 
 What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
 \begin{align}
-P_{{\sf t}+1}(x) &= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x') P_{({\sf t}+1){\sf t}}(x\vert x') \label{eq:master-x-cont-markov} \,.
+P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
 An analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
 %%
 \begin{align}
-P_{{\sf t}+1}(x) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t}\sum_{\omega_{{\sf t}'}} P_{{\sf t}'}(x') P_{({\sf t}+1){\sf t}'}(x \vert x') \label{eq:master-x-disc} \,,
+P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t}\sum_{\omega_{{\sf t}'}} P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x \vert x', z) \label{eq:master-x-disc} \,,
 \end{align}
 %%
 where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}. In the even-simpler case where $x$ is just a vector of binary `on' or `off' states, Eq.~(\ref{eq:master-x-disc}) reduces to
 %%
 \begin{align}
-P^i_{{\sf t}+1} &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{{\sf t}'} P^{ij}_{({\sf t}+1){\sf t}'} = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d \big[ P^j_{{\sf t}'} A^{ij}_{({\sf t}+1){\sf t}'} + (1-P^j_{{\sf t}'}) B^{ij}_{({\sf t}+1){\sf t}'} \big] \label{eq:master-x-disc-binary}\,,
+P^i_{{\sf t}+1}(z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{{\sf t}'}(z) P^{ij}_{({\sf t}+1){\sf t}'}(z) \nonumber \\
+&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d \big\{ P^j_{{\sf t}'}(z) A^{ij}_{({\sf t}+1){\sf t}'}(z) + [1-P^j_{{\sf t}'}(z)] B^{ij}_{({\sf t}+1){\sf t}'}(z) \big\} \label{eq:master-x-disc-binary}\,,
 \end{align}
 %% 
-where $P^i_{{\sf t}'}$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$. The matrices $A$ and $B$ are defined as conditional probabilities where the previous state in time $P^j_{{\sf t}'}$ was either `on' or `off', respectively.
+where $P^i_{{\sf t}'}(z)$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$ given $z$. We've also implicitly defined the matrices $A$ and $B$ as the conditional probabilities where the previous state in time $P^j_{{\sf t}'}(z)$ was either `on' or `off', respectively.
 
 In this section, we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to designing the algorithm for our filter. So let's go!
 
 \section{\sffamily Generalised filtering algorithm}
 
-The empirical probabilistic filtering algorithm that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x)=P_{{\sf t}'}(x)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use in the filter, we need to connect values of $x$ in our filter to the data from which it will be learning. 
+The empirical probabilistic filtering algorithm that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use in the filter, we need to connect values of $x$ in our filter to the data from which it will be learning. 
 
-If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x')$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (and/or covariance) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that a researcher might need.
+If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (and/or covariance) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that a researcher might need.
 
-We should probably make what we've just said a little more mathematically concrete. Let's define a data vector $y$ at time ${\sf t}+1$, which shares the same length as $x$, and represents a specific observation of $x$ at this point in a real dataset. At this point in time, we can define a distribution $P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots )$ which represents the likelihood of $y$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately define an overall objective function (a cumulative log-likelihood) that we might seek to optimise over for a given dataset 
+We should probably make what we've just said a little more mathematically concrete. Let's define a data vector $y$ at time ${\sf t}+1$, which shares the same length as $x$, and represents a specific observation of $x$ at this point in a real dataset. At this point in time, we can define a distribution $P_{{\sf t}+1}[y;M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ]$ which represents the likelihood of $y$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}(z)$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately define an overall objective function (a cumulative log-likelihood) that we might seek to optimise over for a given dataset 
 %%
 \begin{align}
-\ln {\cal L}_{{\sf t}+1} = \ln P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) + \ln P_{{\sf t}}(y';M_{{\sf t}},C_{{\sf t}},\dots ) + \dots \,, \label{eq:log-likelihood-filter}
+\ln {\cal L}_{{\sf t}+1}(z) = \ln P_{{\sf t}+1}[y;M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \ln P_{{\sf t}}[y';M_{{\sf t}}(z),C_{{\sf t}}(z),\dots ] + \dots \,, \label{eq:log-likelihood-filter}
 \end{align}
 %%
 where the summation continues until all of the past measurements have been taken into account.
@@ -108,15 +110,15 @@ where the summation continues until all of the past measurements have been taken
 \label{fig:prob-filter-code}
 \end{figure} 
 
-In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x')$ is, it's quite commmon to define a number of new hyperparameters. For example; one clear, and generally applicable, option for the conditional probability is that of a Gaussian process 
+By optimising Eq.~(\ref{eq:log-likelihood-filter}) with respect to all of the hyperparameters $z$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}. We might think of the overall generalised filtering algorithm as the code schematic in Fig.~\ref{fig:prob-filter-code}.
+
+In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is, it's quite natural to define a set of hyperparameters for the elements of $z$. For example; one clear, and generally applicable, option for the conditional probability is that of a Gaussian process 
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}'}(x\vert x') &= \frac{{\rm exp}\left\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}[x-f({\sf t}+1)]^i \big[ K^{-1}(\theta , {\sf t}+1,{\sf t}')\big]^{ij}[x'-f({\sf t}')]^j  \right\}}{\vert 2\pi K(\theta , {\sf t}+1,{\sf t}') \vert^{\frac{1}{2}}} \label{eq:gaussian-process-cond-prob}\,,
+P_{({\sf t}+1){\sf t}'}(x\vert x',z) &= \frac{{\rm exp}\left\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}[x-f({\sf t}+1)]^i \big[ K^{-1}(\theta , {\sf t}+1,{\sf t}')\big]^{ij}[x'-f({\sf t}')]^j  \right\}}{\vert 2\pi K(\theta , {\sf t}+1,{\sf t}') \vert^{\frac{1}{2}}} \label{eq:gaussian-process-cond-prob}\,,
 \end{align}
 %%
-where $K$ is a covariance matrix; $f$ is a function in time and $\theta$ represents a set of hyperparameters which are both typically learned by optimisation of the corresponding likelihood function of the data; and $\vert A\vert$ denotes computing the determinant of matrix $A$. 
-
-By optimising Eq.~(\ref{eq:log-likelihood-filter}) with respect to all of these hyperparameters which are defined with $P_{({\sf t}+1){\sf t}'}(x\vert x')$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}. We might think of the overall generalised filtering algorithm as the code schematic in Fig.~\ref{fig:prob-filter-code}.
+where $K$ is a covariance matrix; $f$ is a function in time and $\theta$ represents a set of hyperparameters which are both typically learned by optimisation of the corresponding likelihood function of the data; and $\vert A\vert$ denotes computing the determinant of matrix $A$. In the expression above, both $f$ and $\theta$ represent sets of parameters which can exist in $z$.
 
 In the case of Eq.~(\ref{eq:gaussian-process-cond-prob}) above, the hyperparameters that would be optimised will not just include $\theta$; but also a set of values for $f$ at different timesteps. This would essentially equate our optimised filter to be the equivalent to the maximum a posteriori (MAP) of the Gaussian process in this instance. The only difference here is that by passing in sufficient statistics of this process to some data-linking distribution, we enable many different kinds of data to be described by the same underlying conditional probability-based filter. A Gaussian process also only represents one choice in the unlimited number of possible filters we are able to try in the very simple framework we're describing. 
 
@@ -127,8 +129,8 @@ The optimisation approach that one chooses to use for obtaining the best hyperpa
 If the gradients of Eq.~(\ref{eq:log-likelihood-filter}) are needed, we can always factorise each derivative with respect to hyperparameter $z^i$ in the following way through the chain rule
 %%
 \begin{align}
-\frac{\partial}{\partial z^i}\ln {\cal L}_{{\sf t}+1} &= \frac{\partial M_{{\sf t}+1}}{\partial z^i}\frac{\partial}{\partial M_{{\sf t}+1}}\ln P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) \nonumber \\ 
-&\qquad + \frac{\partial C_{{\sf t}+1}}{\partial z^i}\frac{\partial }{\partial C_{{\sf t}+1}}\ln P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) + \dots  \,. \label{eq:log-likelihood-filter-grad}
+\frac{\partial}{\partial z^i}\ln {\cal L}_{{\sf t}+1}(z) &= \frac{\partial M_{{\sf t}+1}}{\partial z^i}\frac{\partial}{\partial M_{{\sf t}+1}}\ln P_{{\sf t}+1}[y;M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] \nonumber \\ 
+&\qquad + \frac{\partial C_{{\sf t}+1}}{\partial z^i}\frac{\partial }{\partial C_{{\sf t}+1}}\ln P_{{\sf t}+1}[y;M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \dots  \,. \label{eq:log-likelihood-filter-grad}
 \end{align}
 %%
 By factoring derivatives in this manner, the computation can be separated into two parts: the derivatives with respect to $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$, which are typically quite straightforward; and the derivatives with respect to $z$ elements, which typically need a more involved calculation depending on the model. Incidentally, this separation also neatly lends itself to abstracting gradient calculations as having a simpler, general purpose component that can be built directly into a library of data models and a more complex, model-specific component that the user must specify.
