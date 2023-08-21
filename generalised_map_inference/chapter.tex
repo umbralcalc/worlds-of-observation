@@ -56,11 +56,11 @@ We now have an objective function to optimise values of $z$ with respect to but,
 Let's now consider a process which represents the progress made by an optimiser towards the optimum value, whose state is defined by the parameters $z$. If we assume that all the elements of $z$ are continuous\footnote{We can modify this expression to work for discrete variables too.} in their domain $\upsilon$, one representation of this process we might consider is
 %%
 \begin{align}
-{\cal P}^{n+1}_{{\sf t}+1}(x,z \vert y, y', \dots) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} \,{\rm d}x' \, P_{({\sf t}+1){\sf t}'}(x\vert x',z)\, {\cal P}^{n+1}_{{\sf t}'}(x',z\vert y, y', \dots) \\
-{\cal P}^{n+1}_{{\sf t}+1}(x,z \vert y, y', \dots) &= \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert x, z', y)\, {\cal P}^{n'}_{{\sf t}+1}(x,z'\vert y, y', \dots) \label{eq:posterior-process} \,,
+{\cal P}^{n+1}_{{\sf t}+1}(x\vert z, y, y', \dots) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} \,{\rm d}x' \, P_{({\sf t}+1){\sf t}'}(x\vert x',z)\, {\cal P}^{n+1}_{{\sf t}'}(x'\vert z, y, y', \dots) \\
+{\cal P}^{n+1}_{{\sf t}+1}(z \vert x, y) &= \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, {\cal P}^{n'}_{{\sf t}+1}(z'\vert x, y) \label{eq:posterior-process} \,,
 \end{align}
 %%
-where $n$ is the iteration number of the optimisation, and hence ${\cal P}^{n+1}_{{\sf t}+1}$ corresponds to a different candidate posterior distribution to one at any of the previous steps ${\cal P}^{n'}_{{\sf t}+1}$. Eq.~(\ref{eq:posterior-process}) can represent the convergence of a probabilistic optimisation algorithm --- represented in particular by $P^{(n+1)n'}(z\vert x, z', y)$ --- towards the true posterior distribution of $z$. As such an algorithm converges, we can recompute (and hence iteratively improve) the MAP estimate with respect to each iteration of the posterior.
+where $n$ is the iteration number of the optimisation, and hence ${\cal P}^{n+1}_{{\sf t}+1}$ corresponds to a different candidate posterior distribution to one at any of the previous steps ${\cal P}^{n'}_{{\sf t}+1}$. Eq.~(\ref{eq:posterior-process}) can represent the convergence of a probabilistic optimisation algorithm --- represented in particular by $P^{(n+1)n'}(z\vert z')$ --- towards the true posterior distribution of $z$. As such an algorithm converges, we can recompute (and hence iteratively improve) the MAP estimate with respect to each iteration of the posterior.
 
 Readers with some machine learning experience may be familiar with the classic exploration vs exploitation tradeoffs. It's clear that these tradeoffs will manifest in our case here when trying to strike a balance between iterating the posterior distribution in Eq.~(\ref{eq:posterior-process}) and optimizing the current posterior with respect to $z$ to compute the MAP. 
 
