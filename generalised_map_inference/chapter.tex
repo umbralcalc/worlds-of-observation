@@ -8,56 +8,56 @@
 In Bayesian inference, one applies Bayes' rule to the problem of statistically inferring a model from some dataset. This typically involves the following formula for a posterior distribution
 %%
 \begin{align}
-{\cal P}_{{\sf t}+1}(z \vert y, y', \dots) \propto {\cal L}_{{\sf t}+1}(y, y', \dots\vert z){\cal P} (z) \label{eq:bayes-rule} \,.
+{\cal P}_{{\sf t}+1}(z \vert Y) \propto {\cal L}_{{\sf t}+1}(Y\vert z){\cal P} (z) \label{eq:bayes-rule} \,.
 \end{align}
 %%
-In the formula above, one relates the prior probability distribution over a parameter set ${\cal P} (z)$ and the likelihood of the of some data measurements $(y, y', \dots)$  up to timestep ${\sf t}+1$ given this parameter set of a model ${\cal L}_{{\sf t}+1}(y, y', \dots \vert z)$ to the posterior probability distribution of parameters given the data ${\cal P}_{{\sf t}+1}(z \vert y, y', \dots)$ up to a proportionality constant. All this may sound a bit technical in statistical language, so it can also be helpful to summarise what the formula above states verbally as follows: the initial (prior) state of knowledge about the parameters $z$ we want to learn can be updated by some likelihood function of the data to give a new state of knowledge about the values for $z$ (the `posterior' probability). 
+In the formula above, one relates the prior probability distribution over a parameter set ${\cal P} (z)$ and the likelihood ${\cal L}_{{\sf t}+1}(Y\vert z)$  of some data matrix $Y$ up to timestep ${\sf t}+1$ given the parameters $z$ of a model to the posterior probability distribution of parameters given the data ${\cal P}_{{\sf t}+1}(z \vert Y)$ up to a proportionality constant. All this may sound a bit technical in statistical language, so it can also be helpful to summarise what the formula above states verbally as follows: the initial (prior) state of knowledge about the parameters $z$ we want to learn can be updated by some likelihood function of the data to give a new state of knowledge about the values for $z$ (the `posterior' probability). 
 
-From the point of view of statistical inference, if we seek to maximise ${\cal P}_{{\sf t}+1}(z \vert y, y', \dots)$ --- or its logarithm --- in Eq.~(\ref{eq:bayes-rule}) with respect to $z$, we will obtain what is known as a maximum posteriori (MAP) estimate of the parameters. In fact, we have already encountered this metholodology in the previous chapter when discussing the algorithm which obtains the best fit parameters for the empirical probability filter. In this case; while it appears that we optimised the log-likelihood directly as our objective function, one can easily show that this is also technically equivalent obtaining a MAP estimate where one chooses a specfic prior ${\cal P} (z) \propto 1$ (typically known as a `flat prior').
+From the point of view of statistical inference, if we seek to maximise ${\cal P}_{{\sf t}+1}(z \vert Y)$ --- or its logarithm --- in Eq.~(\ref{eq:bayes-rule}) with respect to $z$, we will obtain what is known as a maximum posteriori (MAP) estimate of the parameters. In fact, we have already encountered this metholodology in the previous chapter when discussing the algorithm which obtains the best fit parameters for the empirical probability filter. In this case; while it appears that we optimised the log-likelihood directly as our objective function, one can easily show that this is also technically equivalent obtaining a MAP estimate where one chooses a specfic prior ${\cal P} (z) \propto 1$ (typically known as a `flat prior').
 
-So we need to now specify in a little more detail how Eq.~(\ref{eq:bayes-rule}) translates into a practical calculation with some arbitrary stochastic process model that has been defined in the stochadex. In the general case, this stochadex model of interest must be able to use $z$ to generate a set of outputs from a particular realisation of the stochastic process $(y_z, y'_z, \dots)$ that are directly comparable to the measurements made in the real data $(y, y', \dots)$. Since that we have this capability; the first problem is to figure out how we compare these two sequences of vectors in a way which ensures the the statistics of the likelihood are respected. 
+So we need to now specify in a little more detail how Eq.~(\ref{eq:bayes-rule}) translates into a practical calculation with some arbitrary stochastic process model that has been defined in the stochadex. In order to make the comparison to a real dataset, any stochadex model of interest will always need to be able to generate observations which can be directly compared to the data. To formalise this a little; a stochadex model could be represented as a map from $z$ to a set of stochastic outputs ${\cal Y}_{{\sf t}+1}(z), {\cal Y}_{{\sf t}}(z), \dots$ that are directly comparable to the rows in the real data matrix $Y$. Given that we have this capability; the first problem is to figure out how we compare these two sequences of vectors in a way which ensures the the statistics of the likelihood are respected. 
 
 If we now apply Bayes' rule to the likelihood itself in Eq.~(\ref{eq:bayes-rule}), we can easily find the following proportionality relationship
 %%
 \begin{align}
-{\cal L}_{{\sf t}+1}(y, y', \dots\vert z) \propto P(z\vert y, y', \dots)P(y, y', \dots) \label{eq:likelihood-prop-y}\,.
+{\cal L}_{{\sf t}+1}(Y\vert z) \propto P(z\vert Y)P(Y) \label{eq:likelihood-prop-y}\,.
 \end{align}
 %%
-Every model one can specify in the stochadex can be represented by some process which stochastically maps $z$ onto a set of comparable measurements $(y_z, y'_z, \dots)$. Given this identification, we may generally assert that 
+Every model one can specify in the stochadex can be represented by some process which stochastically maps $z$ onto a set of comparable measurements ${\cal Y}_{{\sf t}+1}(z), {\cal Y}_{{\sf t}}(z), \dots$. Given this identification, we may generally assert that 
 %%
 \begin{align}
-P(z\vert y, y', \dots) = P(y_z \vert y, y', \dots)P(y'_z\vert y', \dots) \dots \,.
+P(z\vert Y) = P( {\cal Y}_{{\sf t}+1} \vert Y_{{\sf t}+1}, Y_{{\sf t}}, \dots)P({\cal Y}_{{\sf t}}\vert Y_{{\sf t}}, \dots) \dots \,.
 \end{align}
 %%
-As we demonstrated in the previous chapter, we can also optimise a probability distribution $P_{{\sf t}+1}(y;M_{{\sf t}+1},C_{{\sf t}+1}, \dots)$ for each step in time to match the statistics of the measurements $(y, y', \dots)$ as well as possible, given some statistics $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. If we apply both of these changes, our likelihood in Eq.~(\ref{eq:likelihood-prop-y}) can be rewritten as
+As we demonstrated in the previous chapter, we can also optimise a probability distribution $P_{{\sf t}+1}(Y_{{\sf t}+1};M_{{\sf t}+1},C_{{\sf t}+1}, \dots)$ for each step in time to match the statistics of the measurements in $Y$ as well as possible, given some statistics $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. If we apply both of these changes, our likelihood in Eq.~(\ref{eq:likelihood-prop-y}) can be rewritten as
 %%
 \begin{align}
-\ln {\cal L}_{{\sf t}+1}(y, y', \dots\vert z) = {\rm const.} + \ln P_{{\sf t}+1}(y_z;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) + \ln P_{{\sf t}}(y'_z;M_{{\sf t}},C_{{\sf t}},\dots ) + \dots \label{eq:data-likelihood-for-model} \,.
+\ln {\cal L}_{{\sf t}+1}(Y\vert z) = {\rm const.} + \ln P_{{\sf t}+1}(Y_{{\sf t}+1};M_{{\sf t}+1},C_{{\sf t}+1},\dots ) + \ln P_{{\sf t}}(Y_{{\sf t}};M_{{\sf t}},C_{{\sf t}},\dots ) + \dots \label{eq:data-likelihood-for-model} \,.
 \end{align}
 %%
-This relationship demonstrates how one can construct a meaningful way to compare the sequence of real data measurements $(y, y',\dots)$ to their modelled equivalents $(y_z, y'_z, \dots)$.
+This relationship demonstrates how one can construct a meaningful way to compare the sequence of real data measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ to their modelled equivalents ${\cal Y}_{{\sf t}+1}(z), {\cal Y}_{{\sf t}}(z), \dots$.
 
 Let's consider a few concrete examples of Eq.~(\ref{eq:data-likelihood-for-model}). If the data measurements were well-described by a multivariate normal distribution, then one would insert terms like
 %%
 \begin{align}
-P_{{\sf t}+1}(y_z;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) \propto {\sf MultivariateNormalPDF}(y_z;M_{{\sf t}+1},C_{{\sf t}+1})\,,
+P_{{\sf t}+1}({\cal Y}_{{\sf t}+1};M_{{\sf t}+1},C_{{\sf t}+1},\dots ) \propto {\sf MultivariateNormalPDF}({\cal Y}_{{\sf t}+1};M_{{\sf t}+1},C_{{\sf t}+1})\,,
 \end{align}
 %%
-into Eq.~(\ref{eq:data-likelihood-for-model}) where $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$ would be estimated from the data measurements $(y, y', \dots)$. Similarly, if the data measurements were instead better described by a Poisson distribution, we might disregard the need for a covariance matrix statistic $C_{{\sf t}+1}$ and instead use
+into Eq.~(\ref{eq:data-likelihood-for-model}) where $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$ would be estimated from the data measurements in $Y$. Similarly, if the data measurements were instead better described by a Poisson distribution, we might disregard the need for a covariance matrix statistic $C_{{\sf t}+1}$ and instead use
 %%
 \begin{align}
-P_{{\sf t}+1}(y_z;M_{{\sf t}+1},C_{{\sf t}+1},\dots ) \propto {\sf PoissonPMF}(y_z;M_{{\sf t}+1})\,,
+P_{{\sf t}+1}({\cal Y}_{{\sf t}+1};M_{{\sf t}+1},C_{{\sf t}+1},\dots ) \propto {\sf PoissonPMF}({\cal Y}_{{\sf t}+1};M_{{\sf t}+1})\,,
 \end{align}
 %%
-in Eq.~(\ref{eq:data-likelihood-for-model}). Once again, here, we would need to determine $M_{{\sf t}+1}$ from $(y, y', \dots)$. The more statistically-inclined readers may also note here that we can get away with inserting either a probability mass function or density function in this context because Eq.~(\ref{eq:bayes-rule}) allows for an arbitrary normalisation constant.
+in Eq.~(\ref{eq:data-likelihood-for-model}). Once again, here, we would need to determine $M_{{\sf t}+1}$ from $Y$. The more statistically-inclined readers may also note here that we can get away with inserting either a probability mass function or density function in this context because Eq.~(\ref{eq:bayes-rule}) allows for an arbitrary normalisation constant.
 
-We now have an objective function to optimise values of $z$ with respect to but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples $(y_z, y'_z, \dots)$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter!
+We now have an objective function to optimise values of $z$ with respect to but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples ${\cal Y}_{{\sf t}+1}(z), {\cal Y}_{{\sf t}}(z), \dots$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter!
 
 Let's now consider a process which represents the progress made by an optimiser towards the optimum value, whose state is defined by the parameters $z$. If we assume that all the elements of $z$ are continuous\footnote{We can modify this expression to work for discrete variables too.} in their domain $\upsilon$, one representation of this process we might consider is
 %%
 \begin{align}
-{\cal P}^{n+1}_{{\sf t}+1}(x\vert z, y, y', \dots) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} \,{\rm d}x' \, P_{({\sf t}+1){\sf t}'}(x\vert x',z)\, {\cal P}^{n+1}_{{\sf t}'}(x'\vert z, y, y', \dots) \\
-{\cal P}^{n+1}_{{\sf t}+1}(z \vert x, y) &= \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, {\cal P}^{n'}_{{\sf t}+1}(z'\vert x, y) \label{eq:posterior-process} \,,
+{\cal P}^{n+1}_{{\sf t}+1}(x\vert z, Y_{{\sf t}}, Y_{{\sf t}-1}, \dots) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} \,{\rm d}x' \, P_{({\sf t}+1){\sf t}'}(x\vert x',z)\, {\cal P}^{n+1}_{{\sf t}'}(x'\vert z, Y_{{\sf t}'}, Y_{{\sf t}'-1}, \dots) \\
+{\cal P}^{n+1}_{{\sf t}+1}(z \vert x, Y_{{\sf t}+1}) &= \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, {\cal P}^{n'}_{{\sf t}+1}(z'\vert x, Y_{{\sf t}+1}) \label{eq:posterior-process} \,,
 \end{align}
 %%
 where $n$ is the iteration number of the optimisation, and hence ${\cal P}^{n+1}_{{\sf t}+1}$ corresponds to a different candidate posterior distribution to one at any of the previous steps ${\cal P}^{n'}_{{\sf t}+1}$. Eq.~(\ref{eq:posterior-process}) can represent the convergence of a probabilistic optimisation algorithm --- represented in particular by $P^{(n+1)n'}(z\vert z')$ --- towards the true posterior distribution of $z$. As such an algorithm converges, we can recompute (and hence iteratively improve) the MAP estimate with respect to each iteration of the posterior.

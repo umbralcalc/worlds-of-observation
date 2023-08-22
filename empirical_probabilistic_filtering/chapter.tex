@@ -69,7 +69,7 @@ C_{({\sf t}+1){\sf t}'}^{ij}(z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\
 What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
 \begin{align}
-P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
+P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
 An analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
@@ -95,13 +95,13 @@ The empirical probabilistic filtering algorithm that we're going to describe in 
 
 If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (and/or covariance) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that a researcher might need.
 
-We should probably make what we've just said a little more mathematically concrete. Let's define a data vector $y$ at time ${\sf t}+1$, which shares the same length as $x$, and represents a specific observation of $x$ at this point in a real dataset. At this point in time, we can define a distribution $P_{{\sf t}+1}[y;M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ]$ which represents the likelihood of $y$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}(z)$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately define an overall objective function (a cumulative log-likelihood) that we might seek to optimise over for a given dataset 
+We should probably make what we've just said a little more mathematically concrete. Let's define a data vector $y=Y_{{\sf t}+1}$ at time ${\sf t}+1$, which shares the same length as $x$, and represents a specific observation of $x$ at this point in a real dataset. At this point in time, we can define $P_{{\sf t}+1}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ]$ as representing the likelihood of $y=Y_{{\sf t}+1}$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}(z)$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately evaluate an objective function (a cumulative log-likelihood) that we might seek to optimise over for a given dataset 
 %%
 \begin{align}
-\ln {\cal L}_{{\sf t}+1}(y,y',\dots \vert z) = \ln P_{{\sf t}+1}[y;M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \ln P_{{\sf t}}[y';M_{{\sf t}}(z),C_{{\sf t}}(z),\dots ] + \dots \,, \label{eq:log-likelihood-filter}
+\ln {\cal L}_{{\sf t}+1}(Y\vert z) = \ln P_{{\sf t}+1}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \ln P_{{\sf t}}[Y_{{\sf t}};M_{{\sf t}}(z),C_{{\sf t}}(z),\dots ] + \dots \,, \label{eq:log-likelihood-filter}
 \end{align}
 %%
-where the summation continues until all of the past measurements have been taken into account.
+where the summation continues until all of the past measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ which exist as rows in the data matrix $Y$ have been taken into account.
 
 \begin{figure}[h]
 \centering
@@ -129,8 +129,8 @@ The optimisation approach that one chooses to use for obtaining the best hyperpa
 If the gradients of Eq.~(\ref{eq:log-likelihood-filter}) are needed, we can always factorise each derivative with respect to hyperparameter $z^i$ in the following way through the chain rule
 %%
 \begin{align}
-\frac{\partial}{\partial z^i}\ln {\cal L}_{{\sf t}+1}(y, y', \dots \vert z) &= \frac{\partial M_{{\sf t}+1}}{\partial z^i}\frac{\partial}{\partial M_{{\sf t}+1}}\ln P_{{\sf t}+1}[y;M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] \nonumber \\ 
-&\qquad + \frac{\partial C_{{\sf t}+1}}{\partial z^i}\frac{\partial }{\partial C_{{\sf t}+1}}\ln P_{{\sf t}+1}[y;M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \dots  \,. \label{eq:log-likelihood-filter-grad}
+\frac{\partial}{\partial z^i}\ln {\cal L}_{{\sf t}+1}(Y \vert z) &= \frac{\partial M_{{\sf t}+1}}{\partial z^i}\frac{\partial}{\partial M_{{\sf t}+1}}\ln P_{{\sf t}+1}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] \nonumber \\ 
+&\qquad + \frac{\partial C_{{\sf t}+1}}{\partial z^i}\frac{\partial }{\partial C_{{\sf t}+1}}\ln P_{{\sf t}+1}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \dots  \,. \label{eq:log-likelihood-filter-grad}
 \end{align}
 %%
 By factoring derivatives in this manner, the computation can be separated into two parts: the derivatives with respect to $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$, which are typically quite straightforward; and the derivatives with respect to $z$ elements, which typically need a more involved calculation depending on the model. Incidentally, this separation also neatly lends itself to abstracting gradient calculations as having a simpler, general purpose component that can be built directly into a library of data models and a more complex, model-specific component that the user must specify.
