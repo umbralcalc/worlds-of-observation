@@ -15,18 +15,20 @@ In the formula above, one relates the prior probability distribution over a para
 
 From the point of view of statistical inference, if we seek to maximise ${\cal P}_{{\sf t}+1}(z \vert Y)$ --- or its logarithm --- in Eq.~(\ref{eq:bayes-rule}) with respect to $z$, we will obtain what is known as a maximum posteriori (MAP) estimate of the parameters. In fact, we have already encountered this metholodology in the previous chapter when discussing the algorithm which obtains the best fit parameters for the empirical probability filter. In this case; while it appears that we optimised the log-likelihood directly as our objective function, one can easily show that this is also technically equivalent obtaining a MAP estimate where one chooses a specfic prior ${\cal P} (z) \propto 1$ (typically known as a `flat prior').
 
-So we need to now specify in a little more detail how Eq.~(\ref{eq:bayes-rule}) translates into a practical calculation with some arbitrary stochastic process model that has been defined in the stochadex. In order to make the comparison to a real dataset, any stochadex model of interest will always need to be able to generate observations which can be directly compared to the data. To formalise this a little; a stochadex model could be represented as a map from $z$ to a set of stochastic outputs ${\cal Y}_{{\sf t}+1}(z), {\cal Y}_{{\sf t}}(z), \dots$ that are directly comparable to the rows in the real data matrix $Y$. Given that we have this capability; the first problem is to figure out how we compare these two sequences of vectors in a way which ensures the the statistics of the likelihood are respected. 
-
-If we now apply Bayes' rule to the likelihood itself in Eq.~(\ref{eq:bayes-rule}), we can easily find the following proportionality relationship
+So we need to now specify in a little more detail how we might go about a practical calculation of the posterior with some arbitrary stochastic process model that has been defined in the stochadex. In order to make the comparison to a real dataset, any stochadex model of interest will always need to be able to generate observations which can be directly compared to the data. To formalise this a little; a stochadex model could be represented as a map from $z$ to a set of stochastic outputs ${\cal Y}_{{\sf t}+1}(z), {\cal Y}_{{\sf t}}(z), \dots$ that are directly comparable to the rows in the real data matrix $Y$. The values in $Y$ may only represent a noisy or partial measurement of the latent state of the simulation $x$, so a more complete picture can be provided by the following probabilistic relation
 %%
 \begin{align}
-{\cal L}_{{\sf t}+1}(Y\vert z) \propto P(z\vert Y)P(Y) \label{eq:likelihood-prop-y}\,.
+P_{{\sf t}+1}({\cal Y}_{{\sf t}+1} \vert z) = \int_{\omega_{{\sf t}+1}}{\rm d}x\, P_{{\sf t}+1}({\cal Y}_{{\sf t}+1} \vert x)P_{{\sf t}+1}(x\vert z) \,,
 \end{align}
 %%
-Every model one can specify in the stochadex can be represented by some process which stochastically maps $z$ onto a set of comparable measurements ${\cal Y}_{{\sf t}+1}(z), {\cal Y}_{{\sf t}}(z), \dots$. Given this identification, we may generally assert that 
+where, in practical terms, the measurement $P_{{\sf t}+1}({\cal Y}_{{\sf t}+1} \vert x)$ can be represented by sampling from another stochastic process which takes the state of the stochadex simulation as input. Given that we have this capability to compare like-for-like between the data and the simulation; the first problem is to figure out how this comparison between two sequences of vectors can be done in a way which ensures the the statistics of the posterior are ultimately respected. 
+
+\textcolor{red}{Introduce Likelihood-free methods and ABC-like method here \url{https://link.springer.com/article/10.1007/s11222-022-10092-4}}
+
+We may generally assert that 
 %%
 \begin{align}
-P(z\vert Y) = P( {\cal Y}_{{\sf t}+1} \vert Y_{{\sf t}+1}, Y_{{\sf t}}, \dots)P({\cal Y}_{{\sf t}}\vert Y_{{\sf t}}, \dots) \dots \,.
+{\cal P}_{{\sf t}+1}(z\vert Y) = {\cal P}_{{\sf t}+1}(z \vert {\cal Y}_{{\sf t}+1}, Y_{{\sf t}+1}){\cal P}_{{\sf t}}(z\vert  {\cal Y}_{{\sf t}}, Y_{{\sf t}}) \dots \,.
 \end{align}
 %%
 As we demonstrated in the previous chapter, we can also optimise a probability distribution $P_{{\sf t}+1}(Y_{{\sf t}+1};M_{{\sf t}+1},C_{{\sf t}+1}, \dots)$ for each step in time to match the statistics of the measurements in $Y$ as well as possible, given some statistics $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. If we apply both of these changes, our likelihood in Eq.~(\ref{eq:likelihood-prop-y}) can be rewritten as
@@ -57,7 +59,8 @@ Let's now consider a process which represents the progress made by an optimiser 
 %%
 \begin{align}
 {\cal P}^{n+1}_{{\sf t}+1}(x\vert z, Y_{{\sf t}}, Y_{{\sf t}-1}, \dots) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} \,{\rm d}x' \, P_{({\sf t}+1){\sf t}'}(x\vert x',z)\, {\cal P}^{n+1}_{{\sf t}'}(x'\vert z, Y_{{\sf t}'}, Y_{{\sf t}'-1}, \dots) \\
-{\cal P}^{n+1}_{{\sf t}+1}(z \vert x, Y_{{\sf t}+1}) &= \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, {\cal P}^{n'}_{{\sf t}+1}(z'\vert x, Y_{{\sf t}+1}) \label{eq:posterior-process} \,,
+{\cal P}^{n+1}_{{\sf t}+1}({\cal Y}_{{\sf t}+1} \vert z, Y_{{\sf t}}, Y_{{\sf t}-1}, \dots) &= \int_{\omega_{{\sf t}+1}}{\rm d}x\, P_{{\sf t}+1}({\cal Y}_{{\sf t}+1} \vert x){\cal P}^{n+1}_{{\sf t}+1}(x\vert z, Y_{{\sf t}}, Y_{{\sf t}-1}, \dots) \\
+{\cal P}^{n+1}_{{\sf t}+1}(z \vert {\cal Y}_{{\sf t}+1}, Y_{{\sf t}+1}) &= \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, {\cal P}^{n'}_{{\sf t}+1}(z'\vert {\cal Y}_{{\sf t}+1}, Y_{{\sf t}+1}) \label{eq:posterior-process} \,,
 \end{align}
 %%
 where $n$ is the iteration number of the optimisation, and hence ${\cal P}^{n+1}_{{\sf t}+1}$ corresponds to a different candidate posterior distribution to one at any of the previous steps ${\cal P}^{n'}_{{\sf t}+1}$. Eq.~(\ref{eq:posterior-process}) can represent the convergence of a probabilistic optimisation algorithm --- represented in particular by $P^{(n+1)n'}(z\vert z')$ --- towards the true posterior distribution of $z$. As such an algorithm converges, we can recompute (and hence iteratively improve) the MAP estimate with respect to each iteration of the posterior.
