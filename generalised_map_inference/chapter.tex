@@ -25,6 +25,11 @@ where, in practical terms, the measurement probability $P_{{\sf t}+1}({\sf y} \v
 
 \textcolor{red}{Introduce the fact that state is needed as well as $z$... Also introduce Likelihood-free methods and ABC-like method here \url{https://link.springer.com/article/10.1007/s11222-022-10092-4}}
 
+\textcolor{red}{\begin{itemize}
+\item{Reference the comparison to ABC methods here, which involve approximating the data likelihood with a simple proximity function with a tolerance $\epsilon$.}
+\item{Also talk about the BOLFI method which does indeed use the full Bayesian optimisation as it goes.}
+\end{itemize}}
+
 We may generally assert that 
 %%
 \begin{align}
@@ -71,7 +76,7 @@ shows how the $z$ updates can occur in an iterative fashion.
 
 \textcolor{red}{Got up to here...
 \begin{itemize}
-\item{describe both online and offline learning routes in this chapter so introduce the concept of $n$ for offline and then do away with it for online}
+\item{describe both online and offline learning routes in this chapter so introduce the concept of $n$ for offline and then do away with it for online and replace it with an ensemble --- describe how the two have many similarities from a probabilistic perspective though}
 \item{for online learning, the $P_{{\sf t}+1}(z\vert {\sf Y}) \leftarrow P_{{\sf t}}(z\vert {\sf Y}')$ update can be handles by applying importance-sampled wieghting to the previous distribution samples and then either MC resampling or optimising to get the MAP from the resulting filtered statistics distribution}
 \end{itemize}}
 
@@ -93,11 +98,4 @@ Readers may also have recognized that Eq.~(\ref{eq:posterior-process}) has the s
 
 If we now synthesize both of these observations together, we can see how a stochastic variant of the well-known Expectation-Maximisation Algorithm~\cite{hartley1958maximum, dempster1977maximum, murphy2012machine} naturally emerges.
 
-\textcolor{red}{\begin{itemize}
-\item{consider a tunable conditional probability that is a Gaussian with mean and variance estimated directly from the history (don't optimise it like in Bayesian optimisation!) with a tunable exponential timestep kernel (timestep being the optimiser step here) and the resulting function can be optimised (or draw monte-carlo samples from) in an EM algorithm approach. The resulting Gaussian function could also exploit gradients for SGD.}
-\item{Illustrate the algorithm structure and describe the maths for it step-by-step as well: 1. choose random sampling for $P^{(n+1)n'}(z\vert z')$ 2. alternate between using the probability filter for $P^{(n+1)n'}(z\vert z')$ to sample and optimisation of the current posterior iteration with respect to $z$}
-\item{Reference the contrast to ABC methods here, which involve approximating the data likelihood with a simple proximity function with a tolerance $\epsilon$.}
-\item{Also talk about the BOLFI method which does indeed use the full Bayesian optimisation as it goes.}
-\item{Programming steps for this chapter: need to write a new OptimisationAlgorithm which implements this algorithm --- the rest should just be config}
-\end{itemize}}
 
