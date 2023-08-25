@@ -31,21 +31,21 @@ We may generally assert that
 {\cal P}_{{\sf t}+1}(x,z\vert Y)=\prod_{{\sf t}'=0}^{{\sf t}+1} \bigg[ \int_{\varpi_{{\sf t}'}} {\rm d}{\sf y}' \, {\cal P}_{{\sf t}'}({\sf y}'\vert Y) \bigg] P_{{\sf t}+1}(x,z \vert {\sf Y}) \label{eq:likelihhood-free-posterior} \,.
 \end{align}
 %%
-As we demonstrated in the previous chapter, it's possible for us to also optimise a probability distribution ${\cal P}_{{\sf t}+1}({\sf y}\vert Y) = P_{{\sf t}+1}({\sf y};M_{{\sf t}+1},C_{{\sf t}+1}, \dots)$ for each step in time to match the statistics of the measurements in $Y$ as well as possible, given some statistics $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. Either way, this represents a lossy \emph{compression} of the data we want to fit the simulation to, and so the best possible fit is desirable; regardless of overfitting.
+As we demonstrated in the previous chapter, it's possible for us to also optimise a probability distribution ${\cal P}_{{\sf t}+1}({\sf y}\vert Y) = P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$ for each step in time to match the statistics of the measurements in $Y$ as well as possible, given some statistics $M_{{\sf t}+1}(Y)$ and $C_{{\sf t}+1}(Y)$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. Either way, this represents a lossy \emph{compression} of the data we want to fit the simulation to, and so the best possible fit is desirable; regardless of overfitting.
 
-Let's consider a few concrete examples of $P_{{\sf t}+1}({\sf y};M_{{\sf t}+1},C_{{\sf t}+1}, \dots)$. If the data measurements were well-described by a multivariate normal distribution, then one would use terms like
+Let's consider a few concrete examples of $P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$. If the data measurements were well-described by a multivariate normal distribution, then one would use terms like
 %%
 \begin{align}
-P_{{\sf t}+1}({\sf y};M_{{\sf t}+1},C_{{\sf t}+1}, \dots) = {\sf MultivariateNormalPDF}({\sf y};M_{{\sf t}+1},C_{{\sf t}+1})\,,
+P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ] = {\sf MultivariateNormalPDF}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y)]\,,
 \end{align}
 %%
-where $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$ would be estimated from the data measurements in $Y$. Similarly, if the data measurements were instead better described by a Poisson distribution, we might disregard the need for a covariance matrix statistic $C_{{\sf t}+1}$ and instead use
+where $M_{{\sf t}+1}(Y)$ and $C_{{\sf t}+1}(Y)$ would be estimated from the data measurements in $Y$. Similarly, if the data measurements were instead better described by a Poisson distribution, we might disregard the need for a covariance matrix statistic $C_{{\sf t}+1}(Y)$ and instead use
 %%
 \begin{align}
-P_{{\sf t}+1}({\sf y};M_{{\sf t}+1},C_{{\sf t}+1}, \dots) = {\sf PoissonPMF}({\sf y};M_{{\sf t}+1})\,.
+P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ] = {\sf PoissonPMF}[\,{\sf y};M_{{\sf t}+1}(Y)]\,.
 \end{align}
 %%
-Once again, here, we would need to determine $M_{{\sf t}+1}$ from $Y$. The more statistically-inclined readers may notice that the probability mass function here would require the integrals in Eq.~(\ref{eq:likelihhood-free-posterior}) to be replaced with summations over the relevant domains.
+Once again, here, we would need to determine $M_{{\sf t}+1}(Y)$ from $Y$. The more statistically-inclined readers may notice that the probability mass function here would require the integrals in Eq.~(\ref{eq:likelihhood-free-posterior}) to be replaced with summations over the relevant domains.
 
 Eq.~(\ref{eq:likelihhood-free-posterior}) demonstrates how one can construct a statistically meaningful way to compare the sequence of real data measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ to their modelled equivalents ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$. But we still haven't shown how to compute $P_{{\sf t}+1}(x,z\vert {\sf Y})$ for a given simulation, and this can be the most challenging part. To begin with, we can apply Bayes' rule and the chaining of conditional probability to find 
 %%
@@ -69,7 +69,11 @@ P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}
 %%
 shows how the $z$ updates can occur in an iterative fashion. 
 
-\textcolor{red}{Got up to here...}
+\textcolor{red}{Got up to here...
+\begin{itemize}
+\item{describe both online and offline learning routes in this chapter so introduce the concept of $n$ for offline and then do away with it for online}
+\item{for online learning, the $P_{{\sf t}+1}(z\vert {\sf Y}) \leftarrow P_{{\sf t}}(z\vert {\sf Y}')$ update can be handles by applying importance-sampled wieghting to the previous distribution samples and then either MC resampling or optimising to get the MAP from the resulting filtered statistics distribution}
+\end{itemize}}
 
 We now have an objective function to optimise values of $z$ with respect to in Eq.~(\ref{eq:likelihhood-free-posterior}) but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter!
 
