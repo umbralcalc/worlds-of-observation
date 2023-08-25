@@ -23,7 +23,7 @@ P_{{\sf t}+1}({\sf y} \vert z) = \int_{\omega_{{\sf t}+1}}{\rm d}x\, P_{{\sf t}+
 %%
 where, in practical terms, the measurement probability $P_{{\sf t}+1}({\sf y} \vert x)$ of ${\sf y}={\sf Y}_{{\sf t}+1}$ given $x=X_{{\sf t}+1}$ can be represented by sampling from another stochastic process which takes the state of the stochadex simulation as input. Given that we have this capability to compare like-for-like between the data and the simulation; the first problem is to figure out how this comparison between two sequences of vectors can be done in a way which ensures the the statistics of the posterior are ultimately respected. 
 
-\textcolor{red}{Introduce Likelihood-free methods and ABC-like method here \url{https://link.springer.com/article/10.1007/s11222-022-10092-4}}
+\textcolor{red}{Introduce the fact that state is needed as well as $z$... Also introduce Likelihood-free methods and ABC-like method here \url{https://link.springer.com/article/10.1007/s11222-022-10092-4}}
 
 We may generally assert that 
 %%
@@ -47,13 +47,13 @@ P_{{\sf t}+1}({\sf y};M_{{\sf t}+1},C_{{\sf t}+1}, \dots) = {\sf PoissonPMF}({\s
 %%
 Once again, here, we would need to determine $M_{{\sf t}+1}$ from $Y$. The more statistically-inclined readers may notice that the probability mass function here would require the integrals in Eq.~(\ref{eq:likelihhood-free-posterior}) to be replaced with summations over the relevant domains.
 
-Eq.~(\ref{eq:likelihhood-free-posterior}) demonstrates how one can construct a statistically meaningful way to compare the sequence of real data measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ to their modelled equivalents ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$. But we still haven't shown how to compute $P_{{\sf t}+1}(x,z\vert {\sf Y})$ for a given simulation, and this can be the most challenging part. To begin with, we can apply Bayes' rule to this conditional probability and find 
+Eq.~(\ref{eq:likelihhood-free-posterior}) demonstrates how one can construct a statistically meaningful way to compare the sequence of real data measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ to their modelled equivalents ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$. But we still haven't shown how to compute $P_{{\sf t}+1}(x,z\vert {\sf Y})$ for a given simulation, and this can be the most challenging part. To begin with, we can apply Bayes' rule and the chaining of conditional probability to find 
 %%
 \begin{align}
 P_{{\sf t}+1}(x,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf y}\vert x)P_{{\sf t}+1}(x\vert z, {\sf Y}')P_{{\sf t}}(z\vert {\sf Y}') \,,
 \end{align}
 %%
-where we are leveraging our notation in previous chapters to use ${\sf Y}'$ as indicating all of the past rows of simulation measurements up to ${\sf Y}_{{\sf t}}$.
+where, to keep the expression simpler, we are leveraging our notation in previous chapters to use ${\sf Y}'$ as indicating all of the past rows of simulation measurements up to ${\sf Y}_{{\sf t}}$. 
 
 The relationship between $P_{{\sf t}+1}({\sf y}\vert x, {\sf Y}')$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. The expression is
 %%
@@ -61,10 +61,17 @@ The relationship between $P_{{\sf t}+1}({\sf y}\vert x, {\sf Y}')$ and previous 
 P_{{\sf t}+1}(x\vert z, {\sf Y}') = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} \,{\rm d}x' \, P_{({\sf t}+1){\sf t}'}(x\vert x',z)\, P_{{\sf t}'}(x'\vert z, {\sf Y}') \,.
 \end{align}
 %%
+So we can map probabilities of $x$ throughout time and so learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes indeed, the marginalisation
+%%
+\begin{align} 
+P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}(x,z\vert {\sf Y}) \propto \bigg[ \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z, {\sf Y}') \bigg] P_{{\sf t}}(z\vert {\sf Y}')\,,
+\end{align}
+%%
+shows how the $z$ updates can occur in an iterative fashion. 
 
-\textcolor{red}{Got to here...}
+\textcolor{red}{Got up to here...}
 
-We now have an objective function to optimise values of $z$ with respect to but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter!
+We now have an objective function to optimise values of $z$ with respect to in Eq.~(\ref{eq:likelihhood-free-posterior}) but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter!
 
 Let's now consider a process which represents the progress made by an optimiser towards the optimum value, whose state is defined by the parameters $z$. If we assume that all the elements of $z$ are continuous\footnote{We can modify this expression to work for discrete variables too.} in their domain $\upsilon$, one representation of this process we might consider is
 %%

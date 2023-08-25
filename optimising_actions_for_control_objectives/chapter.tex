@@ -4,6 +4,13 @@
 
 \section{\sffamily States, actions and attributing rewards}
 
+\textcolor{red}{Rewrite the beginning of this section to talk about:
+\begin{itemize}
+\item{dynamic ensemble prediction and updating - online learning of the $(x,z)$ posterior/MAP for generalised simulations by comparing previous future predictions to the current state and updating the surrogate distributions}
+\item{once this pattern is working, the methodology can be adapted directly to incorporate a policy/action-generating function as introduced further below}    
+\end{itemize}
+}
+
 Up to this point, we have only considered actions which were either scheduled up front through some fixed process or through user interaction via a game interface. In order to start creating algorithms to act on the system state for us, we now need to develop a formalism which `closes the loop' by feeding information back from the stochastic process to another decision-making process. Note that in most cases, the state of real-world phenomena cannot be measured perfectly. So in order to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to model this measurement process as part of the information retrieval step.
 
 Let's now define the concept of an `environment state' ${\cal S}_{{\sf t}+1}$ at timestep ${\sf t}+1$; this is a new vector that doesn't have to share the same length as the measured state vector $X_{{\sf t}+1}$. We will then say generally that this environment state is `observed' by the agent using the following observation function
