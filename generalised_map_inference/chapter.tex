@@ -28,9 +28,10 @@ For an arbitrary simulation model which is defined by the stochadex, the likelih
 `Likelihood-Free' methods work by separating out the components of the posterior which relate to the closeness of rows in ${\sf Y}$ (the matrix which comprises ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$) to the rows in $Y$ from the components which relate the state $x$ and parameters $z$ of the simulation stochastically to ${\sf Y}$. To achieve this separation, we can make use of chaining conditional probability like this
 %%
 \begin{align}
-{\cal P}_{{\sf t}+1}(x,z\vert Y)=\prod_{{\sf t}'=0}^{{\sf t}+1} \bigg[ \int_{\varpi_{{\sf t}'}} {\rm d}{\sf y}' \, {\cal P}_{{\sf t}'}({\sf y}'\vert Y) \bigg] P_{{\sf t}+1}(x,z \vert {\sf Y}) \label{eq:likelihhood-free-posterior} \,.
+{\cal P}_{{\sf t}+1}(x,z\vert Y)=\prod_{{\sf t}'=0}^{{\sf t}+1} \bigg[ \int_{\varpi_{{\sf t}'}} {\rm d}{\sf y}' \, {\cal P}_{{\sf t}'}({\sf y}'\vert Y) \bigg] P_{{\sf t}+1}(x,z \vert {\sf Y}) \label{eq:likelihhood-free-posterior} \,,
 \end{align}
 %%
+where $\varpi_{{\sf t}'}$ here corresponds to the domain of ${\sf y}'$ at time ${\sf t}'$.
 
 As we demonstrated in the previous chapter, it's possible for us to also optimise a probability distribution ${\cal P}_{{\sf t}+1}({\sf y}\vert Y) = P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$ for each step in time to match the statistics of the measurements in $Y$ as well as possible, given some statistics $M_{{\sf t}+1}(Y)$ and $C_{{\sf t}+1}(Y)$. We do not necessarily need to obtain these statistics from the probability filter estimation method, but could instead try to fit them via some other objective function. Either way, this represents a lossy \emph{compression} of the data we want to fit the simulation to, and so the best possible fit is desirable; regardless of overfitting. This choice to summarise the data with statistics means we are using what is known as a Bayesian Synthetic Likelihood (BSL) method~\cite{price2018bayesian,wood2010statistical} instead of another class of methods which approximate an objective function directly using a proximity kernel --- known as Approximate Bayesian Computation (ABC) methods~\cite{sisson2018handbook}.
 
@@ -59,10 +60,12 @@ where, to keep the expression simpler, we are leveraging our notation in previou
 The relationship between $P_{{\sf t}+1}({\sf y}\vert x)$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. So we can map probabilities of $x$ throughout time and learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes indeed, the marginalisation
 %%
 \begin{align} 
-P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}(x,z\vert {\sf Y}) \propto \bigg[ \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}')\,,
+P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}(x,z\vert {\sf Y}) &\propto \bigg[ \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \nonumber \\
+\Rightarrow P_{{\sf t}+1}(z\vert {\sf Y}) &\propto P_{0}(z) \prod_{{\sf t}'=0}^{{\sf t}}\bigg[ \int_{\omega_{{\sf t}'+1}} {\rm d}x \, P_{{\sf t}'+1}({\sf y}\vert x) P_{{\sf t}'+1}(x\vert z) \bigg] \,,
 \end{align}
 %%
-shows how the $z$ updates can occur in an iterative fashion. The reader may recognize the factor above in brackets directly as Eq.~(\ref{eq:simulation-measurement}).
+shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}).
+
 
 \textcolor{red}{Got up to here...
 \begin{itemize}
