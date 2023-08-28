@@ -60,17 +60,23 @@ where, to keep the expression simpler, we are leveraging our notation in previou
 The relationship between $P_{{\sf t}+1}({\sf y}\vert x)$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. So we can map probabilities of $x$ throughout time and learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes indeed, the marginalisation
 %%
 \begin{align} 
-P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}(x,z\vert {\sf Y}) &\propto \bigg[ \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \nonumber \\
-\Rightarrow P_{{\sf t}+1}(z\vert {\sf Y}) &\propto P_{0}(z) \prod_{{\sf t}'=0}^{{\sf t}}\bigg[ \int_{\omega_{{\sf t}'+1}} {\rm d}x \, P_{{\sf t}'+1}({\sf y}\vert x) P_{{\sf t}'+1}(x\vert z) \bigg] \,,
+P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}(x,z\vert {\sf Y}) &\propto \bigg[ \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \label{eq:z-update}\,,
 \end{align}
 %%
-shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}).
+shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}). If there is a fixed window size in the past all the way back to ${\sf t}'={\sf s}$ beyond which we do not consider the real data relevant to inform the current state, then Eq.~(\ref{eq:z-update}) implies that
+%%
+\begin{align}
+P_{{\sf t}+1}(z\vert {\sf Y}) &\propto \prod_{{\sf t}'={\sf s}}^{{\sf t}}\bigg[ \int_{\omega_{{\sf t}'+1}} {\rm d}x \, P_{{\sf t}'+1}({\sf y}\vert x) P_{{\sf t}'+1}(x\vert z) \bigg] P_{{\sf s}}(z) \label{eq:windowed-z-update}\,.
+\end{align}
+%%
+
 
 
 \textcolor{red}{Got up to here...
 \begin{itemize}
 \item{describe both online and offline learning routes in this chapter so introduce the concept of $n$ for offline and then do away with it for online and replace it with an ensemble and $z\rightarrow Z_{{\sf t}}$ --- describe how the two have many similarities from a probabilistic perspective though}
 \item{for online learning, the $P_{{\sf t}+1}(z\vert {\sf Y}) \leftarrow P_{{\sf t}}(z\vert {\sf Y}')$ update can be handles by applying importance-sampled wieghting to the previous distribution samples and then either MC resampling or optimising to get the MAP from the resulting filtered statistics distribution}
+\item{the online algorithm is specifically: 1. sample from the $z$ distribution using the current variance estimate, keeping only the current MAP sample and replacing all of the other samples 2. run the iterations again from the window size back in time ${\sf t}'={\sf s}$ all the way up to ${\sf t}'={\sf t}+1$ 3. determine the new MAP sample through Eq.~(\ref{eq:windowed-z-update}) and Eq.~(\ref{eq:likelihhood-free-posterior}), then recompute the estimated variance of the other samples around it using the importance weightings 4. iterate time forward, stream a new datapoint in, recompute the likelihood statistics to go into Eq.~(\ref{eq:likelihhood-free-posterior}) and go to 1. }
 \end{itemize}}
 
 We now have an objective function to optimise values of $z$ with respect to in Eq.~(\ref{eq:likelihhood-free-posterior}) but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter!

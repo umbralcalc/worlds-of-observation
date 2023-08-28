@@ -115,19 +115,17 @@ By optimising Eq.~(\ref{eq:log-likelihood-filter}) with respect to all of the hy
 In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is, it's quite natural to define a set of hyperparameters for the elements of $z$. To get a sense of how the data-linking function relates to these hyperparameters, it's instructive to consider an example. One generally applicable option for the conditional probability could be a purely time-dependent covariance kernel matrix
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}'}(x\vert x',z) &\propto K(z, {\sf t}+1,{\sf t}')  \label{eq:time-dependent-kernel}\,,
+P_{({\sf t}+1){\sf t}'}(x\vert x',z)\,{\rm d}x\, {\rm d}x' &\propto K^{-1}(z, {\sf t}+1,{\sf t}')  \label{eq:time-dependent-kernel} \,, 
 \end{align}
 %%
-where, in the Gaussian case, the data-linking distribution would look like
+and the data-linking distribution, e.g., could be a Gaussian
 %%
 \begin{align}
-&P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] = \nonumber \\
-& \qquad \frac{{\rm exp}\left\{ -\frac{1}{2}\sum^d_{i=1}\sum^d_{j=1}[x-M_{{\sf t}+1}(z)]^i \big[ K^{-1}(z, {\sf t}+1,{\sf t}')\big]^{ij}[x'-M_{{\sf t}'}(z)]^j  \right\}}{\vert 2\pi K(z, {\sf t}+1,{\sf t}') \vert^{\frac{1}{2}}} \label{eq:gaussian-cond-prob}\,,
+P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] = {\sf MultivariateNormalPDF}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z)] \label{eq:gaussian-data-prob}\,.
 \end{align}
 %%
-and where $\vert A\vert$ denotes computing the determinant of matrix $A$.
 
-In the case of Eq.~(\ref{eq:gaussian-cond-prob}) above, the hyperparameters that would be optimised could relate to the kernel in a wide variety of ways. Optimising them would make our optimised filter very similar to (but not quite the same as) evaluating maximum a posteriori (MAP) of a Gaussian process regression. The main differences here are that the mean of a Gaussian process as a function of time is typically included within $z$, and hence must be obtained through optimisation. In contrast, our methodology relies on the fact that the mean estimator can be computed directly by weighted sample estimation and can then be fed to some data-linking distribution. By doing it this way, we enable many different kinds of data to be described by the same underlying conditional probability-based filter and also make incorporating future data into the current model much easier then is the case for a standard Gaussian process (which would require re-optimising with respect to the next data point every time). The time-dependent kernel we have chosen in Eq.~(\ref{eq:time-dependent-kernel}) also only represents one particular choice, but we could consider a wide range of state-dependent conditional probability weightings for the filter as well. 
+In the case of Eqs.~(\ref{eq:time-dependent-kernel}) and~(\ref{eq:gaussian-data-prob}) above, the hyperparameters that would be optimised could relate to the kernel in a wide variety of ways. Optimising them would make our optimised filter very similar to (but not quite the same as) evaluating maximum a posteriori (MAP) of a Gaussian process regression. The main differences here are that the mean of a Gaussian process as a function of time is typically included within $z$, and hence must be obtained through optimisation. In contrast, our methodology relies on the fact that the mean estimator can be computed directly by weighted sample estimation and can then be fed to some data-linking distribution. By doing it this way, we enable many different kinds of data to be described by the same underlying conditional probability-based filter and also make incorporating future data into the current model much easier then is the case for a standard Gaussian process (which would require re-optimising with respect to the next data point every time). The time-dependent kernel we have chosen in Eq.~(\ref{eq:time-dependent-kernel}) also only represents one particular choice, but we could consider a wide range of state-dependent conditional probability weightings for the filter as well. 
 
 As another form of flexibility; we could also try adapting the data-linking distributions to include an intercept term and linear coefficients for the statistics which are passed to it. These could then be treated as additional hyperparameters and optimised jointly with the others if there is sufficient constraining power in the data.
 
