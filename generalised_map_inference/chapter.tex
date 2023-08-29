@@ -3,7 +3,7 @@
 {\bfseries\sffamily Concept.} To largely generalise the procedure of statistical inference for any model using an algorithm which builds from techniques we developed in the previous chapter. When we say `statistical inference' here; we specifically mean computing the maximum a posteriori (MAP) estimate for any arbitrary stochastic model which has been defined in the stochadex simulator. In order for our algorithm to evaluate the MAP of a model, we show that the user must specify the prior distribution over model parameters, and the model must itself be defined within the stochadex. In this chapter, we will discuss some concepts which are commonplace within the field of Bayesian inference and provide a few simple examples of how our algorithm might work in various instances. For the mathematically-inclined, this chapter will give a very brief exposition for Bayesian statistical inference metholodology --- in particular, how it relates to the evaluation of MAP estimates. For the programmers, the software described in this chapter lives in the public Git repository: \href{https://github.com/umbralcalc/learnadex}{https://github.com/umbralcalc/learnadex}.
 
 
-\section{\sffamily Inference methodology}
+\section{\sffamily Inference formalism}
 
 In Bayesian inference, one applies Bayes' rule to the problem of statistically inferring a model from some dataset. This typically involves the following formula for a posterior distribution
 %%
@@ -57,7 +57,7 @@ P_{{\sf t}+1}(x,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf y}\vert x)P_{{\sf t}+
 %%
 where, to keep the expression simpler, we are leveraging our notation in previous chapters to use ${\sf Y}'$ as indicating all of the past rows of simulation measurements up to ${\sf Y}_{{\sf t}}$. 
 
-The relationship between $P_{{\sf t}+1}({\sf y}\vert x)$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. So we can map probabilities of $x$ throughout time and learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes indeed, the marginalisation
+The relationship between $P_{{\sf t}+1}({\sf y}\vert x)$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. So we can map probabilities of $x$ throughout time and learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes there is! The marginalisation
 %%
 \begin{align} 
 P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}(x,z\vert {\sf Y}) &\propto \bigg[ \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \label{eq:z-update}\,,
@@ -70,23 +70,26 @@ P_{{\sf t}+1}(z\vert {\sf Y}) &\propto \prod_{{\sf t}'={\sf s}}^{{\sf t}}\bigg[ 
 \end{align}
 %%
 
-
+\section{\sffamily Online/offline inference algorithms}
 
 \textcolor{red}{Got up to here...
 \begin{itemize}
 \item{describe both online and offline learning routes in this chapter so introduce the concept of $n$ for offline and then do away with it for online and replace it with an ensemble and $z\rightarrow Z_{{\sf t}}$ --- describe how the two have many similarities from a probabilistic perspective though}
 \item{for online learning, the $P_{{\sf t}+1}(z\vert {\sf Y}) \leftarrow P_{{\sf t}}(z\vert {\sf Y}')$ update can be handles by applying importance-sampled wieghting to the previous distribution samples and then either MC resampling or optimising to get the MAP from the resulting filtered statistics distribution}
-\item{the online algorithm is specifically: 1. sample from the $z$ distribution using the current variance estimate, keeping only the current MAP sample and replacing all of the other samples 2. run the iterations again from the window size back in time ${\sf t}'={\sf s}$ all the way up to ${\sf t}'={\sf t}+1$ 3. determine the new MAP sample through Eq.~(\ref{eq:windowed-z-update}) and Eq.~(\ref{eq:likelihhood-free-posterior}), then recompute the estimated variance of the other samples around it using the importance weightings 4. iterate time forward, stream a new datapoint in, recompute the likelihood statistics to go into Eq.~(\ref{eq:likelihhood-free-posterior}) and go to 1. }
+\item{the online algorithm is specifically: 1. sample new values for $z$ from the current $z$ distribution estimate, keeping only the current MAP sample and replacing all of the other samples with new proposal values 2. run the iterations again from the window size back in time ${\sf t}'={\sf s}$ all the way up to ${\sf t}'={\sf t}+1$ 3. determine the new MAP sample through Eq.~(\ref{eq:windowed-z-update}) and Eq.~(\ref{eq:likelihhood-free-posterior}) 4. iterate time forward, stream new datapoints in and recompute the likelihood statistics to go into Eq.~(\ref{eq:likelihhood-free-posterior}) all the way up to the next $z$ distribution refresh checkpoint 
+5. recompute the estimated mean and variance of the samples using the importance weightings to get a new estimated $z$ distribution and go to 1. }
+\item{offline algorithm sets the prior to the inference block in Eq.~(\ref{eq:windowed-z-update}) with 
+$$P^{n+1}_{{\sf t}+1}(z) = \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, P^{n'}_{{\sf t}+1}(z')$$ 
+whereas the online algorithm sets with prior with 
+$$P_{{\sf t}+1}(z) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\upsilon_{{\sf t}'}} \,{\rm d}z' \, P_{({\sf t}+1){\sf t}'}(z\vert z')\, P_{{\sf t}'}(z')$$}
 \end{itemize}}
 
-We now have an objective function to optimise values of $z$ with respect to in Eq.~(\ref{eq:likelihhood-free-posterior}) but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter!
+We now have an objective function to optimise values of $z$ with respect to in Eq.~(\ref{eq:likelihhood-free-posterior}) but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter in the next section.
 
 Let's now consider a process which represents the progress made by an optimiser towards the optimum value, whose state is defined by the parameters $z$. If we assume that all the elements of $z$ are continuous\footnote{We can modify this expression to work for discrete variables too.} in their domain $\upsilon$, one representation of this process we might consider is
 %%
 \begin{align} 
-{\cal P}^{n+1}_{{\sf t}+1}(x\vert z, Y_{{\sf t}}, Y_{{\sf t}-1}, \dots) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} \,{\rm d}x' \, P_{({\sf t}+1){\sf t}'}(x\vert x',z)\, {\cal P}^{n+1}_{{\sf t}'}(x'\vert z, Y_{{\sf t}'}, Y_{{\sf t}'-1}, \dots) \\
-{\cal P}^{n+1}_{{\sf t}+1}({\sf Y}_{{\sf t}+1} \vert z, Y_{{\sf t}}, Y_{{\sf t}-1}, \dots) &= \int_{\omega_{{\sf t}+1}}{\rm d}x\, P_{{\sf t}+1}({\sf Y}_{{\sf t}+1} \vert x){\cal P}^{n+1}_{{\sf t}+1}(x\vert z, Y_{{\sf t}}, Y_{{\sf t}-1}, \dots) \\
-{\cal P}^{n+1}_{{\sf t}+1}(z \vert {\sf Y}_{{\sf t}+1}, Y_{{\sf t}+1}) &= \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, {\cal P}^{n'}_{{\sf t}+1}(z'\vert {\sf Y}_{{\sf t}+1}, Y_{{\sf t}+1}) \label{eq:posterior-process} \,,
+P^{n+1}_{{\sf t}+1}(z) &= \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, P^{n'}_{{\sf t}+1}(z'\vert {\sf Y}_{{\sf t}+1}, Y_{{\sf t}+1}) \label{eq:posterior-process} \,,
 \end{align}
 %%
 where $n$ is the iteration number of the optimisation, and hence ${\cal P}^{n+1}_{{\sf t}+1}$ corresponds to a different candidate posterior distribution to one at any of the previous steps ${\cal P}^{n'}_{{\sf t}+1}$. Eq.~(\ref{eq:posterior-process}) can represent the convergence of a probabilistic optimisation algorithm --- represented in particular by $P^{(n+1)n'}(z\vert z')$ --- towards the true posterior distribution of $z$. As such an algorithm converges, we can recompute (and hence iteratively improve) the MAP estimate with respect to each iteration of the posterior.
