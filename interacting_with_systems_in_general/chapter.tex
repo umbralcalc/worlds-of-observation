@@ -4,6 +4,8 @@
 
 \section{\sffamily Formalising general interactions}
 
+\textcolor{red}{Rewrite this section to remove the existence of parametric actions, rewrite the code in the stochadex to match, and make this section more about the kinds of actions that can be performed on the basic stochadex simulations.}
+
 Let's start by considering how we might adapt the mathematical formalism we have been using so far to be able to take actions which can manipulate the state at each timestep. Using the mathematical notation that we inherited from the stochadex, we may extend the formula for updating the state history matrix $X'\rightarrow X$ to include two layers of possible interactions which are facilitated by a new vector-valued `parametric action' function $G_{{\sf t}}$ and a new vector-valued `state action' function $H_{{\sf t}}$. In doing so we shall be defining the domain of an acting entity in the stochastic process environment --- which we shall hereafter refer to as simply the `agent'.
 
 During a timestep over which actions are performed by the agent, the stochadex state update formula can be extended to look like this system of equations

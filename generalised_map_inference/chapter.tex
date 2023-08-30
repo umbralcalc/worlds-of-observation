@@ -28,7 +28,7 @@ For an arbitrary simulation model which is defined by the stochadex, the likelih
 `Likelihood-Free' methods work by separating out the components of the posterior which relate to the closeness of rows in ${\sf Y}$ (the matrix which comprises ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$) to the rows in $Y$ from the components which relate the state $x$ and parameters $z$ of the simulation stochastically to ${\sf Y}$. To achieve this separation, we can make use of chaining conditional probability like this
 %%
 \begin{align}
-{\cal P}_{{\sf t}+1}(x,z\vert Y)=\prod_{{\sf t}'=0}^{{\sf t}+1} \bigg[ \int_{\varpi_{{\sf t}'}} {\rm d}{\sf y}' \, {\cal P}_{{\sf t}'}({\sf y}'\vert Y) \bigg] P_{{\sf t}+1}(x,z \vert {\sf Y}) \label{eq:likelihhood-free-posterior} \,,
+{\cal P}_{{\sf t}+1}(x,z\vert Y)=\prod_{{\sf t}'=0}^{{\sf t}+1} \bigg[ \int_{\varpi_{{\sf t}'}} {\rm d}{\sf y}' \, {\cal P}_{{\sf t}'}({\sf y}'\vert Y) \bigg] P_{{\sf t}+1}(x,z \vert {\sf Y}) \label{eq:likelihood-free-posterior} \,,
 \end{align}
 %%
 where $\varpi_{{\sf t}'}$ here corresponds to the domain of ${\sf y}'$ at time ${\sf t}'$.
@@ -47,9 +47,9 @@ where $M_{{\sf t}+1}(Y)$ and $C_{{\sf t}+1}(Y)$ would be estimated from the data
 P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ] = {\sf PoissonPMF}[\,{\sf y};M_{{\sf t}+1}(Y)]\,.
 \end{align}
 %%
-Once again, here, we would need to determine $M_{{\sf t}+1}(Y)$ from $Y$. The more statistically-inclined readers may notice that the probability mass function here would require the integrals in Eq.~(\ref{eq:likelihhood-free-posterior}) to be replaced with summations over the relevant domains.
+Once again, here, we would need to determine $M_{{\sf t}+1}(Y)$ from $Y$. The more statistically-inclined readers may notice that the probability mass function here would require the integrals in Eq.~(\ref{eq:likelihood-free-posterior}) to be replaced with summations over the relevant domains.
 
-Eq.~(\ref{eq:likelihhood-free-posterior}) demonstrates how one can construct a statistically meaningful way to compare the sequence of real data measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ to their modelled equivalents ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$. But we still haven't shown how to compute $P_{{\sf t}+1}(x,z\vert {\sf Y})$ for a given simulation, and this can be the most challenging part. To begin with, we can reapply Bayes' rule and the chaining of conditional probability to find 
+Eq.~(\ref{eq:likelihood-free-posterior}) demonstrates how one can construct a statistically meaningful way to compare the sequence of real data measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ to their modelled equivalents ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$. But we still haven't shown how to compute $P_{{\sf t}+1}(x,z\vert {\sf Y})$ for a given simulation, and this can be the most challenging part. To begin with, we can reapply Bayes' rule and the chaining of conditional probability to find 
 %%
 \begin{align}
 P_{{\sf t}+1}(x,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf y}\vert x)P_{{\sf t}+1}(x\vert z)P_{{\sf t}}(z\vert {\sf Y}') \,,
@@ -63,28 +63,27 @@ The relationship between $P_{{\sf t}+1}({\sf y}\vert x)$ and previous timesteps 
 P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}(x,z\vert {\sf Y}) &\propto \bigg[ \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \label{eq:z-update}\,,
 \end{align}
 %%
-shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}). If there is a fixed window size in the past all the way back to ${\sf t}'={\sf s}$ beyond which we do not consider the real data relevant to inform the current state, then Eq.~(\ref{eq:z-update}) implies that
+shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}). To complete the picture, one can combine the $x$ and $z$ updates into a joint distribution update which takes the following form 
 %%
-\begin{align}
-P_{{\sf t}+1}(z\vert {\sf Y}) &\propto \prod_{{\sf t}'={\sf s}}^{{\sf t}}\bigg[ \int_{\omega_{{\sf t}'+1}} {\rm d}x \, P_{{\sf t}'+1}({\sf y}\vert x) P_{{\sf t}'+1}(x\vert z) \bigg] P_{{\sf s}}(z) \label{eq:windowed-z-update}\,.
+\begin{align} 
+P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots ) &\propto \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} {\rm d}x' \, P_{{\sf t}+1}({\sf y}\vert x) P_{({\sf t}+1){\sf t}'}(x\vert x', z) P_{{\sf t}'}(x',z\vert {\sf Y}_{{\sf t}'}, {\sf Y}_{{\sf t}'-1}, \dots) \label{eq:x-z-update}\,,
 \end{align}
 %%
+where we have expanded out the conditional arguments for more clarity on which rows of the simulation measurements matrix are being used at each point in time, e.g., $P_{{\sf t}+1}(x,z \vert {\sf Y}) \equiv P_{{\sf t}+1}(x,z \vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots)$.
+
 
 \section{\sffamily Online/offline inference algorithms}
 
-\textcolor{red}{Got up to here...
-\begin{itemize}
-\item{describe both online and offline learning routes in this chapter so introduce the concept of $n$ for offline and then do away with it for online and replace it with an ensemble and $z\rightarrow Z_{{\sf t}}$ --- describe how the two have many similarities from a probabilistic perspective though}
-\item{for online learning, the $P_{{\sf t}+1}(z\vert {\sf Y}) \leftarrow P_{{\sf t}}(z\vert {\sf Y}')$ update can be handles by applying importance-sampled wieghting to the previous distribution samples and then either MC resampling or optimising to get the MAP from the resulting filtered statistics distribution}
-\item{the online algorithm is specifically: 1. sample new values for $z$ from the current $z$ distribution estimate, keeping only the current MAP sample and replacing all of the other samples with new proposal values 2. run the iterations again from the window size back in time ${\sf t}'={\sf s}$ all the way up to ${\sf t}'={\sf t}+1$ 3. determine the new MAP sample through Eq.~(\ref{eq:windowed-z-update}) and Eq.~(\ref{eq:likelihhood-free-posterior}) 4. iterate time forward, stream new datapoints in and recompute the likelihood statistics to go into Eq.~(\ref{eq:likelihhood-free-posterior}) all the way up to the next $z$ distribution refresh checkpoint 
-5. recompute the estimated mean and variance of the samples using the importance weightings to get a new estimated $z$ distribution and go to 1. }
-\item{offline algorithm sets the prior to the inference block in Eq.~(\ref{eq:windowed-z-update}) with 
-$$P^{n+1}_{{\sf t}+1}(z) = \frac{1}{n}\sum_{n'=0}^n\int_{\upsilon_{n'}} \,{\rm d}z' \, P^{(n+1)n'}(z\vert z')\, P^{n'}_{{\sf t}+1}(z')$$ 
-whereas the online algorithm sets with prior with 
-$$P_{{\sf t}+1}(z) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\upsilon_{{\sf t}'}} \,{\rm d}z' \, P_{({\sf t}+1){\sf t}'}(z\vert z')\, P_{{\sf t}'}(z')$$}
-\end{itemize}}
+\textcolor{red}{Talk about stochastic resetting in the broader context from the literature, stating that in this paper~\cite{evans2011diffusion} the First Passage Time (FPT) distribution for a particle undergoing Brownian motion between two fixed points in space has an infinite mean FPT, its mean FPT with stochastic resetting becomes finite --- so in practice, sampling towards a target can be infinitely faster. And, in this paper~\cite{blumer2022stochastic}, they show this works well for molecular dynamics simulations in practice. 
+The algorithm is specifically: 
+1. sample new values for $(x,z)$ for the current resetters from the current $(x,z)$ distribution
+2. run the iterations for the resetters from the back of the window all the way up to the new step and for the non-resetters just take another step
+3. determine the new MAP $(x,z)$ sample and store it for this point in time 
+4. either optimise using a posterior shape or update the statistics of the posterior over $(x,z)$ using Eq.~(\ref{eq:likelihood-free-posterior}) as additional weightings for each member of the ensemble (consider using annealing to reduce the dependence on history and make this even more like reinforcement learning)
+5. draw the resetters randomly with a random reset rate, iterate time forward, stream new datapoints in go to 1.}
 
-We now have an objective function to optimise values of $z$ with respect to in Eq.~(\ref{eq:likelihhood-free-posterior}) but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter in the next section.
+
+We now have an objective function to optimise values of $z$ with respect to in Eq.~(\ref{eq:likelihood-free-posterior}) but, in practice, this optimisation problem typically has several layers of difficulty to it. Since the model has been defined by its stochastically generated samples ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$, the objective function will manifestly be stochastic too. Another layer of difficulty is that gradients of the objective function are not immediately computable and so navigation around the optimisation domain could be difficult, especially in high-dimensional problems. To solve this issue in a way which maintains the generality of our approach, it turns out that we can rely on another application of our probability filter in the next section.
 
 Let's now consider a process which represents the progress made by an optimiser towards the optimum value, whose state is defined by the parameters $z$. If we assume that all the elements of $z$ are continuous\footnote{We can modify this expression to work for discrete variables too.} in their domain $\upsilon$, one representation of this process we might consider is
 %%
