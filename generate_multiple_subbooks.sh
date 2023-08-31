@@ -5,7 +5,7 @@ declare -a filenames=(
     "building_a_generalised_simulator/chapter" \
     "simulating_a_financial_market/chapter" \
     "quantum_jumps_on_generic_networks/chapter" \
-    "empirical_probabilistic_filtering/chapter" \
+    "empirical_probabilistic_reweighting/chapter" \
     "generalised_map_inference/chapter" \
     "inferring_2d_spatial_dynamics/chapter" \
     "learning_from_ants_on_curved_surfaces/chapter" \
