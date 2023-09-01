@@ -89,7 +89,9 @@ where $P^i_{{\sf t}'}(z)$ now represents the probability that element $x^i=1$ (i
 
 In this section, we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to designing the algorithm for our reweighting. So let's go!
 
-\section{\sffamily Generalised reweighting algorithm}
+\section{\sffamily Online/offline reweighting algorithms}
+
+\textcolor{red}{Need to introduce and create an offline AND online version of this algorithm: `Online' learning algorithms must update continuously as data is given to them, whereas `offline' learning algorithms can train with the whole dataset provided upfront.}
 
 The empirical probabilistic reweighting algorithm that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use in the reweighting, we need to connect values of $x$ in our reweighting to the data from which it will be learning. 
 
