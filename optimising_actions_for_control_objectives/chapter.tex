@@ -13,24 +13,6 @@
 \end{itemize}
 }
 
-Up to this point, we have only considered actions which were either scheduled up front through some fixed process or through user interaction via a game interface. In order to start creating algorithms to act on the system state for us, we now need to develop a formalism which `closes the loop' by feeding information back from the stochastic process to another decision-making process. Note that in most cases, the state of real-world phenomena cannot be measured perfectly. So in order to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to model this measurement process as part of the information retrieval step.
-
-Let's now define the concept of an `environment state' ${\cal S}_{{\sf t}+1}$ at timestep ${\sf t}+1$; this is a new vector that doesn't have to share the same length as the measured state vector $X_{{\sf t}+1}$. We will then say generally that this environment state is `observed' by the agent using the following observation function
-%%
-\begin{align}
-{\cal S}_{{\sf t}+1}^i &= O_{{\sf t}+1}^i(X',{\cal Z}_{{\sf t}+1},{\sf t}) \label{eq:generalised-state-measurement} \,,
-\end{align}
-%%
-where we have also introduced a new vector ${\cal Z}_{{\sf t}+1}$ which we will use to store all of the relevant parameters to the agent\footnote{This vector is intended to include parameters for measurement, policy specification and ultimately the learning algorithm as well.} at timestep ${\sf t}+1$.
-
-If we are now given the conditional probability that an action vector element ${\cal A}_{{\sf t}+1}=a$ is chosen given that state vector ${\cal S}_{{\sf t}+1}=s$ has been measured $\pi (a,s) = p(a\vert s)$, we can use this to draw new actions for the agent with a newly defined action-generating function
-%%
-\begin{align}
-{\cal A}_{{\sf t}+1}^i &= \Pi_{{\sf t}+1}^i({\cal S}_{{\sf t}+1}, {\cal Z}_{{\sf t}+1}) \label{eq:action-generating-function} \,.
-\end{align}
-%%
-From this point on we'll call $\pi (a,s)$ the `policy' adoped by the agent. A Markov Decision Process (MDP) defines an algorithm in which the agent uses a single state measurement vector and its given policy $\pi$ to draw actions ${\cal A}_{{\sf t}+1}$ at timestep ${{\sf t}+1}$. It then performs these actions in its environment, which we have previously formalised through defining the iteration $X_{{\sf t}+1} = {\cal F}_{{\sf t}+1}(X',Z_{\sf t},{\cal A}_{{\sf t}+1},{\sf t})$. 
-
 In order to assess the quality of an agent's actions, we might later attribute a reward value ${\cal R}_{{\sf t}}$ for actions that were taken at timestep ${\sf t}$. Using a series of these rewards, a return value $R$ can also be computed using a future discount factor $\gamma$ like so 
 %%
 \begin{align}

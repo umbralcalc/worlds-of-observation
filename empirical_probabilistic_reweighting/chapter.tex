@@ -38,7 +38,7 @@ $$\int {\rm d}x\int {\rm d}x' \, x\,P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=\int {\
 where we've used the trivial variable swap to get to the last equality, and the domain references $\omega$ in the integrals are implicitly defined.} 
 %%
 \begin{align}
-M_{{\sf t}+1}(z) = \int_{\omega_{{\sf t}+1}}{\rm d}x \,x\,P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, x' \, P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-mean-estimator}\,.
+M_{{\sf t}+1}(z) = \int_{\omega_{{\sf t}+1}}{\rm d}x \,x\,P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' \, x' \, P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}x \, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-mean-estimator}\,.
 \end{align}
 %%
 The standard covariance matrix elements can also be computed in a similar fashion
@@ -46,7 +46,7 @@ The standard covariance matrix elements can also be computed in a similar fashio
 \begin{align}
 C^{ij}_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}x \,[x-M_{{\sf t}+1}(z)
 ]^i[x-M_{{\sf t}+1}(z)]^jP_{{\sf t}+1}(x\vert z) \nonumber \\
-&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \, [x'-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}+1}(z)]^j P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-covariance-estimator}\,.
+&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' \, [x'-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}+1}(z)]^j P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}x \, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-covariance-estimator}\,.
 \end{align}
 %%
 
@@ -87,13 +87,23 @@ P^i_{{\sf t}+1}(z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^
 %% 
 where $P^i_{{\sf t}'}(z)$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$ given $z$. We've also implicitly defined the matrices $A$ and $B$ as the conditional probabilities where the previous state in time $P^j_{{\sf t}'}(z)$ was either `on' or `off', respectively.
 
-In this section, we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to designing the algorithm for our reweighting. So let's go!
+In this section we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to describing the empirical reweighting and its associated learning algorithm. So let's go!
 
-\section{\sffamily Online/offline reweighting algorithms}
+\section{\sffamily Learning the optimal reweighting}
 
-\textcolor{red}{Need to introduce and create an offline AND online version of this algorithm: `Online' learning algorithms must update continuously as data is given to them, whereas `offline' learning algorithms can train with the whole dataset provided upfront. Point out how $z$ can still be considered constant in time because this learning approach is just dynamically changing the model within an ensemble of possible models.}
-
-The empirical probabilistic reweighting algorithm that we're going to describe in this section will depend on the stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. But before we think about the various kinds of conditional probability we could use in the reweighting, we need to connect values of $x$ in our reweighting to the data from which it will be learning. 
+Probabilistic reweighting depends on the stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. The core idea behind it is to represent the past distributions of state values $P_{{\sf t}'}(x\vert z)$ with the samples from a real time series dataset. If the user then specifies a good model for the relationships in this data by providing a weighting function which returns the conditional probability mass up to a normalisation
+%%
+\begin{align}
+{\sf weight}(x',z) \propto \int_{\omega_{{\sf t}+1}} {\rm d}x\, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \,,  
+\end{align}
+%%
+we can apply this as a \emph{reweighting} of the historical time series samples to estimate any statistics of interest. Taking Eq.~(\ref{eq:stationary-mean-estimator}) as the example; we are essentially approximating this integral through a weighted sample estimation like this
+%%
+\begin{align}
+M_{{\sf t}+1}(z) \simeq \frac{\sum_{\forall x' \in {\sf data}}x' \, {\sf weight}(x',z)}{\sum_{\forall x' \in {\sf data}} {\sf weight}(x',z)} \,.
+\end{align}
+%%
+Our goal in this section will be to learn the optimal reweighting ${\sf weight}(x',z)$ with respect to $z$, i.e., the one which most accurately represents a provided dataset. But before we think about the various kinds of conditional probability we could use, we need to think about how to connect the estimated statistics from the reweighting to the data by defining an objective function. 
 
 If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (and/or covariance) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that a researcher might need.
 
