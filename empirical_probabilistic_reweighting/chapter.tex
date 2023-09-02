@@ -17,13 +17,13 @@ Before we are able to develop this empirical reweighting algorithm, we need to r
 \label{fig:master-eqn}
 \end{figure} 
 
-So, how do we begin? In the first chapter, we defined the general stochastic process with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$. This equation also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x\vert z)$ of the next matrix row being $x=X_{{\sf t}+1}$ given that the parameters of the process are $z$. This can be written as
+So, how do we begin? In the first chapter, we defined the general stochastic process with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$. This equation also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x\vert z)$ of the next matrix row being $x=X_{{\sf t}+1}$ given that the parameters of the process are $z$. This can be written as\footnote{The symbol ${\rm d}^nx'$ here just means there can be $n$ elements in the $x'$ vector and so this needs to be a Cartesian product of the integrals over each element. This is also known as the \emph{Lebesgue measure}.}
 %%
 \begin{align}
-P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:master-x-cont} \,,
+P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:master-x-cont} \,,
 \end{align}
 %%
-where at the moment we are assuming the state space is continuous in each dimension and $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$ and the parameters of the process were $z$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
+where at the moment we are assuming the state space is continuous in each of the $n$ dimensions and $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$ and the parameters of the process were $z$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
 
 The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation factor --- this just normalises the sum of all probabilities to 1 given that there is a sum over ${\sf t}'$. Note that, if the process is defined over continuous time, we would need to replace 
 %%
@@ -33,20 +33,20 @@ The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation fac
 %% 
 But what is $\omega_{\sf t}$? You can think of this as just the domain of possible $x'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
 
-If we wanted to compute the mean of the distribution $M_{{\sf t}+1}(z)$ in Eq.~(\ref{eq:master-x-cont}), it would be straightforward to just multiply both sides of the expression by $x$ and integrate over ${\rm d}x$ in the $\omega_{{\sf t}+1}$ domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical reweighting. If the probability distribution is \emph{stationary} --- meaning that $P_{{\sf t}'}(x\vert z)=P_{{\sf t}''}(x\vert z)$ for all ${\sf t}'$ and ${\sf t}''$ --- it's possible to derive\footnote{To see that this is true, first note that the joint distribution $P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=P_{({\sf t}+1){\sf t}'}(x\vert x',z)P_{{\sf t}'}(x'\vert z)$. Secondly, note that joint distributions always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=P_{{\sf t}'({\sf t}+1)}(x',x\vert z)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ means 
-$$\int {\rm d}x\int {\rm d}x' \, x\,P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=\int {\rm d}x\int {\rm d}x'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x'\vert z)=\int {\rm d}x\int {\rm d}x'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x\vert z)\,,$$
+If we wanted to compute the mean of the distribution $M_{{\sf t}+1}(z)$ in Eq.~(\ref{eq:master-x-cont}), it would be straightforward to just multiply both sides of the expression by $x$ and integrate over $x$ in the $\omega_{{\sf t}+1}$ domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical reweighting. If the probability distribution is \emph{stationary} --- meaning that $P_{{\sf t}'}(x\vert z)=P_{{\sf t}''}(x\vert z)$ for all ${\sf t}'$ and ${\sf t}''$ --- it's possible to derive\footnote{To see that this is true, first note that the joint distribution $P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=P_{({\sf t}+1){\sf t}'}(x\vert x',z)P_{{\sf t}'}(x'\vert z)$. Secondly, note that joint distributions always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=P_{{\sf t}'({\sf t}+1)}(x',x\vert z)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ means 
+$$\int {\rm d}^nx\int {\rm d}^nx' \, x\,P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=\int {\rm d}^nx\int {\rm d}^nx'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x'\vert z)=\int {\rm d}^nx\int {\rm d}^nx'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x\vert z)\,,$$
 where we've used the trivial variable swap to get to the last equality, and the domain references $\omega$ in the integrals are implicitly defined.} 
 %%
 \begin{align}
-M_{{\sf t}+1}(z) = \int_{\omega_{{\sf t}+1}}{\rm d}x \,x\,P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' \, x' \, P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}x \, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-mean-estimator}\,.
+M_{{\sf t}+1}(z) = \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\,P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \, x' \, P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}^nx \, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-mean-estimator}\,.
 \end{align}
 %%
 The standard covariance matrix elements can also be computed in a similar fashion
 %%
 \begin{align}
-C^{ij}_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}x \,[x-M_{{\sf t}+1}(z)
+C^{ij}_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,[x-M_{{\sf t}+1}(z)
 ]^i[x-M_{{\sf t}+1}(z)]^jP_{{\sf t}+1}(x\vert z) \nonumber \\
-&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x' \, [x'-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}+1}(z)]^j P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}x \, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-covariance-estimator}\,.
+&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \, [x'-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}+1}(z)]^j P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}^nx \, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-covariance-estimator}\,.
 \end{align}
 %%
 
@@ -62,14 +62,14 @@ P_{({\sf t}+1){\sf t}'{\sf t}''}(x, x', x''\vert z) &= P_{({\sf t}+1){\sf t}'{\s
 For example, Eq.~(\ref{eq:2nd-joint-dist}) would apply if we wanted to retrieve the out-of-time-order pairwise correlations between $x$ at timestep ${\sf t}+1$ and $x'$ at timestep ${\sf t}'$. Using this pairwise relationship we can also derive an equation for the out-of-time-order covariance matrix elements
 %%
 \begin{align}
-C_{({\sf t}+1){\sf t}'}^{ij}(z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}x'\int_{\omega_{{\sf t}+1}}{\rm d}x \,[x-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}'}(z)]^j P_{({\sf t}+1){\sf t}'}(x, x'\vert z) \label{eq:out-of-time-order-covariance-estimator} \,.
+C_{({\sf t}+1){\sf t}'}^{ij}(z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx'\int_{\omega_{{\sf t}+1}}{\rm d}^nx \,[x-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}'}(z)]^j P_{({\sf t}+1){\sf t}'}(x, x'\vert z) \label{eq:out-of-time-order-covariance-estimator} \,.
 \end{align}
 %%
 
 What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
 \begin{align}
-P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}x' P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
+P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
 An analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
@@ -91,10 +91,14 @@ In this section we looked into how the mathematical formalism used in the stocha
 
 \section{\sffamily Learning the optimal reweighting}
 
+\textcolor{red}{Note that these reweightings could be also predicted by a neural network --- investigate if this would be another good thing to introduce here. Check that the compression into statistics of a data-linking distribution is desirable and common for generative models. The other benefit would be acquiring gradients to train this quickly and retrain it dynamically. }
+
+\textcolor{red}{Introduce libtorch integration here in order to use neural networks!}
+
 Probabilistic reweighting depends on the stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. The core idea behind it is to represent the past distributions of state values $P_{{\sf t}'}(x\vert z)$ with the samples from a real time series dataset. If the user then specifies a good model for the relationships in this data by providing a weighting function which returns the conditional probability mass up to a normalisation
 %%
 \begin{align}
-{\sf weight}(x',z) \propto \int_{\omega_{{\sf t}+1}} {\rm d}x\, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \,,  
+{\sf weight}(x',z) \propto \int_{\omega_{{\sf t}+1}} {\rm d}^nx\, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \,,  
 \end{align}
 %%
 we can apply this as a \emph{reweighting} of the historical time series samples to estimate any statistics of interest. Taking Eq.~(\ref{eq:stationary-mean-estimator}) as the example; we are essentially approximating this integral through a weighted sample estimation like this
@@ -124,10 +128,10 @@ where the summation continues until all of the past measurements $Y_{{\sf t}+1},
 
 By optimising Eq.~(\ref{eq:log-likelihood-reweighting}) with respect to all of the hyperparameters $z$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}. We might think of the overall generalised reweighting algorithm as the code schematic in Fig.~\ref{fig:prob-reweighting-code}.
 
-In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is, it's quite natural to define a set of hyperparameters for the elements of $z$. To get a sense of how the data-linking function relates to these hyperparameters, it's instructive to consider an example. One generally applicable option for the conditional probability could be a purely time-dependent covariance kernel matrix
+In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is, it's quite natural to define a set of hyperparameters for the elements of $z$. To get a sense of how the data-linking function relates to these hyperparameters, it's instructive to consider an example. One generally-applicable option for the conditional probability could be a purely time-dependent kernel
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}'}(x\vert x',z)\,{\rm d}x\, {\rm d}x' &\propto K^{-1}(z, {\sf t}+1,{\sf t}')  \label{eq:time-dependent-kernel} \,, 
+P_{({\sf t}+1){\sf t}'}(x\vert x',z) &\propto {\cal K}(z, {\sf t}+1,{\sf t}')  \label{eq:time-dependent-kernel} \,, 
 \end{align}
 %%
 and the data-linking distribution, e.g., could be a Gaussian

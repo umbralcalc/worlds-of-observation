@@ -8,7 +8,7 @@
 Let's by returning to the probabilistic reweighting formalism that we introduced earlier and noting that the covariance matrix estimate given by 
 %%
 \begin{align}
-C^{ij}_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}x \,[x-M_{{\sf t}+1}(z)]^i[x-M_{{\sf t}+1}(z)]^jP_{{\sf t}+1}(x\vert z) \,,
+C^{ij}_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,[x-M_{{\sf t}+1}(z)]^i[x-M_{{\sf t}+1}(z)]^jP_{{\sf t}+1}(x\vert z) \,,
 \end{align}
 %%
 represents a matrix that could get very large, depending on the problem. For example; if we encoded the state of a 2-dimensional spatial field of values into the elements $X^i_{\sf t}$, the number of elements in the covariance matrix $C^{ij}_{{\sf t}+1}(z)$ would scale as $4N^2$ --- where $N$ here is the number of spatial points we wanted to encode. 

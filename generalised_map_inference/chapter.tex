@@ -18,7 +18,7 @@ From the point of view of statistical inference, if we seek to maximise ${\cal P
 How might we calulate the posterior in practice with some arbitrary stochastic process model that has been defined in the stochadex? In order to make the comparison to a real dataset, any stochadex model of interest will always need to be able to generate observations which can be directly compared to the data. To formalise this a little; a stochadex model could be represented as a map from $z$ to a set of stochastic outputs ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$ that are directly comparable to the rows in the real data matrix $Y$. The values in $Y$ may only represent a noisy or partial measurement of the latent state of the simulation $x$, so a more complete picture can be provided by the following probabilistic relation
 %%
 \begin{align}
-P_{{\sf t}+1}({\sf y} \vert z) = \int_{\omega_{{\sf t}+1}}{\rm d}x\, P_{{\sf t}+1}({\sf y} \vert x)P_{{\sf t}+1}(x\vert z) \label{eq:simulation-measurement} \,,
+P_{{\sf t}+1}({\sf y} \vert z) = \int_{\omega_{{\sf t}+1}}{\rm d}^nx\, P_{{\sf t}+1}({\sf y} \vert x)P_{{\sf t}+1}(x\vert z) \label{eq:simulation-measurement} \,,
 \end{align}
 %%
 where, in practical terms, the measurement probability $P_{{\sf t}+1}({\sf y} \vert x)$ of ${\sf y}={\sf Y}_{{\sf t}+1}$ given $x=X_{{\sf t}+1}$ can be represented by sampling from another stochastic process which takes the state of the stochadex simulation as input. Given that we have this capability to compare like-for-like between the data and the simulation; the next problem is to figure out how this comparison between two sequences of vectors can be done in a way which ensures the the statistics of the posterior are ultimately respected. 
@@ -28,10 +28,10 @@ For an arbitrary simulation model which is defined by the stochadex, the likelih
 `Likelihood-Free' methods work by separating out the components of the posterior which relate to the closeness of rows in ${\sf Y}$ (the matrix which comprises ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$) to the rows in $Y$ from the components which relate the state $x$ and parameters $z$ of the simulation stochastically to ${\sf Y}$. To achieve this separation, we can make use of chaining conditional probability like this
 %%
 \begin{align}
-{\cal P}_{{\sf t}+1}(x,z\vert Y)=\prod_{{\sf t}'=0}^{{\sf t}+1} \bigg[ \int_{\varpi_{{\sf t}'}} {\rm d}{\sf y}' \, {\cal P}_{{\sf t}'}({\sf y}'\vert Y) \bigg] P_{{\sf t}+1}(x,z \vert {\sf Y}) \label{eq:likelihood-free-posterior} \,,
+{\cal P}_{{\sf t}+1}(x,z\vert Y)=\prod_{{\sf t}'=0}^{{\sf t}+1} \bigg[ \int_{\varpi_{{\sf t}'}} {\rm d}^m{\sf y}' \, {\cal P}_{{\sf t}'}({\sf y}'\vert Y) \bigg] P_{{\sf t}+1}(x,z \vert {\sf Y}) \label{eq:likelihood-free-posterior} \,,
 \end{align}
 %%
-where $\varpi_{{\sf t}'}$ here corresponds to the domain of ${\sf y}'$ at time ${\sf t}'$.
+where $\varpi_{{\sf t}'}$ here corresponds to the domain of ${\sf y}'$ (which we assume has $m$ elements) at time ${\sf t}'$.
 
 As we demonstrated in the previous chapter, it's possible for us to also optimise a probability distribution ${\cal P}_{{\sf t}+1}({\sf y}\vert Y) = P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$ for each step in time to match the statistics of the measurements in $Y$ as well as possible, given some statistics $M_{{\sf t}+1}(Y)$ and $C_{{\sf t}+1}(Y)$. We do not necessarily need to obtain these statistics from the probability reweighting method, but could instead try to fit them via some other objective function. Either way, this represents a lossy \emph{compression} of the data we want to fit the simulation to, and so the best possible fit is desirable; regardless of overfitting. This choice to summarise the data with statistics means we are using what is known as a Bayesian Synthetic Likelihood (BSL) method~\cite{price2018bayesian,wood2010statistical} instead of another class of methods which approximate an objective function directly using a proximity kernel --- known as Approximate Bayesian Computation (ABC) methods~\cite{sisson2018handbook}.
 
@@ -60,13 +60,13 @@ where, to keep the expression simpler, we are leveraging our notation in previou
 The relationship between $P_{{\sf t}+1}({\sf y}\vert x)$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. So we can map probabilities of $x$ throughout time and learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes there is! The marginalisation
 %%
 \begin{align} 
-P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}(x,z\vert {\sf Y}) &\propto \bigg[ \int_{\omega_{{\sf t}+1}} {\rm d}x \, P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \label{eq:z-update}\,,
+P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\omega_{{\sf t}+1}} {\rm d}^nx \, P_{{\sf t}+1}(x,z\vert {\sf Y}) &\propto \bigg[ \int_{\omega_{{\sf t}+1}} {\rm d}^nx \, P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \label{eq:z-update}\,,
 \end{align}
 %%
 shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}). To complete the picture, one can combine the $x$ and $z$ updates into a joint distribution update which takes the following form 
 %%
 \begin{align} 
-P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots ) &\propto \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} {\rm d}x' \, P_{{\sf t}+1}({\sf y}\vert x) P_{({\sf t}+1){\sf t}'}(x\vert x', z) P_{{\sf t}'}(x',z\vert {\sf Y}_{{\sf t}'}, {\sf Y}_{{\sf t}'-1}, \dots) \label{eq:x-z-update}\,,
+P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots ) &\propto \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} {\rm d}^nx' \, P_{{\sf t}+1}({\sf y}\vert x) P_{({\sf t}+1){\sf t}'}(x\vert x', z) P_{{\sf t}'}(x',z\vert {\sf Y}_{{\sf t}'}, {\sf Y}_{{\sf t}'-1}, \dots) \label{eq:x-z-update}\,,
 \end{align}
 %%
 where we have expanded out the conditional arguments for more clarity on which rows of the simulation measurements matrix are being used at each point in time, e.g., $P_{{\sf t}+1}(x,z \vert {\sf Y}) \equiv P_{{\sf t}+1}(x,z \vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots)$.
@@ -87,6 +87,8 @@ So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{
 \item{Some way of representing samples from the distribution $P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots )$ so that their distribution can be updated and will coverge towards the posterior over $(x,z)$.}
 \end{enumerate}
 %%
+
+\textcolor{red}{Note that the reweighting algorithm can be used for not just $P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$ but also $P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots )$. If these statistics are estimated by a neural network then it can be quickly retrained to generate new samples. Also talk about extensions which use neural networks not just on the compression (or `encode') step but also use them as a layer between the sample from the data distribution model and the output (the `decode' step) --- this is also known as a Variational Autoencoder (VAE)~\cite{pinheiro2021variational}.}
 
 \textcolor{red}{Talk about stochastic resetting in the broader context from the literature, stating that in this paper~\cite{evans2011diffusion} the First Passage Time (FPT) distribution for a particle undergoing Brownian motion between two fixed points in space has an infinite mean FPT, its mean FPT with stochastic resetting becomes finite --- so in practice, sampling towards a target can be infinitely faster. And, in this paper~\cite{blumer2022stochastic}, they show this works well for molecular dynamics simulations in practice. 
 The algorithm is specifically: 
