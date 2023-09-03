@@ -93,7 +93,9 @@ In this section we looked into how the mathematical formalism used in the stocha
 
 \textcolor{red}{Note that these reweightings could be also predicted by a neural network --- investigate if this would be another good thing to introduce here. Check that the compression into statistics of a data-linking distribution is desirable and common for generative models. The other benefit would be acquiring gradients to train this quickly and retrain it dynamically. }
 
-\textcolor{red}{Introduce libtorch integration here in order to use neural networks!}
+%%% LOOK HERE....
+%% Use this article to handle this bit: https://medium.com/hal24k-techblog/a-guide-to-generating-probability-distributions-with-neural-networks-ffc4efacd6a4
+\textcolor{red}{Introduce TensorFlow Keras integration here in order to use neural networks!}
 
 Probabilistic reweighting depends on the stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. The core idea behind it is to represent the past distributions of state values $P_{{\sf t}'}(x\vert z)$ with the samples from a real time series dataset. If the user then specifies a good model for the relationships in this data by providing a weighting function which returns the conditional probability mass up to a normalisation
 %%
@@ -101,17 +103,19 @@ Probabilistic reweighting depends on the stationarity of $P_{{\sf t}+1}(x\vert z
 {\sf weight}(x',z) \propto \int_{\omega_{{\sf t}+1}} {\rm d}^nx\, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \,,  
 \end{align}
 %%
-we can apply this as a \emph{reweighting} of the historical time series samples to estimate any statistics of interest. Taking Eq.~(\ref{eq:stationary-mean-estimator}) as the example; we are essentially approximating this integral through a weighted sample estimation like this
+we can apply this as a \emph{reweighting} of the historical time series samples to estimate any statistics of interest. Taking Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) as the examples; we are essentially approximating these integrals through weighted sample estimations like this
 %%
 \begin{align}
-M_{{\sf t}+1}(z) \simeq \frac{\sum_{\forall x' \in {\sf data}}x' \, {\sf weight}(x',z)}{\sum_{\forall x' \in {\sf data}} {\sf weight}(x',z)} \,.
+{\sf W}_{{\sf t}+1} &= {\sum^{{\sf t}+1}_{{\sf t}'=0}} {\sf weight}(Y_{{\sf t}'},z) \\
+M_{{\sf t}+1}(z) &\simeq \frac{1}{{\sf W}_{{\sf t}+1}}\sum^{{\sf t}+1}_{{\sf t}'=0}Y_{{\sf t}'} \, {\sf weight}(Y_{{\sf t}'},z) \\
+C^{ij}_{{\sf t}+1}(z) &\simeq \frac{1}{{\sf W}_{{\sf t}+1}}\sum^{{\sf t}+1}_{{\sf t}'=0}[Y_{{\sf t}'}-M_{{\sf t}+1}(z)]^i[Y_{{\sf t}'}-M_{{\sf t}+1}(z)]^j \, {\sf weight}(Y_{{\sf t}'},z) \,,
 \end{align}
 %%
-Our goal in this section will be to learn the optimal reweighting ${\sf weight}(x',z)$ with respect to $z$, i.e., the one which most accurately represents a provided dataset. But before we think about the various kinds of conditional probability we could use, we need to think about how to connect the estimated statistics from the reweighting to the data by defining an objective function. 
+where we have defined the data matrix $Y$ with rows $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$, each of which representing specific observations of the rows in $X$ at each point in time from a real dataset. Our goal in this section will be to learn the optimal reweightings with respect to $z$, i.e., the ones which most accurately represent a provided dataset. But before we think about the various kinds of conditional probability we could use, we need to think about how to connect the estimated statistics from the reweighting to the data by defining an objective function. 
 
 If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (and/or covariance) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that a researcher might need.
 
-We should probably make what we've just said a little more mathematically concrete. Let's define a data vector $y=Y_{{\sf t}+1}$ at time ${\sf t}+1$, which shares the same length as $x$, and represents a specific observation of $x$ at this point in a real dataset. At this point in time, we can define $P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ]$ as representing the likelihood of $y=Y_{{\sf t}+1}$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}(z)$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately evaluate an objective function (a cumulative log-likelihood) that we might seek to optimise over for a given dataset 
+We should probably make what we've just said a little more mathematically concrete. We can define $P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ]$ as representing the likelihood of $y=Y_{{\sf t}+1}$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}(z)$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately evaluate an objective function (a cumulative log-likelihood) that we might seek to optimise over for a given dataset 
 %%
 \begin{align}
 \ln {\cal L}_{{\sf t}+1}(Y\vert z) = &\ln P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \ln P_{{\sf t}}[y{=}Y_{{\sf t}};M_{{\sf t}}(z),C_{{\sf t}}(z),\dots ] + ... \,, \label{eq:log-likelihood-reweighting}
