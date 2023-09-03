@@ -88,7 +88,7 @@ So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{
 \end{enumerate}
 %%
 
-\textcolor{red}{Note that the reweighting algorithm can be used for not just $P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$ but also $P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots )$. If these statistics are estimated by a neural network then it can be quickly retrained to generate new samples. Also talk about extensions which use neural networks not just on the compression (or `encode') step but also use them as a layer between the sample from the data distribution model and the output (the `decode' step) --- this is also known as a Variational Autoencoder (VAE)~\cite{pinheiro2021variational}.}
+\textcolor{red}{Note that the reweighting algorithm can be used for not just $P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$ but also $P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots )$.}
 
 \textcolor{red}{Talk about stochastic resetting in the broader context from the literature, stating that in this paper~\cite{evans2011diffusion} the First Passage Time (FPT) distribution for a particle undergoing Brownian motion between two fixed points in space has an infinite mean FPT, its mean FPT with stochastic resetting becomes finite --- so in practice, sampling towards a target can be infinitely faster. And, in this paper~\cite{blumer2022stochastic}, they show this works well for molecular dynamics simulations in practice. 
 The algorithm is specifically: 

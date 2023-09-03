@@ -91,12 +91,6 @@ In this section we looked into how the mathematical formalism used in the stocha
 
 \section{\sffamily Learning the optimal reweighting}
 
-\textcolor{red}{Note that these reweightings could be also predicted by a neural network --- investigate if this would be another good thing to introduce here. Check that the compression into statistics of a data-linking distribution is desirable and common for generative models. The other benefit would be acquiring gradients to train this quickly and retrain it dynamically. }
-
-%%% LOOK HERE....
-%% Use this article to handle this bit: https://medium.com/hal24k-techblog/a-guide-to-generating-probability-distributions-with-neural-networks-ffc4efacd6a4
-\textcolor{red}{Introduce TensorFlow Keras integration here in order to use neural networks!}
-
 Probabilistic reweighting depends on the stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. The core idea behind it is to represent the past distributions of state values $P_{{\sf t}'}(x\vert z)$ with the samples from a real time series dataset. If the user then specifies a good model for the relationships in this data by providing a weighting function which returns the conditional probability mass up to a normalisation
 %%
 \begin{align}
@@ -160,7 +154,10 @@ If the gradients of Eq.~(\ref{eq:log-likelihood-reweighting}) are needed, we can
 %%
 By factoring derivatives in this manner, the computation can be separated into two parts: the derivatives with respect to $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$, which are typically quite straightforward; and the derivatives with respect to $z$ elements, which typically need a more involved calculation depending on the model. Incidentally, this separation also neatly lends itself to abstracting gradient calculations as having a simpler, general purpose component that can be built directly into a library of data models and a more complex, model-specific component that the user must specify.
 
+
 \section{\sffamily Software design}
+
+Before moving on to the software design considerations, it's worth pointing out that other machine learning frameworks could easily be used to model the conditional probabilities, as opposed to more user-defined kernels such as Eq.~(\ref{eq:time-dependent-kernel}). For example, neural networks could be used to infer the optimal reweighting scheme and this would still allow us to use the data-linking distribution. It would still be desirable to keep the data-linking distribution as it can usually be sampled from very easily --- something that can be quite difficult to achieve with a purely machine learning-based representation of the distribution. Sampling itself could be made more flexible by leveraging a Variational Autoencoder (VAE)~\cite{pinheiro2021variational}; these use neural networks not just on the compression (or `encode') step to estimate the statistics but also use them as a layer between the sample from the data distribution model and the output (the `decode' step). We should therefore ensure that our software can integrate with other machine learning libraries and frameworks to enable this flexibility for the user.
 
 Let's now take a step back from the specifics of the probabilistic reweighting algorithm to introduce our new sofware package for this part of the book: the `learnadex'. At its core, the learnadex algorithm adapts the stochadex iteration engine to iterate through streams of data in order to accumulate a global objective function value with respect to that data. The user may then choose which optimisation algorithm (or write their own) to use in order to leverage this objective for learning a better representation of the data. Readers with some familiarity of machine learning concepts will note that this design should enable either `offline' or `online' learning algorithms to work.
 
