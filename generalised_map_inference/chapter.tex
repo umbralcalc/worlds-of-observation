@@ -90,13 +90,13 @@ So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{
 
 \textcolor{red}{Note that the reweighting algorithm can be used for not just $P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$ but also $P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots )$.}
 
-\textcolor{red}{Talk about stochastic resetting in the broader context from the literature, stating that in this paper~\cite{evans2011diffusion} the First Passage Time (FPT) distribution for a particle undergoing Brownian motion between two fixed points in space has an infinite mean FPT, its mean FPT with stochastic resetting becomes finite --- so in practice, sampling towards a target can be infinitely faster. And, in this paper~\cite{blumer2022stochastic}, they show this works well for molecular dynamics simulations in practice. 
-The algorithm is specifically: 
+\textcolor{red}{The algorithm is specifically: 
 1. sample new values for $(x,z)$ for the current resetters from the current $(x,z)$ distribution
 2. run the iterations for the resetters from the back of the window all the way up to the new step and for the non-resetters just take another step
 3. determine the new MAP $(x,z)$ sample and store it for this point in time 
-4. either optimise using a posterior shape or update the statistics of the posterior over $(x,z)$ using Eq.~(\ref{eq:likelihood-free-posterior}) as additional weightings for each member of the ensemble (consider using annealing to reduce the dependence on history and make this even more like reinforcement learning)
-5. draw the resetters randomly with a random reset rate, iterate time forward, stream new datapoints in go to 1.}
+4. update the statistics of the posterior over $(x,z)$ using Eq.~(\ref{eq:likelihood-free-posterior}) as additional weightings for each member of the ensemble using annealing to reduce the dependence on history and make this even more like reinforcement learning AND also compute the statistics using only the upper $q$-th quartile 
+5. if this is labelled as a refit step on the refitting schedule, determine any new resetters by comparing all runs to the $q$-th quartile --- those falling short become resetters and those above are retained for the next step
+6. stream in the data for the next point in time and go to 1.}
 
 
 As such an algorithm converges, we can recompute (and hence iteratively improve) the MAP estimate with respect to each iteration of the posterior.
