@@ -6,7 +6,7 @@
 
 The key distinction between the methods that we will develop in this chapter and the ones in the proceeding chapters is in their utility when faced with the problem of attempting to model real-world data. In the proceeding chapter, we shall describe some powerful techniques that can be used most effectively when the researcher is aware of the family of models that generated the data. In the present chapter, we will go into the details of how a more `empirical' approach can be derived for dynamical process modeling in a probabilistic framework which locally adapts the model to the data through time. 
 
-While we think that it's worth going into some mathematical detail to give a better sense of where our formalism comes from; we want to emphasise that the framework we discuss here is not new to the technical literature at all. Our overall framework draws on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and also Gaussian processes~\cite{murphy2012machine} as well. The novelties here, instead, lie more in the specifics of how we combine some of these ideas together when referencing the stochadex formalism, and how this manifests in designing more generally-applicable software for the user.
+While we think that it's worth going into some mathematical detail to give a better sense of where our formalism comes from; we want to emphasise that the framework we discuss here is not new to the technical literature at all. Our overall framework draws on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and also Gaussian processes~\cite{murphy2012machine} as well. The novelties here, instead, lie more in the specifics of how we combine some of these ideas together when referencing the stochadex formalism, and how this manifests in designing more generally-applicable software for the user. In addition, readers well-versed in machine learning will note that our software design and mathematical formalism reflects our preference for `online' learning\footnote{We'll explain this later in the chapter.} in the context of time series prediction, in contrast to some of the more standard frameworks.
 
 Before we are able to develop this empirical reweighting algorithm, we need to return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. However, when trying robustly assess how far a model is from accurately describing a set of real-world data, trying to use only generated samples of the model process can be diffcult. Instead, in this section, we are going to extend this formalism to look at how probability theory can help with this data comparison problem in a systematic way.
 
@@ -89,7 +89,7 @@ where $P^i_{{\sf t}'}(z)$ now represents the probability that element $x^i=1$ (i
 
 In this section we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to describing the empirical reweighting and its associated learning algorithm. So let's go!
 
-\section{\sffamily Learning the optimal reweighting}
+\section{\sffamily Online learning the optimal reweighting}
 
 Probabilistic reweighting depends on the stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. The core idea behind it is to represent the past distributions of state values $P_{{\sf t}'}(x\vert z)$ with the samples from a real time series dataset. If the user then specifies a good model for the relationships in this data by providing a weighting function which returns the conditional probability mass up to a normalisation
 %%
@@ -124,8 +124,6 @@ where the summation continues until all of the past measurements $Y_{{\sf t}+1},
 \label{fig:prob-reweighting-code}
 \end{figure} 
 
-By optimising Eq.~(\ref{eq:log-likelihood-reweighting}) with respect to all of the hyperparameters $z$, we are effectively adopting what is known as an `empirical Bayes' approach~\cite{murphy2012machine, mackay2003information}. We might think of the overall generalised reweighting algorithm as the code schematic in Fig.~\ref{fig:prob-reweighting-code}.
-
 In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is, it's quite natural to define a set of hyperparameters for the elements of $z$. To get a sense of how the data-linking function relates to these hyperparameters, it's instructive to consider an example. One generally-applicable option for the conditional probability could be a purely time-dependent kernel
 %%
 \begin{align}
@@ -138,6 +136,16 @@ and the data-linking distribution, e.g., could be a Gaussian
 P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] = {\sf MultivariateNormalPDF}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z)] \label{eq:gaussian-data-prob}\,.
 \end{align}
 %%
+Putting this all together into a computation, we might think of the overall generalised reweighting algorithm as something like the code schematic in Fig.~\ref{fig:prob-reweighting-code}.
+
+\textcolor{red}{
+\begin{itemize}
+\item{Introduce the idea of `concept drift' here and why we're choosing to go the online learning route for this book}
+\item{Introduce online vs offline learning here}
+\item{Talk about how computational expense means we will have a refitting schedule that isn't retraining every single point, but rather in collections of points.} 
+\item{Make a side note about the possibilities of using stochastic resetting as the refitting schedule in the broader context from the literature, stating that in this paper~\cite{evans2011diffusion} the First Passage Time (FPT) distribution for a particle undergoing Brownian motion between two fixed points in space has an infinite mean FPT, its mean FPT with stochastic resetting becomes finite --- so in practice, sampling towards a target can be infinitely faster. And, in this paper~\cite{blumer2022stochastic}, they show this works well for molecular dynamics simulations in practice. }
+\end{itemize}
+}
 
 In the case of Eqs.~(\ref{eq:time-dependent-kernel}) and~(\ref{eq:gaussian-data-prob}) above, the hyperparameters that would be optimised could relate to the kernel in a wide variety of ways. Optimising them would make our optimised reweighting very similar to (but not quite the same as) evaluating maximum a posteriori (MAP) of a Gaussian process regression. The main differences here are that the mean of a Gaussian process as a function of time is typically included within $z$, and hence must be obtained through optimisation. In contrast, our methodology relies on the fact that the mean estimator can be computed directly by weighted sample estimation and can then be fed to some data-linking distribution. By doing it this way, we enable many different kinds of data to be described by the same underlying conditional probability-based reweighting and also make incorporating future data into the current model much easier then is the case for a standard Gaussian process (which would require re-optimising with respect to the next data point every time). The time-dependent kernel we have chosen in Eq.~(\ref{eq:time-dependent-kernel}) also only represents one particular choice, but we could consider a wide range of state-dependent conditional probability weightings for the algorithm as well. 
 
@@ -174,7 +182,6 @@ On the learning side; in order to define a specific objective for each data iter
 
 \textcolor{red}{\begin{itemize}
 \item{refactor the code so that it's always doing online learning under the hood --- do this in blocks on a refitting schedule which can either be deterministic or stochastic event-based --- optimisation algorithms can be used with the previous best used as input or more rapid online learning methods! needs an interface!}
-\item{Make a side note about the possibilities of using stochastic resetting as the refitting schedule in the broader context from the literature, stating that in this paper~\cite{evans2011diffusion} the First Passage Time (FPT) distribution for a particle undergoing Brownian motion between two fixed points in space has an infinite mean FPT, its mean FPT with stochastic resetting becomes finite --- so in practice, sampling towards a target can be infinitely faster. And, in this paper~\cite{blumer2022stochastic}, they show this works well for molecular dynamics simulations in practice. }
 \item{describe the method calls diagram in more detail --- in particular, point out how it can replace the \texttt{Iteration.Iterate} method which is called when the \texttt{StateIterator} is asked for another iteration from the \texttt{PartitionCoordinator} of the stochadex}
 \item{then talk about the optimiser! starting with non-gradient-based: the two packages that are supported out of the box are gonum and eaopt (still need to do gago --- see here: github.com/maxhalford/eaopt) }
 \item{also need to then support gradient-based algorithms (like vanilla SGD) by implementing Eq.~(\ref{eq:log-likelihood-reweighting-grad}) for the current basic implementations in the learnadex --- shouldn't be too difficult!}
