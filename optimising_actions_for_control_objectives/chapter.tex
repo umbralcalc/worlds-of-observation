@@ -11,24 +11,31 @@
 \item{forward-predicting with this ensemble given an ensemble of policies to try, applying a discount to the forecasts to compute cumulative reward and then choosing the best route}
 \item{once this pattern is working, the methodology can be adapted to improve the policy/action-generating function}    
 \end{itemize}
+%%
+\begin{align}
+P_{{\sf t}+1}(a\vert \theta^*_{{\sf t}+1}) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} {\rm d}x'P_{({\sf t}+1){\sf t}'}(a\vert x', A_{{\sf t}'},\theta^*_{{\sf t}+1}){\cal P}_{{\sf t}'}(x'\vert Y_{{\sf t}'}, Y_{{\sf t}'-1}, \dots) \\
+{\cal R}_{{\sf t}+1}(\theta) &=(1-\gamma)\sum_{{\sf t}'={\sf t}}^{\infty}\int_{\upsilon_{{\sf t}'}} {\rm d}r' \gamma^{{\sf t}'-{\sf t}}r'P_{{\sf t}'}(r'\vert x', A_{{\sf t}'},\theta ){\cal P}_{{\sf t}'}(x'\vert Y') \\
+\theta^*_{{\sf t}+1} &= {\rm argmax} \big[ {\cal R}_{{\sf t}+1}(\theta)\big]
+\end{align}
+%%
 }
 
 In order to assess the quality of an agent's actions, we might later attribute a reward value ${\cal R}_{{\sf t}}$ for actions that were taken at timestep ${\sf t}$. Using a series of these rewards, a return value $R$ can also be computed using a future discount factor $\gamma$ like so 
 %%
 \begin{align}
-R &= \sum_{{\sf t}=0}^\infty \gamma^{\sf t}{\cal R}_{\sf t} \,.
+{\cal R}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}}^\infty \gamma^{{\sf t}'-{\sf t}}R_{{\sf t}'} \,.
 \end{align}
 %%
-A state-value function $V_\pi$ is defined as the expectation (under policy $\pi$) of return $R$, given state vector ${\cal S}_{\sf t}=s$, i.e.,
+A state-value function $V_\pi$ is defined as the expectation (under policy $\pi$) of return ${\cal R}$, given state vector ${\cal S}_{\sf t}=s$, i.e.,
 %%
 \begin{align}
-V_\pi (s) = {\rm E}_\pi (R\vert s) \,.
+V_\pi (s) = {\rm E}_\pi ({\cal R}\vert s) \,.
 \end{align}
 %%
-Similarly, an action-value function $Q_\pi$ is defined as the expectation (again, under policy $\pi$) of return $R$, given state vector ${\cal S}_{\sf t}=s$ and action vector ${\cal A}_{\sf t}=a$, i.e.,
+Similarly, an action-value function $Q_\pi$ is defined as the expectation (again, under policy $\pi$) of return ${\cal R}$, given state vector ${\cal S}_{\sf t}=s$ and action vector ${\cal A}_{\sf t}=a$, i.e.,
 %%
 \begin{align}
-Q_\pi (s,a) = {\rm E}_\pi (R\vert s,a) \,.
+Q_\pi (s,a) = {\rm E}_\pi ({\cal R}\vert s,a) \,.
 \end{align}
 %%
 
