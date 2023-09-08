@@ -1,18 +1,18 @@
 \chapter{\sffamily Interacting with systems in general}
 
-{\bfseries\sffamily Concept.} To design and build a software which can interact with stochastic processes of any kind, either manually through user input or automatically by introducing a `policy'. The mathematical formalism and software that we introduce here will serve as a common language and interface for any simulation studies into manipulating real world phenomena, and will enable the learning of control algorithms in later chapters of this book. We will implement this new interaction software as an extension to the stochadex package. For the mathematically-inclined, this chapter will cover how interactions are structured in theory by developing some useful extensions to the stochadex formalism and illustrating with some simple examples. For the programmers, the public Git repository for the code described in this chapter can be found here: \href{https://github.com/umbralcalc/stochadex}{https://github.com/umbralcalc/stochadex}.
+{\bfseries\sffamily Concept.} To design and build a software which can interact with stochastic processes of any kind, either manually through user input, or automatically by introducing a `policy'. The mathematical formalism and software that we introduce here will serve as a common language and interface for any simulation studies into manipulating real world phenomena, and will enable the learning of control algorithms in later chapters of this book. We will implement this new interaction software as an extension to the stochadex package. For the mathematically-inclined, this chapter will cover how interactions are structured in theory by adding some new concepts to the stochadex formalism and illustrating with some simple examples. For the programmers, the public Git repository for the code described in this chapter can be found here: \href{https://github.com/umbralcalc/stochadex}{https://github.com/umbralcalc/stochadex}.
 
 \section{\sffamily Formalising general interactions}
 
-Let's start by considering how we might adapt the mathematical formalism we have been using so far to be able to take actions which can manipulate the state at each timestep. Using the mathematical notation that we inherited from the stochadex, we may extend the formula for updating the state history matrix $X'\rightarrow X$ to include a new layer of possible interactions which is facilitated by a new vector-valued `state action' function $G_{{\sf t}}$. In doing so we shall be defining the domain of an acting entity in the stochastic process environment --- which we shall hereafter refer to as simply the `agent'.
+Let's start by considering how we might adapt the mathematical formalism we have been using so far to be able to take actions which can manipulate the state at each timestep. Using the mathematical notation that we inherited from the stochadex, we may extend the formula for updating the state history matrix $X'\rightarrow X$ to include a new layer of possible interactions which is facilitated by a new vector-valued `take action' function $G_{{\sf t}}$. In doing so we shall be defining the domain of an acting entity in the stochastic process environment --- which we shall hereafter refer to as simply the `agent'.
 
 During a timestep over which actions are performed by the agent, the stochadex state update formula can be extended to look to include interactions by composition with the original state update function like so
 %%
 \begin{align}
-X_{{\sf t}+1}^i &= G^i_{{\sf t}+1}[F_{{\sf t}+1}(X', z, {\sf t}), {\cal Z}_{{\sf t}+1}, {\cal A}_{{\sf t}+1}] = {\cal F}^i_{{\sf t}+1}(X', z, {\cal Z}_{{\sf t}+1}, {\cal A}_{{\sf t}+1}, {\sf t}) \label{eq:generalised-state-actions} \,,
+X_{{\sf t}+1}^i &= G^i_{{\sf t}+1}[F_{{\sf t}+1}(X', z, {\sf t}), A_{{\sf t}+1}] = {\cal F}^i_{{\sf t}+1}(X', z, A_{{\sf t}+1}, {\sf t}) \label{eq:generalised-state-actions} \,,
 \end{align}
 %%
-where we have also introduced the concept of the `actions' performed ${\cal A}_{{\sf t}+1}$ on the system; some vector of parameters which define what actions are taken at timestep ${\sf t}+1$. In this equation notice that, in addition to the constant vector of parameters $z$ (as in the stochadex formalism), we have introduced a new time-dependent vector of other parameters $Z_{{\sf t}+1}$ that may be updated by the agent at any (but not necessarily every) timestep.
+where we have also introduced the concept of the `actions' performed $A_{{\sf t}+1}$ on the system; some vector of parameters which define what actions are taken at timestep ${\sf t}+1$.
 
 The code for the new iteration formula given by Eq.~(\ref{eq:generalised-state-actions}), which includes taking actions in the same timestep, would look something like Fig.~\ref{fig:iterations-with-actions}.
 
@@ -23,24 +23,27 @@ The code for the new iteration formula given by Eq.~(\ref{eq:generalised-state-a
 \label{fig:iterations-with-actions}
 \end{figure}
 
-\textcolor{red}{Rewrite this section to remove the existence of parametric actions, rewrite the code in the stochadex to match, and make this section more about the kinds of actions that can be performed on the basic stochadex simulations.}
+So far, Eq.~(\ref{eq:generalised-state-actions}) on its own will allow the agent to take actions that are scheduled up front through some fixed process or through user interaction via a game interface. So what's next? In order to start creating algorithms which will act on the system state for us, we need to develop a formalism which `closes the loop' by feeding information back from the stochastic process to the agent's decision-making algorithm. Note that in most cases, the state of real-world phenomena cannot be measured perfectly. So to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to include a measurement process as part of the information retrieval step.
 
-\textcolor{red}{Include a full description of policies here!!}
+When an agent takes an action to measure the state of the system (or when it is given measurements without needing to take action) there will typically be some uncertainty in how the history of measured real-world data $Y$ maps to the latent state of the system $x$ and its parameters $z$ at time ${\sf t}+1$. It is natural, then, to represent this uncertainty with a posterior probability distribution ${\cal P}_{{\sf t}+1}(x,z\vert Y)$ as we did in the previous chapters of this book. 
 
-Up to this point, we have only considered actions which were either scheduled up front through some fixed process or through user interaction via a game interface. In order to start creating algorithms to act on the system state for us, we now need to develop a formalism which `closes the loop' by feeding information back from the stochastic process to another decision-making process. Note that in most cases, the state of real-world phenomena cannot be measured perfectly. So in order to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to model this measurement process as part of the information retrieval step.
-
-Let's now define the concept of an `environment state' ${\cal S}_{{\sf t}+1}$ at timestep ${\sf t}+1$; this is a new vector that doesn't have to share the same length as the measured state vector $X_{{\sf t}+1}$. We will then say generally that this environment state is `observed' by the agent using the following observation function
+Let us now define a fully general Non-Markovian Decision Process (NMDP) as a probabilistic model which draws the next action $a=A_{{\sf t}+1}$ from the following distribution
 %%
 \begin{align}
-{\cal S}_{{\sf t}+1}^i &= O_{{\sf t}+1}^i(X',{\cal Z}_{{\sf t}+1},{\sf t}) \label{eq:generalised-state-measurement} \,,
+P_{{\sf t}+1}(a) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} {\rm d}x'P_{({\sf t}+1){\sf t}'}(a\vert x',a',v){\cal P}_{{\sf t}'}(x'\vert Y_{{\sf t}'}, Y_{{\sf t}'-1}, \dots) \,.
 \end{align}
 %%
-where we have also introduced a new vector ${\cal Z}_{{\sf t}+1}$ which we will use to store all of the relevant parameters to the agent\footnote{This vector is intended to include parameters for measurement, policy specification and ultimately the learning algorithm as well.} at timestep ${\sf t}+1$.
 
-If we are now given the conditional probability that an action vector element ${\cal A}_{{\sf t}+1}=a$ is chosen given that state vector ${\cal S}_{{\sf t}+1}=s$ has been measured $\pi (a,s) = p(a\vert s)$, we can use this to draw new actions for the agent with a newly defined action-generating function
+\textcolor{red}{
+got to here --- remember to add examples later on
+}
+
+If we now define the conditional probability that an action vector element $A_{{\sf t}+1}=a$ is chosen given that the state history up to this point is $X'$ has been measured $\pi (a,x) = p(a\vert x)$, we can use this to draw new actions for the agent with an action-generating function
 %%
 \begin{align}
-{\cal A}_{{\sf t}+1}^i &= \Pi_{{\sf t}+1}^i({\cal S}_{{\sf t}+1}, {\cal Z}_{{\sf t}+1}) \label{eq:action-generating-function} \,.
+A_{{\sf t}+1}^i &= \Pi_{{\sf t}+1}^i(X', z, A', v) \label{eq:action-generating-function} \,.
 \end{align}
 %%
-From this point on we'll call $\pi (a,s)$ the `policy' adoped by the agent. A Markov Decision Process (MDP) defines an algorithm in which the agent uses a single state measurement vector and its given policy $\pi$ to draw actions ${\cal A}_{{\sf t}+1}$ at timestep ${{\sf t}+1}$. It then performs these actions in its environment, which we have previously formalised through defining the iteration $X_{{\sf t}+1} = {\cal F}_{{\sf t}+1}(X',Z_{\sf t},{\cal A}_{{\sf t}+1},{\sf t})$. 
+From this point on we'll call $\pi (a,x)$ the `policy' adoped by the agent. A Markov Decision Process (MDP) defines an algorithm in which the agent uses a single state measurement vector and its given policy $\pi$ to draw actions $A_{{\sf t}+1}$ at timestep ${{\sf t}+1}$. As a reminder; it then takes these actions by interacting with the system using Eq.~(\ref{eq:generalised-state-actions}).
+
+In this equation notice that, in addition to the constant vector of parameters $z$ (as in the stochadex formalism), we have introduced a new time-dependent vector of other parameters $Z_{{\sf t}+1}$ that may be updated by the agent at any (but not necessarily every) timestep. This vector represents the parameters which will be used to define agent behaviour in due course.
