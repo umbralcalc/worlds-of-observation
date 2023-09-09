@@ -30,9 +30,16 @@ When an agent takes an action to measure the state of the system (or when it is 
 Let us now define a fully general Non-Markovian Decision Process (NMDP) as a probabilistic model which draws the next action $a=A_{{\sf t}+1}$ from the following distribution
 %%
 \begin{align}
-P_{{\sf t}+1}(a\vert \theta) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} {\rm d}x'P_{({\sf t}+1){\sf t}'}(a\vert x',A_{{\sf t}'},\theta){\cal P}_{{\sf t}'}(x'\vert Y_{{\sf t}'}, Y_{{\sf t}'-1}, \dots) \,.
+P_{{\sf t}+1}(a\vert A',\theta) &= \int_{\Omega_{{\sf t}}} {\rm d}X' \, \Pi_{({\sf t}+1){\sf t}}(a\vert X',A',\theta){\cal P}_{{\sf t}}(X'\vert Y') \,.
 \end{align}
 %%
+There's also an updated iteration formula for the stochastic process state which takes the effect of agent actions into account
+%%
+\begin{align}
+P_{{\sf t}+1}(X\vert z,A) &= \int_{\Omega_{{\sf t}'}}{\rm d}X' P_{{\sf t}}(X'\vert z, A') P_{({\sf t}+1){\sf t}}(X\vert X',z,A) \,.
+\end{align}
+%%
+
 
 \textcolor{red}{
 got to here --- remember to add examples later on

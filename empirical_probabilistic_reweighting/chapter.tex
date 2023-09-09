@@ -10,6 +10,14 @@ While we think that it's worth going into some mathematical detail to give a bet
 
 Before we are able to develop this empirical reweighting algorithm, we need to return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. However, when trying robustly assess how far a model is from accurately describing a set of real-world data, trying to use only generated samples of the model process can be diffcult. Instead, in this section, we are going to extend this formalism to look at how probability theory can help with this data comparison problem in a systematic way.
 
+So, how do we begin? In the first chapter, we defined the general stochastic process with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$. This equation also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(X\vert z)$ of the next matrix being $X$ given that the parameters of the process are $z$. This can be written as
+%%
+\begin{align}
+P_{{\sf t}+1}(X\vert z) &= \int_{\Omega_{{\sf t}}}{\rm d}X' P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(X\vert X',z) \label{eq:master-x-cont} \,,
+\end{align}
+%%
+where for the time being we are assuming the state space is continuous in each of the matrix elements and $P_{({\sf t}+1){\sf t}}(X\vert X',z)$ is the conditional probability that the matrix at time $({\sf t}+1)$ will be $X$ given that the previous one at time ${\sf t}$ was $X'$ and the parameters of the process are $z$. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible matrix $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. 
+
 \begin{figure}[h]
 \centering
 \includegraphics[width=8cm]{images/chapter-4-master-eq-graph.drawio.png}
@@ -17,102 +25,97 @@ Before we are able to develop this empirical reweighting algorithm, we need to r
 \label{fig:master-eqn}
 \end{figure} 
 
-So, how do we begin? In the first chapter, we defined the general stochastic process with the formula $X^{i}_{{\sf t}+1} = F^{i}_{{\sf t}+1}(X',z,{\sf t})$. This equation also has an implicit \emph{master equation} associated to it that fully describes the time evolution of the \emph{probability density function} $P_{{\sf t}+1}(x\vert z)$ of the next matrix row being $x=X_{{\sf t}+1}$ given that the parameters of the process are $z$. This can be written as\footnote{The symbol ${\rm d}^nx'$ here just means there can be $n$ elements in the $x'$ vector and so this needs to be a Cartesian product of the integrals over each element. This is also known as the \emph{Lebesgue measure}.}
+The symbol ${\rm d}X'$ in Eq.~(\ref{eq:master-x-cont}) is our shorthand notation throughout the book for taking a sum of sub-domain integrals over each matrix row; where each row measure is a Cartesian product of $n$ elements (a Lebesgue measure), i.e.,
 %%
 \begin{align}
-P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:master-x-cont} \,,
+\int_{\Omega_{{\sf t}}}{\rm d}X' = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} \int_{\omega_{{\sf t}'}}{\rm d}X_{{\sf t}'} = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} \int_{\omega_{{\sf t}'}}\prod_{i=0}^n{\rm d}X^i_{{\sf t}'} \,,
 \end{align}
 %%
-where at the moment we are assuming the state space is continuous in each of the $n$ dimensions and $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is the conditional probability that the matrix row at time $({\sf t}+1)$ will be $x=X_{{\sf t}+1}$ given that the row at time ${\sf t}'$ was $x'=X_{{\sf t}'}$ and the parameters of the process were $z$. This is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
-
-The factor of $1/{\sf t}$ in Eq.~(\ref{eq:master-x-cont}) is a normalisation factor --- this just normalises the sum of all probabilities to 1 given that there is a sum over ${\sf t}'$. Note that, if the process is defined over continuous time, we would need to replace 
+so you can see why we prefer the shorthand! Note that $1/{\sf t}$ here is a normalisation factor --- this just normalises the sum of all probabilities to 1 given that there is a sum over ${\sf t}'$. Note also that, if the process is defined over continuous time, we would need to replace 
 %%
 \begin{align}
 \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} \rightarrow \frac{1}{t({\sf t})}\sum_{{\sf t}'=0}^{{\sf t}}\delta t({\sf t}') \,.
 \end{align}
 %% 
-But what is $\omega_{\sf t}$? You can think of this as just the domain of possible $x'$ inputs into the integral which will depend on the specific stochastic process we are looking at.
 
-If we wanted to compute the mean of the distribution $M_{{\sf t}+1}(z)$ in Eq.~(\ref{eq:master-x-cont}), it would be straightforward to just multiply both sides of the expression by $x$ and integrate over $x$ in the $\omega_{{\sf t}+1}$ domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical reweighting. If the probability distribution is \emph{stationary} --- meaning that $P_{{\sf t}'}(x\vert z)=P_{{\sf t}''}(x\vert z)$ for all ${\sf t}'$ and ${\sf t}''$ --- it's possible to derive\footnote{To see that this is true, first note that the joint distribution $P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=P_{({\sf t}+1){\sf t}'}(x\vert x',z)P_{{\sf t}'}(x'\vert z)$. Secondly, note that joint distributions always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=P_{{\sf t}'({\sf t}+1)}(x',x\vert z)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ means 
-$$\int {\rm d}^nx\int {\rm d}^nx' \, x\,P_{({\sf t}+1){\sf t}'}(x,x'\vert z)=\int {\rm d}^nx\int {\rm d}^nx'  \, x\, P_{{\sf t}'({\sf t}+1)}(x,x'\vert z)=\int {\rm d}^nx\int {\rm d}^nx'  \, x\, P_{({\sf t}+1){\sf t}'}(x',x\vert z)\,,$$
-where we've used the trivial variable swap to get to the last equality, and the domain references $\omega$ in the integrals are implicitly defined.} 
+Eq.~(\ref{eq:master-x-cont}) is a very general equation which should almost always apply to any continuous stochastic phenomenon we want to study in due course. To try and understand what this equation is saying we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
+
+If we wanted to compute the mean $M_{{\sf t}+1}(z)$ of the distribution over the matrix row corresponding to time $({\sf t}+1)$, it would be straightforward to just multiply both sides of Eq.~(\ref{eq:master-x-cont}) by $X_{{\sf t}+1}$ and integrate over $X_{{\sf t}+1}$ in its $\omega_{{\sf t}+1}$ sub-domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical reweighting. Let's assume that we can neglect the oldest row in $X$ such that its rows can be directly compared to $X'$. Then, if the probability distribution over each of these now-comparable matrices is \emph{stationary} --- meaning that $P_{{\sf t}+1}(X\vert z)=P_{{\sf t}}(X'\vert z)$ --- it's possible to derive
 %%
 \begin{align}
-M_{{\sf t}+1}(z) = \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\,P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \, x' \, P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}^nx \, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-mean-estimator}\,.
+M_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}X_{{\sf t}+1} X_{{\sf t}+1}P_{{\sf t}+1}(X_{{\sf t}+1}\vert z) \nonumber \\
+&= \int_{\Omega_{{\sf t}}}{\rm d}X' X' P_{{\sf t}}(X'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}X_{{\sf t}+1} P_{({\sf t}+1){\sf t}}(X_{{\sf t}+1}\vert X',z) \label{eq:stationary-mean-estimator}\,.
 \end{align}
 %%
+To see that this is true, first note that a joint distribution over both $X$ and $X'$ can be dervied like this $P_{({\sf t}+1){\sf t}}(X,X'\vert z)=P_{({\sf t}+1){\sf t}}(X\vert X',z)P_{{\sf t}}(X'\vert z)$. Secondly, note that this joint distribution will always allow variable swaps trivially like this $P_{({\sf t}+1){\sf t}}(X,X'\vert z)=P_{{\sf t}({\sf t}+1)}(X',X\vert z)$. Then, lastly, note that stationarity of $P_{{\sf t}+1}$$(X\vert z)=P_{{\sf t}}(X'\vert z)$ means 
+%%
+\begin{align}
+\int {\rm d}X\int {\rm d}X' X P_{({\sf t}+1){\sf t}}(X,X'\vert z)&=\int {\rm d}X\int {\rm d}X'  X P_{{\sf t}({\sf t}+1)}(X,X'\vert z)\nonumber \\
+&=\int {\rm d}X'\int {\rm d}X X' P_{{\sf t}({\sf t}+1)}(X,X'\vert z) \nonumber \\
+&=\int {\rm d}X' X' P_{{\sf t}}(X'\vert z)\int {\rm d}X P_{({\sf t}+1){\sf t}}(X\vert X', z) \nonumber \,,
+\end{align}
+%%
+where we've used the trivial variable swap and integration variable relabelling to get to the penultimate equality, and the domain references $\Omega$ in the integrals are implicitly defined.
+
 The standard covariance matrix elements can also be computed in a similar fashion
 %%
 \begin{align}
-C^{ij}_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,[x-M_{{\sf t}+1}(z)
-]^i[x-M_{{\sf t}+1}(z)]^jP_{{\sf t}+1}(x\vert z) \nonumber \\
-&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \, [x'-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}+1}(z)]^j P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}^nx \, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-covariance-estimator}\,.
+C^{ij}_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}X_{{\sf t}+1} \,[X_{{\sf t}+1}-M_{{\sf t}+1}(z)
+]^i[X_{{\sf t}+1}-M_{{\sf t}+1}(z)]^jP_{{\sf t}+1}(X_{{\sf t}+1}\vert z) \nonumber \\
+&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}X_{{\sf t}'} \, [X_{{\sf t}'}-M_{{\sf t}+1}(z)]^i[X_{{\sf t}'}-M_{{\sf t}+1}(z)]^j P_{{\sf t}}(X'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}X_{{\sf t}+1} P_{({\sf t}+1){\sf t}}(X_{{\sf t}+1}\vert X',z) \label{eq:stationary-covariance-estimator}\,.
+\end{align}
+%%
+While they look quite abstract, Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) express the core idea behind how our probabilistic reweighting will function. By assuming a stationary distribution, we gain the ability to directly estimate the statistics of the probability distribution of the next sample from the stochastic process $P_{{\sf t}+1}(X_{{\sf t}+1}\vert z)$ from past samples it may have in empirical data; which are represented here by $P_{{\sf t}}(X'\vert z)$. More on this later.
+
+It may seem needlessly more complex to deal with probability distributions over matrices instead of marginal distributions over separate vectors which represent the rows of these matrices. However, the matrix description is more general, and it turns out to be quite neat to describe correlations across time (which would be lost by marginal distributions over row vectors). In order to study these out-of-time-order correlations, we need only consider using the statistical moments computed across the columns of $X'$. For example, pairwise correlations can be analysed through the out-of-time-order covariance matrix elements
+%%
+\begin{align}
+C_{({\sf t}+1){\sf t}'}^{ij}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}X_{{\sf t}+1}\int_{\omega_{{\sf t}'}}{\rm d}X_{{\sf t}'} [X_{{\sf t}+1}-M_{{\sf t}+1}(z)
+]^i[X_{{\sf t}'}-M_{{\sf t}'}(z)]^jP_{{\sf t}+1}(X\vert z) \label{eq:out-of-time-order-covariance-estimator} \,.
 \end{align}
 %%
 
-While they look quite abstract, Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) express the core idea behind how our probabilistic reweighting will function. By assuming a stationary distribution, we gain the ability to directly estimate the statistics of the probability distribution $P_{{\sf t}+1}(x\vert z)$ from past samples it may have in empirical data; which are represented here by $P_{{\sf t}'}(x'\vert z)$.
-
-In order to study higher-order out-of-time-order correlations, we can also consider using the statistical moments computed from joint distributions like these
+What other classes of process can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}'}(x, x'\vert z) &= P_{({\sf t}+1){\sf t}'}(x\vert x',z)P_{{\sf t}'}(x'\vert z) \label{eq:2nd-joint-dist}\\
-P_{({\sf t}+1){\sf t}'{\sf t}''}(x, x', x''\vert z) &= P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x', x'', z)P_{{\sf t}'{\sf t}''}(x'\vert x'', z)P_{{\sf t}''}(x''\vert z) \label{eq:3rd-joint-dist}\,.
-\end{align}
-%%
-For example, Eq.~(\ref{eq:2nd-joint-dist}) would apply if we wanted to retrieve the out-of-time-order pairwise correlations between $x$ at timestep ${\sf t}+1$ and $x'$ at timestep ${\sf t}'$. Using this pairwise relationship we can also derive an equation for the out-of-time-order covariance matrix elements
-%%
-\begin{align}
-C_{({\sf t}+1){\sf t}'}^{ij}(z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx'\int_{\omega_{{\sf t}+1}}{\rm d}^nx \,[x-M_{{\sf t}+1}(z)]^i[x'-M_{{\sf t}'}(z)]^j P_{({\sf t}+1){\sf t}'}(x, x'\vert z) \label{eq:out-of-time-order-covariance-estimator} \,.
-\end{align}
-%%
-
-What other processes can be described by Eq.~(\ref{eq:master-x-cont})? For Markovian phenomena, the equation no longer depends on timesteps older than the immediately previous one, hence the expression reduces to just
-%%
-\begin{align}
-P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
+P_{{\sf t}+1}(X_{{\sf t}+1}\vert z) &= \int_{\omega_{\sf t}}{\rm d}X_{{\sf t}} \, P_{\sf t}(X_{{\sf t}}\vert z) P_{({\sf t}+1){\sf t}}(X_{{\sf t}+1}\vert X_{{\sf t}},z) \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
 An analog of Eq.~(\ref{eq:master-x-cont}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
 %%
 \begin{align}
-P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t}\sum_{\omega_{{\sf t}'}} P_{{\sf t}'}(x'\vert z) P_{({\sf t}+1){\sf t}'}(x \vert x', z) \label{eq:master-x-disc} \,,
+P_{{\sf t}+1}(X\vert z) &= \sum_{\Omega_{{\sf t}}} P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(X \vert X', z) \label{eq:master-x-disc} \,,
 \end{align}
 %%
-where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}. In the even-simpler case where $x$ is just a vector of binary `on' or `off' states, Eq.~(\ref{eq:master-x-disc}) reduces to
-%%
-\begin{align}
-P^i_{{\sf t}+1}(z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d P^j_{{\sf t}'}(z) P^{ij}_{({\sf t}+1){\sf t}'}(z) \nonumber \\
-&= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{\sf t} \sum_{j=1}^d \big\{ P^j_{{\sf t}'}(z) A^{ij}_{({\sf t}+1){\sf t}'}(z) + [1-P^j_{{\sf t}'}(z)] B^{ij}_{({\sf t}+1){\sf t}'}(z) \big\} \label{eq:master-x-disc-binary}\,,
-\end{align}
-%% 
-where $P^i_{{\sf t}'}(z)$ now represents the probability that element $x^i=1$ (is `on') at time ${\sf t}'$ given $z$. We've also implicitly defined the matrices $A$ and $B$ as the conditional probabilities where the previous state in time $P^j_{{\sf t}'}(z)$ was either `on' or `off', respectively.
+where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}.
 
 In this section we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to describing the empirical reweighting and its associated learning algorithm. So let's go!
 
 \section{\sffamily Online learning the optimal reweighting}
 
-Probabilistic reweighting depends on the stationarity of $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. The core idea behind it is to represent the past distributions of state values $P_{{\sf t}'}(x\vert z)$ with the samples from a real time series dataset. If the user then specifies a good model for the relationships in this data by providing a weighting function which returns the conditional probability mass up to a normalisation
+Probabilistic reweighting depends on the stationarity of $P_{{\sf t}+1}(X\vert z)=P_{{\sf t}}(X'\vert z)$ such that, e.g., Eq.~(\ref{eq:stationary-mean-estimator}) is applicable. The core idea behind it is to represent the past distribution of state values $P_{{\sf t}}(X'\vert z)$ with the samples from a real time series dataset. If the user then specifies a good model for the relationships in this data by providing a matrix-valued weighting function which returns the conditional probability mass
 %%
 \begin{align}
-{\sf weight}(x',z) \propto \int_{\omega_{{\sf t}+1}} {\rm d}^nx\, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \,,  
+{\sf W}(X',z) = \int_{\omega_{{\sf t}+1}} {\rm d}X_{{\sf t}+1} P_{({\sf t}+1){\sf t}}(X_{{\sf t}+1}\vert X',z) \,,  
 \end{align}
 %%
 we can apply this as a \emph{reweighting} of the historical time series samples to estimate any statistics of interest. Taking Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) as the examples; we are essentially approximating these integrals through weighted sample estimations like this
 %%
 \begin{align}
-{\sf W}_{{\sf t}+1} &= {\sum^{{\sf t}+1}_{{\sf t}'=0}} {\sf weight}(Y_{{\sf t}'},z) \\
-M_{{\sf t}+1}(z) &\simeq \frac{1}{{\sf W}_{{\sf t}+1}}\sum^{{\sf t}+1}_{{\sf t}'=0}Y_{{\sf t}'} \, {\sf weight}(Y_{{\sf t}'},z) \\
-C^{ij}_{{\sf t}+1}(z) &\simeq \frac{1}{{\sf W}_{{\sf t}+1}}\sum^{{\sf t}+1}_{{\sf t}'=0}[Y_{{\sf t}'}-M_{{\sf t}+1}(z)]^i[Y_{{\sf t}'}-M_{{\sf t}+1}(z)]^j \, {\sf weight}(Y_{{\sf t}'},z) \,,
+M_{{\sf t}+1}(z) &\simeq \frac{1}{{\sf t}}\sum^{{\sf t}}_{{\sf t}'=0}Y_{{\sf t}'} {\sf W}_{{\sf t}'}(Y',z) \\
+C^{ij}_{{\sf t}+1}(z) &\simeq \frac{1}{{\sf t}}\sum^{{\sf t}}_{{\sf t}'=0}[Y_{{\sf t}'}-M_{{\sf t}+1}(z)]^i[Y_{{\sf t}'}-M_{{\sf t}+1}(z)]^j \, {\sf W}_{{\sf t}'}(Y',z) \,,
 \end{align}
 %%
-where we have defined the data matrix $Y$ with rows $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$, each of which representing specific observations of the rows in $X$ at each point in time from a real dataset. Our goal in this section will be to learn the optimal reweightings with respect to $z$, i.e., the ones which most accurately represent a provided dataset. But before we think about the various kinds of conditional probability we could use, we need to think about how to connect the estimated statistics from the reweighting to the data by defining an objective function. 
+where we have defined the data matrix $Y$ with rows $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$, each of which representing specific observations of the rows in $X$ at each point in time from a real dataset. Analogously to $X$ and $X'$; we have also defined $Y'$ as the values of $Y$ in the previous timestep.
 
-If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (and/or covariance) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that a researcher might need.
+Our goal in this section will be to learn the optimal reweighting matrix ${\sf W}(Y',z)$ with respect to $z$, i.e., the ones which most accurately represent a provided dataset. But before we think about the various kinds of conditional probability we could use, we need to think about how to connect the post-reweighting statistics to the data by defining an objective function. 
 
-We should probably make what we've just said a little more mathematically concrete. We can define $P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ]$ as representing the likelihood of $y=Y_{{\sf t}+1}$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}(z)$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately evaluate an objective function (a cumulative log-likelihood) that we might seek to optimise over for a given dataset 
+If the mean is a sufficient statistic for the distribution which describes the data, a choice of, e.g., Exponential, Poisson or Binomial distribution could be used where the mean is estimated directly from the time series using Eq.~(\ref{eq:stationary-mean-estimator}), given a conditional probability $P_{({\sf t}+1){\sf t}}(X_{{\sf t}+1}\vert X',z)$. Extending this idea further to include distributions which also require a variance to be known, e.g., the Normal, Gamma or Negative Binomial distributions could be used where the variance (and/or covariance) could be estimated using Eq.~(\ref{eq:stationary-covariance-estimator}). These are just a few simple examples of distributions that can link the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) to a time series dataset. However, the algorithmic framework is very general to whatever choice of `data linking' distribution that a researcher might need.
+
+We should probably make what we've just said a little more mathematically concrete. We can define $P_{{\sf t}+1}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ]$ as representing the likelihood of $Y_{{\sf t}+1}$ given the estimated statistics from Eqs.~(\ref{eq:stationary-mean-estimator}) and~(\ref{eq:stationary-covariance-estimator}) (and maybe higher-orders). Note that in order to do this, we need to identify the $x'$ and ${\sf t}'$ values that are used to estimate, e.g., $M_{{\sf t}+1}(z)$ with the past data values which are observed in the dataset time series itself. Now that we have this likelihood, we can immediately evaluate an objective function (a cumulative log-likelihood) that we might seek to optimise over for a given dataset 
 %%
 \begin{align}
-\ln {\cal L}_{{\sf t}+1}(Y\vert z) = &\ln P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \ln P_{{\sf t}}[y{=}Y_{{\sf t}};M_{{\sf t}}(z),C_{{\sf t}}(z),\dots ] + ... \,, \label{eq:log-likelihood-reweighting}
+\ln {\cal L}_{{\sf t}+1}(Y\vert z) = &\ln P_{{\sf t}+1}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \ln P_{{\sf t}}[Y_{{\sf t}};M_{{\sf t}}(z),C_{{\sf t}}(z),\dots ] + \dots \,, \label{eq:log-likelihood-reweighting}
 \end{align}
 %%
 where the summation continues until all of the past measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ which exist as rows in the data matrix $Y$ have been taken into account. The code to compute this objective function follows the schematic we have provided in Fig.~\ref{fig:prob-reweighting-code}.
@@ -124,16 +127,16 @@ where the summation continues until all of the past measurements $Y_{{\sf t}+1},
 \label{fig:prob-reweighting-code}
 \end{figure} 
 
-In order to specify what $P_{({\sf t}+1){\sf t}'}(x\vert x',z)$ is, it's quite natural to define a set of hyperparameters for the elements of $z$. To get a sense of how the data-linking function relates to these hyperparameters, it's instructive to consider an example. One generally-applicable option for the conditional probability could be a purely time-dependent kernel
+In order to specify what $P_{({\sf t}+1){\sf t}}(X_{{\sf t}+1}\vert X',z)$ is, it's quite natural to define a set of hyperparameters for the elements of $z$. To get a sense of how the data-linking function relates to these hyperparameters, it's instructive to consider an example. One generally-applicable option for the conditional probability could be a purely time-dependent pairwise kernel
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}'}(x\vert x',z) &\propto {\cal K}(z, {\sf t}+1,{\sf t}')  \label{eq:time-dependent-kernel} \,, 
+P_{({\sf t}+1){\sf t}}(X_{{\sf t}+1}\vert X',z) &\propto \prod_{{\sf t}'=0}^{{\sf t}} {\cal K}(z, {\sf t}+1,{\sf t}')  \label{eq:time-dependent-kernel} \,, 
 \end{align}
 %%
 and the data-linking distribution, e.g., could be a Gaussian
 %%
 \begin{align}
-P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] = {\sf MultivariateNormalPDF}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z)] \label{eq:gaussian-data-prob}\,.
+P_{{\sf t}+1}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] = {\sf MultivariateNormalPDF}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z)] \label{eq:gaussian-data-prob}\,.
 \end{align}
 %%
 It's worth pointing out that other machine learning frameworks could easily be used to model these conditional probabilities. For example, neural networks could be used to infer the optimal reweighting scheme and this would still allow us to use the data-linking distribution. It would still be desirable to keep the data-linking distribution as it can usually be sampled from very easily --- something that can be quite difficult to achieve with a purely machine learning-based representation of the distribution. Sampling itself could even be made more flexible by leveraging a Variational Autoencoder (VAE)~\cite{pinheiro2021variational}; these use neural networks not just on the compression (or `encode') step to estimate the statistics but also use them as a layer between the sample from the data distribution model and the output (the `decode' step). 
@@ -147,8 +150,8 @@ The optimisation approach that we choose to use for obtaining the best hyperpara
 If the gradients of Eq.~(\ref{eq:log-likelihood-reweighting}) are needed, we can always factorise each derivative with respect to hyperparameter $z^i$ in the following way through the chain rule
 %%
 \begin{align}
-\frac{\partial}{\partial z^i}\ln {\cal L}_{{\sf t}+1}(Y \vert z) &= \frac{\partial M_{{\sf t}+1}}{\partial z^i}\frac{\partial}{\partial M_{{\sf t}+1}}\ln P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] \nonumber \\ 
-&\qquad + \frac{\partial C_{{\sf t}+1}}{\partial z^i}\frac{\partial }{\partial C_{{\sf t}+1}}\ln P_{{\sf t}+1}[y{=}Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \dots  \,. \label{eq:log-likelihood-reweighting-grad}
+\frac{\partial}{\partial z^i}\ln {\cal L}_{{\sf t}+1}(Y \vert z) &= \frac{\partial M_{{\sf t}+1}}{\partial z^i}\frac{\partial}{\partial M_{{\sf t}+1}}\ln P_{{\sf t}+1}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] \nonumber \\ 
+&\qquad + \frac{\partial C_{{\sf t}+1}}{\partial z^i}\frac{\partial }{\partial C_{{\sf t}+1}}\ln P_{{\sf t}+1}[Y_{{\sf t}+1};M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] + \dots  \,. \label{eq:log-likelihood-reweighting-grad}
 \end{align}
 %%
 By factoring derivatives in this manner, the computation can be separated into two parts: the derivatives with respect to $M_{{\sf t}+1}$ and $C_{{\sf t}+1}$, which are typically quite straightforward; and the derivatives with respect to $z$ elements, which typically need a more involved calculation depending on the model. Incidentally, this separation also neatly lends itself to abstracting gradient calculations as having a simpler, general purpose component that can be built directly into a library of data models and a more complex, model-specific component that the user must specify.

@@ -13,9 +13,9 @@
 \end{itemize}
 %%
 \begin{align}
-P_{{\sf t}+1}(a\vert \theta^*_{{\sf t}+1}) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} {\rm d}x'P_{({\sf t}+1){\sf t}'}(a\vert x', A_{{\sf t}'},\theta^*_{{\sf t}+1}){\cal P}_{{\sf t}'}(x'\vert Y_{{\sf t}'}, Y_{{\sf t}'-1}, \dots) \\
-{\cal R}_{{\sf t}+1}(\theta) &=(1-\gamma)\sum_{{\sf t}'={\sf t}}^{\infty}\int_{\upsilon_{{\sf t}'}} {\rm d}r' \gamma^{{\sf t}'-{\sf t}}r'P_{{\sf t}'}(r'\vert x', A_{{\sf t}'},\theta ){\cal P}_{{\sf t}'}(x'\vert Y') \\
-\theta^*_{{\sf t}+1} &= {\rm argmax} \big[ {\cal R}_{{\sf t}+1}(\theta)\big]
+P_{{\sf t}+1}(a\vert A', Y', \theta) &= \int_{\Omega_{{\sf t}}} {\rm d}X' \, \Pi_{({\sf t}+1){\sf t}}(a\vert X',A',\theta){\cal P}_{{\sf t}}(X'\vert Y') \\
+{\cal R}_{{\sf t}+1}(\theta, Y') &=(1-\gamma)\sum_{{\sf t}'={\sf t}}^{\infty}\int_{\upsilon_{{\sf t}'}} {\rm d}r' \gamma^{{\sf t}'-{\sf t}}r'P_{{\sf t}'}(r'\vert x', A_{{\sf t}'},\theta ){\cal P}_{{\sf t}'}(x'\vert Y') \\
+\theta^*_{{\sf t}+1} &= {\rm argmax} \big[ {\cal R}_{{\sf t}+1}(\theta, Y')\big]
 \end{align}
 %%
 }
