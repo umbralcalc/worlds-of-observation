@@ -93,15 +93,13 @@ So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{
 \begin{enumerate}
 \item{A process $P_{({\sf t}+1){\sf t}}(X\vert X', z)$ which iterates the state matrix of the simulation $X$ forward in time.}
 \item{A process $P_{{\sf t}+1}({\sf Y}\vert X)$ which generates simulated measurements from the simulated states $X$.}
-\item{A probability distribution $P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots )$ which represents the posterior distribution of the simulated measurement vector ${\sf y}$ given an optimised compression of the real data into summary statistics.}
+\item{A probability distribution= $P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots )$ which represents the posterior distribution of the simulated measurement vector ${\sf y}$ given an optimised compression of the real data into summary statistics.}
 \item{Some way of representing samples from the distribution $P_{{\sf t}+1}(X,z\vert {\sf Y})$ so that their distribution can be updated and will coverge towards the posterior over $(X,z)$.}
 \end{enumerate}
 %%
 
-\textcolor{red}{Note that the reweighting algorithm can be used for not just $P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$ but also $P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots )$.}
-
 \textcolor{red}{The algorithm is specifically: 
-1. if this is a refit step, sample new values for $(x,z)$ for all members of the ensemble from the current $(x,z)$ distribution points and run the iterations for all of these ensemble members from the back of the window all the way up to the current point in time
+1. if this is a refit step, sample new values for $(X,z)$ for all members of the ensemble from the current $(X,z)$ distribution points and run the iterations for all of these ensemble members from the back of the window all the way up to the current point in time (hence the full matrix $X$ is sampled)
 2. take all of the ensemble members a step forward in time
 3. approximate the mode by computing the average values of $z$ within the $q$-th percentile of the sampled probability mass (where $q$ is set by the user and is ideally < 68\%) --- this idea comes from nested sampling
 4. stream in the data for the next point in time and go to 1.}
@@ -109,9 +107,9 @@ So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{
 
 As such an algorithm converges, we can recompute (and hence iteratively improve) the MAP estimate with respect to each iteration of the posterior.
 
-Readers with some machine learning experience may be familiar with the classic exploration vs exploitation tradeoffs. It's clear that these tradeoffs will manifest in our case here when trying to strike a balance between iterating the posterior distribution and optimizing the current posterior with respect to $(x,z)$ to compute the MAP. 
+Readers with some machine learning experience may be familiar with the classic exploration vs exploitation tradeoffs. It's clear that these tradeoffs will manifest in our case here when trying to strike a balance between iterating the posterior distribution and optimizing the current posterior with respect to $(X,z)$ to compute the MAP. 
 
-Readers of the previous section may also have recognized that Eq.~(\ref{eq:x-z-update}) contains the same conditional probability $P_{({\sf t}+1){\sf t}'}(x\vert x,z)$ as the reweighting algorithm. This structure enables us to reuse all of the exposition we provided for the probabilistic reweighting and highlights how the reweighting itself can be used in the algorithm to optimise the posterior.   
+Readers of the previous section may also have recognized that Eq.~(\ref{eq:x-z-update}) contains the same conditional probability $P_{({\sf t}+1){\sf t}}(X\vert X,z)$ as the reweighting algorithm. This structure enables us to reuse all of the exposition we provided for the probabilistic reweighting and highlights how the reweighting itself can be used in the algorithm to optimise the posterior.   
 
 If we now synthesize both of these observations together, we can see how a stochastic variant of the well-known Expectation-Maximisation Algorithm~\cite{hartley1958maximum, dempster1977maximum, murphy2012machine} naturally emerges.
 

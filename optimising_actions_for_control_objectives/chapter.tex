@@ -13,9 +13,11 @@
 \end{itemize}
 %%
 \begin{align}
-P_{{\sf t}+1}(a\vert A', Y', \theta) &= \int_{\Omega_{{\sf t}}} {\rm d}X' \, \Pi_{({\sf t}+1){\sf t}}(a\vert X',A',\theta){\cal P}_{{\sf t}}(X'\vert Y') \\
-{\cal R}_{{\sf t}+1}(\theta, Y') &=(1-\gamma)\sum_{{\sf t}'={\sf t}}^{\infty}\int_{\upsilon_{{\sf t}'}} {\rm d}r' \gamma^{{\sf t}'-{\sf t}}r'P_{{\sf t}'}(r'\vert x', A_{{\sf t}'},\theta ){\cal P}_{{\sf t}'}(x'\vert Y') \\
-\theta^*_{{\sf t}+1} &= {\rm argmax} \big[ {\cal R}_{{\sf t}+1}(\theta, Y')\big]
+P_{{\sf t}+1}(A\vert \theta,Y) &= \int_{\Omega_{{\sf t}}} {\rm d}X \, \Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta){\cal P}_{{\sf t}}(X\vert Y) \\
+P_{{\sf t}+1}(R\vert \theta, Y) &= \int_{\Omega_{{\sf t}+1}} {\rm d}X \int_{\aleph_{{\sf t}+1}} {\rm d}A  \, P_{{\sf t}+1}(R\vert X, A){\cal P}_{{\sf t}+1}(X\vert Y)P_{{\sf t}+1}(A\vert \theta,Y) \\
+{\cal N} &= \sum_{{\sf t}'={\sf t}}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \gamma [\delta t({\sf t}')] \right\} \\
+{\cal R}_{{\sf t}+1}(\theta, Y) &= \frac{1}{{\cal N}}\sum_{{\sf t}'={\sf t}}^{\infty}\int_{\upsilon_{{\sf t}'}} {\rm d}r \,\left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \gamma [\delta t({\sf t}')] \right\} r \,P_{{\sf t}'}(r\vert \theta, Y) \\
+\theta^*_{{\sf t}+1} &= {\rm argmax} \big[ {\cal R}_{{\sf t}+1}(\theta, Y)\big]
 \end{align}
 %%
 }
