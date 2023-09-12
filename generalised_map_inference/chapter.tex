@@ -15,17 +15,17 @@ In the formula above, one relates the prior probability distribution over a para
 
 From the point of view of statistical inference, if we seek to maximise ${\cal P}_{{\sf t}+1}(z \vert Y)$ --- or its logarithm --- in Eq.~(\ref{eq:bayes-rule}) with respect to $z$, we will obtain what is known as a maximum posteriori (MAP) estimate of the parameters. In fact, we have already encountered this metholodology in the previous chapter when discussing the algorithm which obtains the best fit parameters for the empirical probability reweighting. In this case; while it appears that we optimised the log-likelihood directly as our objective function, one can easily show that this is also technically equivalent obtaining a MAP estimate where one chooses a specfic prior ${\cal P} (z) \propto 1$ (typically known as a `flat prior').
 
-How might we calulate the posterior in practice with some arbitrary stochastic process model that has been defined in the stochadex? In order to make the comparison to a real dataset, any stochadex model of interest will always need to be able to generate observations which can be directly compared to the data. To formalise this a little; a stochadex model could be represented as a map from $z$ to a set of stochastic outputs ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$ that are directly comparable to the rows in the real data matrix $Y$. The values in $Y$ may only represent a noisy or partial measurement of the latent states of the simulation $X$, so a more complete picture can be provided by the following probabilistic relation
+How might we calulate the posterior in practice with some arbitrary stochastic process model that has been defined in the stochadex? In order to make the comparison to a real dataset, any stochadex model of interest will always need to be able to generate observations which can be directly compared to the data. To formalise this a little; a stochadex model could be represented as a map from $z$ to a set of stochastic measurements ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$ that are directly comparable to the rows in the real data matrix $Y$. The values in $Y$ may only represent a noisy or partial measurement of the latent states of the simulation $X$, so a more complete picture can be provided by the following probabilistic relation
 %%
 \begin{align}
-P_{{\sf t}+1}({\sf Y}_{{\sf t}+1} \vert z) = \int_{\omega_{{\sf t}+1}}{\rm d}X_{{\sf t}+1} P_{{\sf t}+1}({\sf Y}_{{\sf t}+1} \vert X_{{\sf t}+1} )P_{{\sf t}+1}(X_{{\sf t}+1} \vert z) \label{eq:simulation-measurement} \,,
+P_{{\sf t}+1}({\sf Y} \vert z) = \int_{\Omega_{{\sf t}+1}}{\rm d}X P_{{\sf t}+1}({\sf Y} \vert X)P_{{\sf t}+1}(X \vert z) \,, \label{eq:simulation-measurement}
 \end{align}
 %%
-where, in practical terms, the measurement probability $P_{{\sf t}+1}({\sf Y}_{{\sf t}+1} \vert X_{{\sf t}+1})$ of ${\sf Y}_{{\sf t}+1}$ given $X_{{\sf t}+1}$ can be represented by sampling from another stochastic process which takes the state of the stochadex simulation as input. Given that we have this capability to compare like-for-like between the data and the simulation; the next problem is to figure out how this comparison between two sequences of vectors can be done in a way which ensures the the statistics of the posterior are ultimately respected. 
+where, in practical terms, the measurement probability $P_{{\sf t}+1}({\sf Y} \vert X)$ of ${\sf Y}$ given $X$ can be represented by sampling from another stochastic process which takes the state of the stochadex simulation as input. Given that we have this capability to compare like-for-like between the data and the simulation; the next problem is to figure out how this comparison between two sequences of vectors can be done in a way which ensures the the statistics of the posterior are ultimately respected. 
 
 For an arbitrary simulation model which is defined by the stochadex, the likelihood in Eq.~(\ref{eq:bayes-rule}) is typically not describable as a simple function or distribution. While we could train the probability reweighting we derived in the previous chapter to match the simulation; to do this well would require having an exact formula for the conditional probability, and this is not always easy to derive in the general case. Instead, there is a class of Bayesian inference methods which we shall lean on to help us compute the posterior distribution (and hence the MAP), which are known as `Likelihood-Free' methods~\cite{sisson2018handbook,price2018bayesian,wood2010statistical,drovandi2022comparison}.
 
-`Likelihood-Free' methods work by separating out the components of the posterior which relate to the closeness of rows in ${\sf Y}$ (the matrix which comprises ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$) to the rows in $Y$ from the components which relate the state $x$ and parameters $z$ of the simulation stochastically to ${\sf Y}$. To achieve this separation, we can make use of chaining conditional probability like this
+`Likelihood-Free' methods work by separating out the components of the posterior which relate to the closeness of rows in ${\sf Y}$ to the rows in $Y$ from the components which relate the states $X$ and parameters $z$ of the simulation stochastically to ${\sf Y}$. To achieve this separation, we can make use of chaining conditional probability like this
 %%
 \begin{align}
 {\cal P}_{{\sf t}+1}(X,z\vert Y)=\int_{\Upsilon_{{\sf t}+1}} {\rm d}{\sf Y} \, {\cal P}_{{\sf t}+1}({\sf Y}\vert Y) P_{{\sf t}+1}(X,z \vert {\sf Y}) \label{eq:likelihood-free-posterior} \,,
@@ -33,27 +33,27 @@ For an arbitrary simulation model which is defined by the stochadex, the likelih
 %%
 where $\Upsilon_{{\sf t}+1}$ here corresponds to the domain of the simulated measurements matrix ${\sf Y}$ at time ${\sf t}+1$.
 
-As we demonstrated in the previous chapter, it's possible for us to also optimise a probability distribution ${\cal P}_{{\sf t}+1}({\sf Y}_{{\sf t}+1}\vert Y) = P_{{\sf t}+1}[{\sf Y}_{{\sf t}+1};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y),\dots ]$ for each step in time to match the statistics of the measurements in $Y$ as well as possible, given some statistics $M_{{\sf t}+1}(Y)$ and $C_{{\sf t}+1}(Y)$. Assuming the independence of samples (rows) in $Y$, this distribution can be used to construct the distribution over all of $Y$ through the following product
+As we demonstrated in the previous chapter, it's possible for us to also optimise a probability distribution ${\cal P}_{{\sf t}'}({\sf y}\vert Y) = P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'},\dots )$ for each step in time to match the statistics of the measurements in $Y$ as well as possible, given some statistics ${\cal M}_{{\sf t}'}={\cal M}_{{\sf t}'}(Y)$ and ${\cal C}_{{\sf t}'}={\cal C}_{{\sf t}'}(Y)$. Assuming the independence of samples (rows) in $Y$, this distribution can be used to construct the distribution over all of $Y$ through the following product
 %%
 \begin{align}
-{\cal P}_{{\sf t}+1}({\sf Y}\vert Y) = \prod_{{\sf t}'=0}^{{\sf t}+1}{\cal P}_{{\sf t}'}({\sf Y}_{{\sf t}'}\vert Y_{{\sf t}'}, Y_{{\sf t}'-1}, \dots) \,,
+{\cal P}_{{\sf t}+1}({\sf Y}\vert Y) = \prod_{{\sf t}'=0}^{{\sf t}+1}P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'},\dots ) \,.
 \end{align}
 %%
-where we have separated out the conditional dependence into each row, e.g., $Y \rightarrow Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ for additional clarity. We do not necessarily need to obtain these statistics from the probability reweighting method, but could instead try to fit them via some other objective function. Either way, this represents a lossy \emph{compression} of the data we want to fit the simulation to, and so the best possible fit is desirable; regardless of overfitting. This choice to summarise the data with statistics means we are using what is known as a Bayesian Synthetic Likelihood (BSL) method~\cite{price2018bayesian,wood2010statistical} instead of another class of methods which approximate an objective function directly using a proximity kernel --- known as Approximate Bayesian Computation (ABC) methods~\cite{sisson2018handbook}.
+ We do not necessarily need to obtain these statistics from the probability reweighting method, but could instead try to fit them via some other objective function. Either way, this represents a lossy \emph{compression} of the data we want to fit the simulation to, and so the best possible fit is desirable; regardless of overfitting. This choice to summarise the data with statistics means we are using what is known as a Bayesian Synthetic Likelihood (BSL) method~\cite{price2018bayesian,wood2010statistical} instead of another class of methods which approximate an objective function directly using a proximity kernel --- known as Approximate Bayesian Computation (ABC) methods~\cite{sisson2018handbook}.
 
-Let's consider a few concrete examples of $P_{{\sf t}+1}[{\sf Y}_{{\sf t}+1};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$. If the data measurements were well-described by a multivariate normal distribution, then
+Let's consider a few concrete examples of $P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots )$. If the data measurements were well-described by a multivariate normal distribution, then
 %%
 \begin{align}
-P_{{\sf t}+1}[{\sf Y}_{{\sf t}+1};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ] = {\sf MultivariateNormalPDF}[{\sf Y}_{{\sf t}+1};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y)]\,,
+P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots ) = {\sf MultivariateNormalPDF}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'})\,,
 \end{align}
 %%
-where $M_{{\sf t}+1}(Y)$ and $C_{{\sf t}+1}(Y)$ would be estimated from the data measurements in $Y$. Similarly, if the data measurements were instead better described by a Poisson distribution, we might disregard the need for a covariance matrix statistic $C_{{\sf t}+1}(Y)$ and instead use
+Similarly, if the data measurements were instead better described by a Poisson distribution, we might disregard the need for a covariance matrix statistic ${\cal C}_{{\sf t}'}$ and instead use
 %%
 \begin{align}
-P_{{\sf t}+1}[{\sf Y}_{{\sf t}+1};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ] = {\sf PoissonPMF}[{\sf Y}_{{\sf t}+1};M_{{\sf t}+1}(Y)]\,.
+P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots ) = {\sf PoissonPMF}({\sf y};{\cal M}_{{\sf t}'})\,.
 \end{align}
 %%
-Once again, here, we would need to determine $M_{{\sf t}+1}(Y)$ from $Y$. The more statistically-inclined readers may notice that the probability mass function here would require the integrals in Eq.~(\ref{eq:likelihood-free-posterior}) to be replaced with summations over the relevant domains.
+The more statistically-inclined readers may notice that the probability mass function here would require the integrals in Eq.~(\ref{eq:likelihood-free-posterior}) to be replaced with summations over the relevant domains.
 
 Eq.~(\ref{eq:likelihood-free-posterior}) demonstrates how one can construct a statistically meaningful way to compare the sequence of real data measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ to their modelled equivalents ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$. But we still haven't shown how to compute $P_{{\sf t}+1}(X,z\vert {\sf Y})$ for a given simulation, and this can be the most challenging part. To begin with, we can reapply Bayes' rule and the chaining of conditional probability to find 
 %%
@@ -61,9 +61,7 @@ Eq.~(\ref{eq:likelihood-free-posterior}) demonstrates how one can construct a st
 P_{{\sf t}+1}(X,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf Y}\vert X)P_{{\sf t}+1}(X\vert z)P_{{\sf t}}(z\vert {\sf Y}') \,,
 \end{align}
 %%
-where, to keep the expression simpler, we are leveraging our notation in previous chapters to use ${\sf Y}'$ as indicating all of the past rows of simulation measurements up to ${\sf Y}_{{\sf t}}$. 
-
-\textcolor{red}{got this far...}
+where here ${\sf Y}$ at ${\sf t}+1$ is the updated version of itself ${\sf Y}'$ at ${\sf t}$.
 
 The relationship between $P_{{\sf t}+1}(X\vert z)$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. So we can map probabilities of $X$ throughout time and learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes there is! The marginalisation
 %%
@@ -71,22 +69,20 @@ The relationship between $P_{{\sf t}+1}(X\vert z)$ and previous timesteps can be
 P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\Omega_{{\sf t}+1}} {\rm d}X \, P_{{\sf t}+1}(X,z\vert {\sf Y}) &\propto \bigg[ \int_{\Omega_{{\sf t}+1}} {\rm d}X P_{{\sf t}+1}({\sf Y}\vert X) P_{{\sf t}+1}(X\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \label{eq:z-update}\,,
 \end{align}
 %%
-shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}). To complete the picture, one can combine the $x$ and $z$ updates into a joint distribution update which takes the following form 
+shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}). To complete the picture, one can combine the $X$ and $z$ updates into a joint distribution update which takes the following form 
 %%
 \begin{align} 
-P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots ) &\propto \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}} {\rm d}^nx' \, P_{{\sf t}+1}({\sf y}\vert x) P_{({\sf t}+1){\sf t}'}(x\vert x', z) P_{{\sf t}'}(x',z\vert {\sf Y}_{{\sf t}'}, {\sf Y}_{{\sf t}'-1}, \dots) \label{eq:x-z-update}\,,
+P_{{\sf t}+1}(X,z\vert {\sf Y}) &\propto \int_{\Omega_{{\sf t}}} {\rm d}X' P_{{\sf t}+1}({\sf Y}\vert X) P_{({\sf t}+1){\sf t}}(X\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update}\,.
 \end{align}
 %%
-where we have expanded out the conditional arguments for more clarity on which rows of the simulation measurements matrix are being used at each point in time, e.g., $P_{{\sf t}+1}(x,z \vert {\sf Y}) \equiv P_{{\sf t}+1}(x,z \vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots)$.
 
-In the next section, we're going to discuss how to translate all of this probabilistic language into some MAP inference algorithms. Before we do this, however, it will be instructive (particularly for `online' learning algorithms) to consider what happens if the model changes over time and $z$ needs to change in order to better represent the real data? We could apply the same formula as Eq.~(\ref{eq:x-z-update}) but instead replace the distribution over $(x,y)$ on the right hand side with its `past discounted' version 
+In the next section, we're going to discuss how to translate all of this probabilistic language into some MAP inference algorithms. Before we do this, however, it will be instructive (particularly for `online' learning algorithms) to consider what happens if the model changes over time and $z$ needs to change in order to better represent the real data. In such situations, we propose to apply the same formula as Eq.~(\ref{eq:x-z-update}) but instead replace the distribution over $(X',z)$ on the right hand side with its `past discounted' version 
 %%
 \begin{align}
-P_{{\sf t}'}(x',z\vert {\sf Y}_{{\sf t}'}, {\sf Y}_{{\sf t}'-1}, \dots) \rightarrow P_{{\sf t}'}(x',z\vert {\sf Y}_{{\sf t}'}, {\sf Y}_{{\sf t}'-1}, \dots)\prod_{{\sf t}'=1}^{{\sf t}} \beta [\delta t({\sf t}')] \,,
+\int_{\Omega_{{\sf t}}}{\rm d}X' \dots P_{{\sf t}}(X',z\vert {\sf Y}') \,\, \longrightarrow \,\, \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \dots \left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \beta [\delta t({\sf t}'')] \right\} P_{{\sf t}'}(x',z\vert {\sf Y}') \,,
 \end{align}
 %%
-where $0 < \beta [\delta t({\sf t}')] < 1$. This factor could be used to reduce the dependence of the update on data which is much further in the past, and hence will ultimately lead to a more responsive algorithm. This responsiveness would have to be balanced with the tradeoffs associated with discounting potentially valuable data that may offer greater long-term stability. Readers who are familiar with reinforcement learning may be starting to feel in familiar territory here --- they will have to wait for the latter parts of the book to see more on discounting though!
-
+where $0 < \beta [\delta t({\sf t}'')] < 1$ and we recall the notation which considers distributions over the individual rows $x'$ within the matrix $X'$ in this new version. This time-dependent discount factor could be used to reduce the dependence of the update on data which is much further in the past, and hence will ultimately lead to a more responsive algorithm. This responsiveness would have to be balanced with the tradeoffs associated with discounting potentially valuable data that may offer greater long-term stability. Readers who are familiar with reinforcement learning may be starting to feel in familiar territory here --- they will have to wait for the latter parts of the book to see more on discounting though!
 
 \section{\sffamily Online learning the MAP}
 
@@ -95,10 +91,10 @@ Eq.~(\ref{eq:x-z-update}) tells us how to probabilistically translate the curren
 So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{eq:likelihood-free-posterior}) and~(\ref{eq:x-z-update}) tell us we need to synthesize the following components into a single algorithm:
 %%
 \begin{enumerate}
-\item{A process $P_{({\sf t}+1){\sf t}'}(x\vert x', z)$ which iterates the state of the simulation $x$ forward in time.}
-\item{A process $P_{{\sf t}+1}({\sf y}\vert x)$ which generates simulated measurements from the simulated state $x$.}
-\item{A probability distribution $P_{{\sf t}+1}[\,{\sf y};M_{{\sf t}+1}(Y),C_{{\sf t}+1}(Y), \dots ]$ which represents the posterior distribution of the simulated measurement vector ${\sf y}$ given an optimised compression of the real data into summary statistics.}
-\item{Some way of representing samples from the distribution $P_{{\sf t}+1}(x,z\vert {\sf Y}_{{\sf t}+1}, {\sf Y}_{{\sf t}}, \dots )$ so that their distribution can be updated and will coverge towards the posterior over $(x,z)$.}
+\item{A process $P_{({\sf t}+1){\sf t}}(X\vert X', z)$ which iterates the state matrix of the simulation $X$ forward in time.}
+\item{A process $P_{{\sf t}+1}({\sf Y}\vert X)$ which generates simulated measurements from the simulated states $X$.}
+\item{A probability distribution $P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots )$ which represents the posterior distribution of the simulated measurement vector ${\sf y}$ given an optimised compression of the real data into summary statistics.}
+\item{Some way of representing samples from the distribution $P_{{\sf t}+1}(X,z\vert {\sf Y})$ so that their distribution can be updated and will coverge towards the posterior over $(X,z)$.}
 \end{enumerate}
 %%
 
