@@ -43,9 +43,8 @@ P_{{\sf t}+1}(X,A\vert z, \theta ) &= P_{{\sf t}}(X\vert z,\theta ) \,\Pi_{({\sf
 There's also an updated iteration formula for the stochastic process state which takes the effect of agent actions into account
 %%
 \begin{align}
-P_{{\sf t}+1}(X\vert z,\theta ) &= \int_{\Omega_{{\sf t}}}{\rm d}X' \int_{\Xi_{{\sf t}+1}}{\rm d}A \, P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A)  \,,
+P_{{\sf t}+1}(X\vert z,\theta ) &= \int_{\Omega_{{\sf t}}}{\rm d}X' \int_{\Xi_{{\sf t}+1}}{\rm d}A \, P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A)  \,.
 \end{align}
 %%
-where $A'$ represents the matrix $A$ at time ${\sf t}$. 
 
 \textcolor{red}{Explain in more detail --- plus give some examples of actions before moving onto the code.}
