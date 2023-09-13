@@ -11,15 +11,26 @@
 \item{forward-predicting with this ensemble given an ensemble of policies to try, applying a discount to the forecasts to compute cumulative reward and then choosing the best route}
 \item{once this pattern is working, the methodology can be adapted to improve the policy/action-generating function}    
 \end{itemize}
+Using state value distribution $V$...
 %%
 \begin{align}
-P_{{\sf t}'{\sf t}}(A\vert Y,\theta ) &= \int_{\Omega_{{\sf t}}} {\rm d}X \, \Pi_{{\sf t}'{\sf t}}(A\vert X,\theta){\cal P}_{{\sf t}}(X\vert Y) \\
-P_{{\sf t}'{\sf t}}(R\vert Y,\theta ) &= \int_{\Omega_{{\sf t}'}} {\rm d}X \int_{\aleph_{{\sf t}'}} {\rm d}A  \, P_{{\sf t}'}(R\vert X, A){\cal P}_{{\sf t}'{\sf t}}(X\vert Y)P_{{{\sf t}}'{\sf t}}(A\vert Y,\theta) \\
-{\cal N}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \gamma [\delta t({\sf t}')] \right\} \\
-{\cal R}_{{\sf t}}(Y,\theta ) &= \frac{1}{{\cal N}}\sum_{{\sf t}'={\sf t}}^{\infty}\int_{\upsilon_{{\sf t}'}} {\rm d}r \,\left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \gamma [\delta t({\sf t}')] \right\} r \,P_{{\sf t}'{\sf t}}(r\vert Y,\theta ) \\
-\theta^*_{{\sf t}} &= {\rm argmax} \big[ {\cal R}_{{\sf t}}(Y,\theta )\big]
+P_{{\sf t}+1}(X\vert z,\theta ) &= \int_{\Omega_{{\sf t}}}{\rm d}X' \int_{\Xi_{{\sf t}+1}}{\rm d}A \, P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A)  \\
+P_{{\sf t}'}(R\vert z,\theta ) &= \int_{\Omega_{{\sf t}'}} {\rm d}X \, V_{{\sf t}'}(R\vert X)P_{{\sf t}'}(X\vert z,\theta ) \,,
 \end{align}
 %%
+or using the action value distribution $Q$...
+%%
+\begin{align}
+P_{{\sf t}+1}(X,A\vert z,\theta ) &= \int_{\Omega_{{\sf t}}}{\rm d}X' P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A) \\
+P_{{\sf t}'}(R\vert z,\theta ) &= \int_{\Omega_{{\sf t}'}} {\rm d}X \, Q_{{\sf t}'}(R\vert X,A)P_{{\sf t}'}(X,A\vert z,\theta ) \,,
+\end{align}
+%%
+In either case, the optimal $\theta = \theta^*$ can be derived from
+\begin{align}
+{\cal N}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \gamma [\delta t({\sf t}')] \right\} \\
+{\cal R}_{{\sf t}}(z,\theta ) &= \frac{1}{{\cal N}_{{\sf t}}}\sum_{{\sf t}'={\sf t}}^{\infty}\int_{\rho_{{\sf t}'}} {\rm d}r \,\left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \gamma [\delta t({\sf t}')] \right\} r \,P_{{\sf t}'}(r\vert z,\theta ) \\
+\theta^*_{{\sf t}} &= {\rm argmax} \big[ {\cal R}_{{\sf t}}(z,\theta )\big] \,.
+\end{align}
 }
 
 In order to assess the quality of an agent's actions, we might later attribute a reward value ${\cal R}_{{\sf t}}$ for actions that were taken at timestep ${\sf t}$. Using a series of these rewards, a return value $R$ can also be computed using a future discount factor $\gamma$ like so 
