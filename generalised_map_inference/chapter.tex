@@ -63,7 +63,7 @@ P_{{\sf t}+1}(X,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf Y}\vert X)P_{{\sf t}+
 %%
 where here ${\sf Y}$ at ${\sf t}+1$ is the updated version of itself ${\sf Y}'$ at ${\sf t}$.
 
-The relationship between $P_{{\sf t}+1}(X\vert z)$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. So we can map probabilities of $X$ throughout time and learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes there is! The marginalisation
+The relationship between $P_{{\sf t}+1}(X\vert z)$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. So we can map probabilities of $X_{0:{\sf t}+1} = X$ throughout time and learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes there is! The marginalisation
 %%
 \begin{align} 
 P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\Omega_{{\sf t}+1}} {\rm d}X \, P_{{\sf t}+1}(X,z\vert {\sf Y}) &\propto \bigg[ \int_{\Omega_{{\sf t}+1}} {\rm d}X P_{{\sf t}+1}({\sf Y}\vert X) P_{{\sf t}+1}(X\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \label{eq:z-update}\,,
