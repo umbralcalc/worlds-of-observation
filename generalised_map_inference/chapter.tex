@@ -98,6 +98,11 @@ So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{
 \end{enumerate}
 %%
 
+\textcolor{red}{
+Before writing this up, should read this paper on efficient amortized inference using neural networks with \texttt{BayesFlow} here in particular:~\cite{radev2020bayesflow}. But also, should cite other works to make amortized inference more efficient by using neural networks to learn convenient functions of the Bayes factor in Evidence networks~\cite{jeffrey2023evidence}.
+}
+
+
 \textcolor{red}{The algorithm is specifically: 
 1. if this is a refit step, sample new values for $(X,z)$ for all members of the ensemble from the current $(X,z)$ distribution points and run the iterations for all of these ensemble members from the back of the window all the way up to the current point in time (hence the full matrix $X$ is sampled)
 2. take all of the ensemble members a step forward in time
