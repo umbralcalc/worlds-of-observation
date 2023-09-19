@@ -2,55 +2,22 @@
 
 {\bfseries\sffamily Concept.} The idea here is 
 
-\section{\sffamily States, actions and attributing rewards}
+\section{\sffamily States, actions and attributing rewards}    
 
-\textcolor{red}{Rewrite the beginning of this section to talk about:
-\begin{itemize}
-\item{remove the need to parametric actions from this section --- actions are encoded as their own separate state variables in the history and the policy can be defined through $z$ which can change through a data update}
-\item{using the online learning of state and parameters MAP}
-\item{forward-predicting with this ensemble given an ensemble of policies to try, applying a discount to the forecasts to compute cumulative reward and then choosing the best route}
-\item{once this pattern is working, the methodology can be adapted to improve the policy/action-generating function}    
-\end{itemize}
-Using state value distribution $V$...
+Using the state value function $V$...
 %%
 \begin{align}
-P_{{\sf t}+1}(X\vert z,\theta ) &= \int_{\Omega_{{\sf t}}}{\rm d}X' \int_{\Xi_{{\sf t}+1}}{\rm d}A \, P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A)  \\
-P_{{\sf t}'}(R\vert z,\theta ) &= \int_{\Omega_{{\sf t}'}} {\rm d}X \, V_{{\sf t}'}(R\vert X)P_{{\sf t}'}(X\vert z,\theta ) \,,
+P_{{\sf t}+1}(X\vert z,\theta ) &= \int_{\Omega_{{\sf t}}}{\rm d}X' \int_{\Xi_{{\sf t}+1}}{\rm d}A \, P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A) \\
+P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta) &= P_{{\sf t}+1}(r\vert X',A)\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)P_{({\sf t}+1){\sf t}}(X'\vert X,z,A)  \\
+{\cal N}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}+1}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')] \right\} \\
+V_{{\sf t}}(X,z,\theta) &= \frac{1}{{\cal N}_{{\sf t}}}\sum_{{\sf t}'={\sf t}+1}^{\infty} \int_{\Omega_{{\sf t}'}}{\rm d}X'\int_{\rho_{{\sf t}'}} {\rm d}r \,r\, \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')]P_{({\sf t}''+1){\sf t}''}(r,X'\vert X, z,\theta) \\
+V_{{\sf t}}(X,z,\theta) &= \int_{\Omega_{{\sf t}+1}}{\rm d}X'\int_{\rho_{{\sf t}+1}} {\rm d}r \, P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta)\bigg\{ r+\gamma [\delta t({\sf t})]V_{{\sf t}+1}(X',z,\theta)\bigg\} \,.
 \end{align}
 %%
-or using the action value distribution $Q$...
-%%
+In either case, the optimal $\theta = \theta_{{\sf t}}^*(X,z)$ can be derived from
 \begin{align}
-P_{{\sf t}+1}(X,A\vert z,\theta ) &= \int_{\Omega_{{\sf t}}}{\rm d}X' P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A) \\
-P_{{\sf t}'}(R\vert z,\theta ) &= \int_{\Omega_{{\sf t}'}} {\rm d}X \int_{\Xi_{{\sf t}'}}{\rm d}A \, Q_{{\sf t}'}(R\vert X,A)P_{{\sf t}'}(X,A\vert z,\theta ) \,,
+\theta^*_{{\sf t}}(X,z) &= {\rm argmax} \big[ V_{{\sf t}}(X,z,\theta)\big] \,.
 \end{align}
-%%
-In either case, the optimal $\theta = \theta^*$ can be derived from
-\begin{align}
-{\cal N}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \gamma [\delta t({\sf t}')] \right\} \\
-{\cal R}_{{\sf t}}(z,\theta ) &= \frac{1}{{\cal N}_{{\sf t}}}\sum_{{\sf t}'={\sf t}}^{\infty}\int_{\rho_{{\sf t}'}} {\rm d}r \,\left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \gamma [\delta t({\sf t}')] \right\} r \,P_{{\sf t}'}(r\vert z,\theta ) \\
-\theta^*_{{\sf t}} &= {\rm argmax} \big[ {\cal R}_{{\sf t}}(z,\theta )\big] \,.
-\end{align}
-}
-
-In order to assess the quality of an agent's actions, we might later attribute a reward value ${\cal R}_{{\sf t}}$ for actions that were taken at timestep ${\sf t}$. Using a series of these rewards, a return value $R$ can also be computed using a future discount factor $\gamma$ like so 
-%%
-\begin{align}
-{\cal R}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}}^\infty \gamma^{{\sf t}'-{\sf t}}R_{{\sf t}'} \,.
-\end{align}
-%%
-A state-value function $V_\pi$ is defined as the expectation (under policy $\pi$) of return ${\cal R}$, given state vector ${\cal S}_{\sf t}=s$, i.e.,
-%%
-\begin{align}
-V_\pi (s) = {\rm E}_\pi ({\cal R}\vert s) \,.
-\end{align}
-%%
-Similarly, an action-value function $Q_\pi$ is defined as the expectation (again, under policy $\pi$) of return ${\cal R}$, given state vector ${\cal S}_{\sf t}=s$ and action vector ${\cal A}_{\sf t}=a$, i.e.,
-%%
-\begin{align}
-Q_\pi (s,a) = {\rm E}_\pi ({\cal R}\vert s,a) \,.
-\end{align}
-%%
 
 Follow-up this bit with the model-based approach that we're going to take in this book.
 \begin{itemize}
