@@ -110,7 +110,7 @@ where we have defined the data matrix $Y$ with rows $Y_{{\sf t}+1}, Y_{{\sf t}},
 
 \textcolor{red}{
 Those readers who are well-versed in generative machine learning methods may recognise Eqs.~(\ref{eq:mean-reweighting}) and~(\ref{eq:covariance-reweighting}) as being equivalent to a kind of autoregressive network. Another way we might use... 
-Use normalising flows Jacobian layer~\cite{kobyzev2020normalizing} in between the output density distribution and the input --- this should give $\vert {\rm d} f/{\rm d}x' \vert W_{{\sf t}'}[f,z]$ as the reweighting wrt features $f$ whose moments could be simpler to compute and uncorrelated!!!}
+Use normalising flows Jacobian layer~\cite{kobyzev2020normalizing} in between the output density distribution and the input --- this should give $\vert {\rm d} f/{\rm d}x' \vert W_{{\sf t}'}(f,z)$ as the reweighting wrt features $f$ whose moments could be simpler to compute and uncorrelated!!!}
 
 Our goal in this section will be to learn the optimal reweighting function ${\sf w}_{{\sf t}'}(Y_{{\sf t}'},z)$ with respect to $z$, i.e., the ones which most accurately represent a provided dataset. But before we think about the various kinds of conditional probability we could use, we need to think about how to connect the post-reweighting statistics to the data by defining an objective function. 
 
