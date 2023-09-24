@@ -6,13 +6,13 @@
 
 Let's start by considering how we might adapt the mathematical formalism we have been using so far to be able to take actions which can manipulate the state at each timestep. Using the mathematical notation that we inherited from the stochadex, we may extend the formula for updating the state history matrix $X_{0:{\sf t}}\rightarrow X_{0:{\sf t}+1}$ to include a new layer of possible interactions which is facilitated by a new vector-valued `take action' function $G_{{\sf t}}$. In doing so we shall be defining the domain of an acting entity in the stochastic process environment --- which we shall hereafter refer to as simply the `agent'.
 
-During a timestep over which actions are performed by the agent, the stochadex state update formula can be extended to look to include interactions by composition with the original state update function like so
+During a timestep over which actions are performed by the agent, the stochadex state update formula can be extended to include interactions by composition with the original state update function like so
 %%
 \begin{align}
 X_{{\sf t}+1}^i &= G^i_{{\sf t}+1}[F_{{\sf t}+1}(X_{0:{\sf t}}, z, {\sf t}), A_{{\sf t}+1}] = {\cal F}^i_{{\sf t}+1}(X_{0:{\sf t}}, z, A_{{\sf t}+1}, {\sf t}) \label{eq:generalised-state-actions} \,,
 \end{align}
 %%
-where we have also introduced the concept of the `actions' performed $A_{{\sf t}+1}$ on the system; some vector of parameters which define what actions are taken at timestep ${\sf t}+1$.
+where we have also introduced the concept of the `actions' performed $A_{{\sf t}+1}$ on the system; some vector of parameters which define what actions are taken at timestep ${\sf t}+1$. We have illustrated Eq.~(\ref{eq:generalised-state-actions}) with a new graph representation in Fig.~\ref{fig:fundamental-loop-with-actions}. In addition to this diagram, the code for the new iteration formula would look something like Fig.~\ref{fig:iterations-with-actions}.
 
 \begin{figure}[h]
 \centering
@@ -21,8 +21,6 @@ where we have also introduced the concept of the `actions' performed $A_{{\sf t}
 \label{fig:fundamental-loop-with-actions}
 \end{figure}
 
-The code for the new iteration formula given by Eq.~(\ref{eq:generalised-state-actions}), which includes taking actions in the same timestep, would look something like Fig.~\ref{fig:iterations-with-actions}.
-
 \begin{figure}[h]
 \centering
 \includegraphics[width=11cm]{images/chapter-9-iterations-with-actions.drawio.png}
@@ -30,17 +28,17 @@ The code for the new iteration formula given by Eq.~(\ref{eq:generalised-state-a
 \label{fig:iterations-with-actions}
 \end{figure}
 
-So far, Eq.~(\ref{eq:generalised-state-actions}) on its own will allow the agent to take actions that are scheduled up front through some fixed process or through user interaction via a game interface. So what's next? In order to start creating algorithms which will act on the system state for us, we need to develop a formalism which `closes the loop' by feeding information back from the stochastic process to the agent's decision-making algorithm. Note that in most cases, the state of real-world phenomena cannot be measured perfectly. So to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to include a measurement process as part of the information retrieval step.
+So far, Eq.~(\ref{eq:generalised-state-actions}) on its own will allow the agent to take actions that are scheduled up front through some fixed process or perhaps through user interaction via a game interface. So what's next? In order to start creating algorithms which will act on the system state for us, we need to develop a formalism which `closes the loop' by feeding information back from the stochastic process to the agent's decision-making algorithm.
 
-When an agent takes an action to measure the state of the system (or when it is given measurements without needing to take action) there will typically be some uncertainty in how the history of measured real-world data $Y$ maps to the latent states of the system $X$ and its parameters $z$ at time ${\sf t}+1$. It is natural, then, to represent this uncertainty with a posterior probability distribution ${\cal P}_{{\sf t}+1}(X,z\vert Y)$ as we did in the previous chapters of this book. 
-
-Let us now define a fully general Non-Markovian Decision Process (NMDP) as a probabilistic model which draws an actions matrix $A$ from a `policy' distribution $\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)$. The joint distribution over $X$ and $A$ at time ${\sf t}+1$ is therefore
+If we use $A_{0:{\sf t}+1}$ a referring to the matrix of historically-taken actions which up to time ${\sf t}+1$, we can build up a more generalised, non-Markovian picture of automated interactions with the system which matches the notation we are already using for $X_{0:{\sf t}+1}$. Let us now define a Non-Markovian Decision Process (NMDP) as a probabilistic model which draws an actions matrix $A=A_{0:{\sf t}+1}$ from a `policy' distribution $\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)$ given $X=X_{0:{\sf t}}$ and a new vector of parameters which fully specify the automated interations. Using the probabilistic notation from the previous part of the book, the joint probability that $X=X_{0:{\sf t}+1}$ and $A=A_{0:{\sf t}+1}$ at time ${\sf t}+1$ is
 %%
 \begin{align}
-P_{{\sf t}+1}(X,A\vert z, \theta ) &= P_{{\sf t}}(X\vert z,\theta ) \,\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta) \,.
+P_{{\sf t}+1}(X,A\vert z, \theta ) &= P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A) \label{eq:joint-prob-x-and-a} \,,
 \end{align}
 %%
-There's also an updated iteration formula for the stochastic process state which takes the effect of agent actions into account
+where we recall that $P_{({\sf t}+1){\sf t}}(X\vert X',z,A)$ is the conditional probability of $X=X_{0:{\sf t}+1}$ given $X'=X_{0:{\sf t}}$ and $z$ that we have encountered before, but it now requires $A=A_{0:{\sf t}+1}$ as another given input.
+
+By marginalising over Eq.~(\ref{eq:joint-prob-x-and-a}) we find an updated probabilistic iteration formula for the stochastic process state which now takes the influence of agent actions into account
 %%
 \begin{align}
 P_{{\sf t}+1}(X\vert z,\theta ) &= \int_{\Omega_{{\sf t}}}{\rm d}X' \int_{\Xi_{{\sf t}+1}}{\rm d}A \, P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A)  \,.
