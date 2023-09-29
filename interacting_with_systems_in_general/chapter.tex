@@ -12,14 +12,7 @@ During a timestep over which actions are performed by the agent, the stochadex s
 X_{{\sf t}+1}^i &= G^i_{{\sf t}+1}[F_{{\sf t}+1}(X_{0:{\sf t}}, z, {\sf t}), A_{{\sf t}+1}] = {\cal F}^i_{{\sf t}+1}(X_{0:{\sf t}}, z, A_{{\sf t}+1}, {\sf t}) \label{eq:generalised-state-actions} \,,
 \end{align}
 %%
-where we have also introduced the concept of the `actions' performed $A_{{\sf t}+1}$ on the system; some vector of parameters which define what actions are taken at timestep ${\sf t}+1$. We have illustrated Eq.~(\ref{eq:generalised-state-actions}) with a new graph representation in Fig.~\ref{fig:fundamental-loop-with-actions}. In addition to this diagram, the code for the new iteration formula would look something like Fig.~\ref{fig:iterations-with-actions}.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=11cm]{images/chapter-9-fundamental-loop-with-actions.drawio.png}
-\caption{Graph representation of Eq.~(\ref{eq:generalised-state-actions}).}
-\label{fig:fundamental-loop-with-actions}
-\end{figure}
+where we have also introduced the concept of the `actions' performed $A_{{\sf t}+1}$ on the system; some vector of parameters which define what actions are taken at timestep ${\sf t}+1$. The code for the new iteration formula would look something like Fig.~\ref{fig:iterations-with-actions}.
 
 \begin{figure}[h]
 \centering
@@ -36,7 +29,14 @@ If we use $A_{0:{\sf t}+1}$ a referring to the matrix of historically-taken acti
 P_{{\sf t}+1}(X,A\vert z, \theta ) &= P_{{\sf t}}(X'\vert z,\theta ) \, \Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)P_{({\sf t}+1){\sf t}}(X\vert X',z,A) \label{eq:joint-prob-x-and-a} \,,
 \end{align}
 %%
-where we recall that $P_{({\sf t}+1){\sf t}}(X\vert X',z,A)$ is the conditional probability of $X=X_{0:{\sf t}+1}$ given $X'=X_{0:{\sf t}}$ and $z$ that we have encountered before, but it now requires $A=A_{0:{\sf t}+1}$ as another given input.
+where we recall that $P_{({\sf t}+1){\sf t}}(X\vert X',z,A)$ is the conditional probability of $X=X_{0:{\sf t}+1}$ given $X'=X_{0:{\sf t}}$ and $z$ that we have encountered before, but it now requires $A=A_{0:{\sf t}+1}$ as another given input. We have illustrated Eq.~(\ref{eq:generalised-state-actions}) and how it relates to the policy distribution of Eq.~(\ref{eq:joint-prob-x-and-a}) with a new graph representation in Fig.~\ref{fig:fundamental-loop-with-actions}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=11cm]{images/chapter-9-fundamental-loop-with-actions.drawio.png}
+\caption{Graph representation of Eq.~(\ref{eq:generalised-state-actions}) with the policy distribution of Eq.~(\ref{eq:joint-prob-x-and-a}).}
+\label{fig:fundamental-loop-with-actions}
+\end{figure}
 
 For additional clarity, let's take a moment to think about what $\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)$ represents and how generally descriptive it can be. If an agent is acting under and entirely deterministic policy, then the policy distribution may be simplified to a direct function mapping which is parameterised by $\theta$. At the other extreme, the distribution may also describe a fully stochastic policy where actions are drawn randomly in time. If we combine this consideration of noise with the observation that policies described by a distribution $\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)$ permit a memory of past actions and states, it's easy to see that this structure can be used in a wide variety of different use cases.
 
