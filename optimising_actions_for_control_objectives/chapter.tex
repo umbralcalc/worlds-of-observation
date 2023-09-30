@@ -4,27 +4,40 @@
 
 \section{\sffamily States, actions and attributing rewards}
 
-In the previous parts of this book we laid out the concept for a generalised framework to simulate and learn stochastic phenomena continually as data is received. Given that we have also introduced a framework for the automated control of these phenomena; we have all the ingredients we need to create optimal decision-making algorithms. An obvious question to answer then, is optimal \emph{with respect to what objective}?
+In the previous parts of this book we laid out the concept for a generalised framework to simulate and learn stochastic phenomena continually as data is received. Given that we have also introduced a framework for the automated control of these phenomena, we have all the ingredients we need to create optimal decision-making algorithms. The key question to answer then, is: \emph{optimal with respect to what objective?}
 
-Note that in most cases, the state of real-world phenomena cannot be measured perfectly. So to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to include a measurement process as part of the information retrieval step. 
+The objective of an automated control algorithm could take many forms depending on the specific context. Since there is no loss in generality in doing so, it seems natural to follow the naming convention used by Markov Decision Processes (MDP)~\cite{bertsekas2011dynamic,sutton2018reinforcement} by referring to the objective outcome of an action at a particular point in time as having a `reward' value $r$. Since the relationship between reward, actions and states may be stochastic, it makes sense to relate the reward outcome $r$ given a state history $X$ and action history $A$ at timestep ${\sf t}+1$ through the probability distribution $P_{{\sf t}+1}(r\vert X,A)$. We can then use this reward probability distribution to derive a joint distribution over both state history $X'$ and reward $r$ at timestep ${\sf t}+1$ like so
+%%
+\begin{align}
+P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta) &= P_{{\sf t}+1}(r\vert X',A)\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)P_{({\sf t}+1){\sf t}}(X'\vert X,z,A) \,.
+\end{align}
+%%
+In this expression, let's recall that we are using the policy distribution $\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)$ for agent interactions and the fundamental state update conditional probability for the underlying stochastic process $P_{({\sf t}+1){\sf t}}(X'\vert X,z,A)$.
 
-When an agent takes an action to measure the state of the system (or when it is given measurements without needing to take action) there will typically be some uncertainty in how the history of measured real-world data $Y$ maps to the latent states of the system $X$ and its parameters $z$ at time ${\sf t}+1$. It is natural, then, to represent this uncertainty with a posterior probability distribution ${\cal P}_{{\sf t}+1}(X,z\vert Y)$ as we did in the previous chapters of this book.
+Note that in most use cases, the state of real-world phenomena cannot be measured perfectly. So to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to include a measurement process as part of the information retrieval step. This is the part where we can leverage our work in a previous chapter which develops an online learning system for stochastic process models. But we're jumping ahead with this thinking and will return to this point later on.
 
 Using the state value function $V$...
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta) &= P_{{\sf t}+1}(r\vert X',A)\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)P_{({\sf t}+1){\sf t}}(X'\vert X,z,A)  \\
 {\cal N}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}+1}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')] \right\} \\
-V_{{\sf t}}(X,z,\theta) &= \frac{1}{{\cal N}_{{\sf t}}}\sum_{{\sf t}'={\sf t}+1}^{\infty} \int_{\Omega_{{\sf t}'}}{\rm d}X'\int_{\rho_{{\sf t}'}} {\rm d}r \,r\, \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')]P_{({\sf t}''+1){\sf t}''}(r,X'\vert X, z,\theta) \\
+V_{{\sf t}}(X,z,\theta) &= \frac{1}{{\cal N}_{{\sf t}}}\sum_{{\sf t}'={\sf t}+1}^{\infty} \int_{\Omega_{{\sf t}'}}{\rm d}X'\int_{\rho_{{\sf t}'}} {\rm d}r \,r\, \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')]P_{({\sf t}''+1){\sf t}''}(r,X'\vert X, z,\theta) \,,
+\end{align}
+%%
+where we note that $V$ is inherently recursively defined, such that
+%%
+\begin{align}
 V_{{\sf t}}(X,z,\theta) &= \int_{\Omega_{{\sf t}+1}}{\rm d}X'\int_{\rho_{{\sf t}+1}} {\rm d}r \, P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta)\bigg\{ r+\gamma [\delta t({\sf t})]V_{{\sf t}+1}(X',z,\theta)\bigg\} \,.
 \end{align}
 %%
-In either case, the optimal $\theta$, $\Pi$ and $V$ can be derived from
+
+The optimal $\theta$, $\Pi$ and $V$ can be derived from
 \begin{align}
 \theta^*_{{\sf t}}(X,z) &= \underset{\theta}{{\rm argmax}} \big[ V_{{\sf t}}(X,z,\theta)\big] \\
 \Pi^*_{({\sf t}+1){\sf t}}(A\vert X,z) &= \Pi_{({\sf t}+1){\sf t}}[A\vert X,\theta^*_{{\sf t}}(X,z)] \\
 V^*_{{\sf t}}(X,z) &= V_{{\sf t}}[X,z,\theta^*_{{\sf t}}(X,z)] \,.
 \end{align}
+
+When an agent takes an action to measure the state of the system (or when it is given measurements without needing to take action) there will typically be some uncertainty in how the history of measured real-world data $Y$ maps to the latent states of the system $X$ and its parameters $z$ at time ${\sf t}+1$. It is natural, then, to represent this uncertainty with a posterior probability distribution ${\cal P}_{{\sf t}+1}(X,z\vert Y)$ as we did in the previous chapters of this book.
 
 \textcolor{red}{
 Follow-up this bit with the model-based approach that we're going to take in this book.
