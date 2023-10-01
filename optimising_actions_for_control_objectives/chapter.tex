@@ -9,21 +9,27 @@ In the previous parts of this book we laid out the concept for a generalised fra
 The objective of an automated control algorithm could take many forms depending on the specific context. Since there is no loss in generality in doing so, it seems natural to follow the naming convention used by Markov Decision Processes (MDP)~\cite{bertsekas2011dynamic,sutton2018reinforcement} by referring to the objective outcome of an action at a particular point in time as having a `reward' value $r$. Since the relationship between reward, actions and states may be stochastic, it makes sense to relate the reward outcome $r$ given a state history $X$ and action history $A$ at timestep ${\sf t}+1$ through the probability distribution $P_{{\sf t}+1}(r\vert X,A)$. We can then use this reward probability distribution to derive a joint distribution over both state history $X'$ and reward $r$ at timestep ${\sf t}+1$ like so
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta) &= P_{{\sf t}+1}(r\vert X',A)\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)P_{({\sf t}+1){\sf t}}(X'\vert X,z,A) \,.
+P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta) &= P_{{\sf t}+1}(r\vert X',A)\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)P_{({\sf t}+1){\sf t}}(X'\vert X,z,A) \label{eq:joint-x-and-r}\,.
 \end{align}
 %%
 In this expression, let's recall that we are using the policy distribution $\Pi_{({\sf t}+1){\sf t}}(A\vert X,\theta)$ for agent interactions and the fundamental state update conditional probability for the underlying stochastic process $P_{({\sf t}+1){\sf t}}(X'\vert X,z,A)$.
 
 Note that in most use cases, the state of real-world phenomena cannot be measured perfectly. So to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to include a measurement process as part of the information retrieval step. This is the part where we can leverage our work in a previous chapter which develops an online learning system for stochastic process models. But we're jumping ahead with this thinking and will return to this point later on.
 
-Using the state value function $V$...
+Using Eq.~(\ref{eq:joint-x-and-r}), we can now define`state value function' $V_{{\sf t}}$ at timestep ${\sf t}$ which is the expected $\gamma$-discounted future reward given the current state history $X$ and the other parameters like this
 %%
 \begin{align}
-{\cal N}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}+1}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')] \right\} \\
 V_{{\sf t}}(X,z,\theta) &= \frac{1}{{\cal N}_{{\sf t}}}\sum_{{\sf t}'={\sf t}+1}^{\infty} \int_{\Omega_{{\sf t}'}}{\rm d}X'\int_{\rho_{{\sf t}'}} {\rm d}r \,r\, \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')]P_{({\sf t}''+1){\sf t}''}(r,X'\vert X, z,\theta) \,,
 \end{align}
 %%
-where we note that $V$ is inherently recursively defined, such that
+where ${\cal N}_{{\sf t}}$ is a normalisation factor that can be computed from
+%%
+\begin{align}
+{\cal N}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}+1}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')] \right\} \,.
+\end{align}
+%%
+
+Note that $V$ is inherently recursively defined, such that
 %%
 \begin{align}
 V_{{\sf t}}(X,z,\theta) &= \int_{\Omega_{{\sf t}+1}}{\rm d}X'\int_{\rho_{{\sf t}+1}} {\rm d}r \, P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta)\bigg\{ r+\gamma [\delta t({\sf t})]V_{{\sf t}+1}(X',z,\theta)\bigg\} \,.
