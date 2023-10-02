@@ -16,32 +16,37 @@ In this expression, let's recall that we are using the policy distribution $\Pi_
 
 Note that in most use cases, the state of real-world phenomena cannot be measured perfectly. So to enable any agent trained on simulated phenomena to potentially act in the real world, we will need to include a measurement process as part of the information retrieval step. This is the part where we can leverage our work in a previous chapter which develops an online learning system for stochastic process models. But we're jumping ahead with this thinking and will return to this point later on.
 
-Using Eq.~(\ref{eq:joint-x-and-r}), we can now define`state value function' $V_{{\sf t}}$ at timestep ${\sf t}$ which is the expected $\gamma$-discounted future reward given the current state history $X$ and the other parameters like this
+Using Eq.~(\ref{eq:joint-x-and-r}), we can now define a `state value function' $V_{{\sf t}}$ at timestep ${\sf t}$ which is the expected $\gamma$-discounted future reward given the current state history $X$ and the other parameters like this
 %%
 \begin{align}
-V_{{\sf t}}(X,z,\theta) &= \frac{1}{{\cal N}_{{\sf t}}}\sum_{{\sf t}'={\sf t}+1}^{\infty} \int_{\Omega_{{\sf t}'}}{\rm d}X'\int_{\rho_{{\sf t}'}} {\rm d}r \,r\, \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')]P_{({\sf t}''+1){\sf t}''}(r,X'\vert X, z,\theta) \,,
+V_{{\sf t}}(X,z,\theta) &= \frac{1}{{\cal N}_{{\sf t}}}\sum_{{\sf t}'={\sf t}}^{\infty} \int_{\Omega_{{\sf t}'}}{\rm d}X'\int_{\rho_{{\sf t}'}} {\rm d}r \,r\, \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}''+1)]P_{({\sf t}''+1){\sf t}''}(r,X'\vert X, z,\theta) \,,
 \end{align}
 %%
 where ${\cal N}_{{\sf t}}$ is a normalisation factor that can be computed from
 %%
 \begin{align}
-{\cal N}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}+1}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}'')] \right\} \,.
+{\cal N}_{{\sf t}} &= \sum_{{\sf t}'={\sf t}}^{\infty}\left\{ \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}''+1)] \right\} \,.
 \end{align}
 %%
-
-Note that $V$ is inherently recursively defined, such that
+The idea behind this discount factor $\gamma$ is to decrease the contribution of rewards to the optimisation objective (often called the `expected return' in RL) more and more as the prediction increases into the future. Note also that $V$ is inherently recursively defined, such that
 %%
 \begin{align}
-V_{{\sf t}}(X,z,\theta) &= \int_{\Omega_{{\sf t}+1}}{\rm d}X'\int_{\rho_{{\sf t}+1}} {\rm d}r \, P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta)\bigg\{ r+\gamma [\delta t({\sf t})]V_{{\sf t}+1}(X',z,\theta)\bigg\} \,.
+V_{{\sf t}}(X,z,\theta) &= \int_{\Omega_{{\sf t}+1}}{\rm d}X'\int_{\rho_{{\sf t}+1}} {\rm d}r \, P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta)\bigg\{ r+\gamma [\delta t({\sf t}+1)]V_{{\sf t}+1}(X',z,\theta)\bigg\} \,,
 \end{align}
 %%
-
-The optimal $\theta$, $\Pi$ and $V$ can be derived from
+and the optimal $\theta$ can hence be derived from
+%%
 \begin{align}
-\theta^*_{{\sf t}}(X,z) &= \underset{\theta}{{\rm argmax}} \big[ V_{{\sf t}}(X,z,\theta)\big] \\
+\theta^*_{{\sf t}}(X,z) &= \underset{\theta}{{\rm argmax}} \big[ V_{{\sf t}}(X,z,\theta)\big] \,.
+\end{align}
+%%
+Using $\theta^*_{{\sf t}}(X,z)$ the optimal state value function and policy distribution can also be defined
+%%
+\begin{align}
 \Pi^*_{({\sf t}+1){\sf t}}(A\vert X,z) &= \Pi_{({\sf t}+1){\sf t}}[A\vert X,\theta^*_{{\sf t}}(X,z)] \\
 V^*_{{\sf t}}(X,z) &= V_{{\sf t}}[X,z,\theta^*_{{\sf t}}(X,z)] \,.
 \end{align}
+%%
 
 When an agent takes an action to measure the state of the system (or when it is given measurements without needing to take action) there will typically be some uncertainty in how the history of measured real-world data $Y$ maps to the latent states of the system $X$ and its parameters $z$ at time ${\sf t}+1$. It is natural, then, to represent this uncertainty with a posterior probability distribution ${\cal P}_{{\sf t}+1}(X,z\vert Y)$ as we did in the previous chapters of this book.
 
