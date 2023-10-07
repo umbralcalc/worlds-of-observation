@@ -19,10 +19,11 @@ Note that in most use cases, the state of real-world phenomena cannot be measure
 Using Eq.~(\ref{eq:joint-x-and-r}), we can now define a `state value function' $V_{{\sf t}}$ at timestep ${\sf t}$ which is the expected $\gamma$-discounted future reward given the current state history $X$ and the other parameters like this
 %%
 \begin{align}
-V_{{\sf t}}(X,z,\theta) &= \sum_{{\sf t}'={\sf t}}^{\infty} \int_{\Omega_{{\sf t}'}}{\rm d}X'\int_{\rho_{{\sf t}'}} {\rm d}r \,r\, \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}''+1)]P_{({\sf t}''+1){\sf t}''}(r,X'\vert X, z,\theta) \,.
+V_{{\sf t}}(X,z,\theta) &= {\rm E}({\sf Discounted \,Return}\vert X, z, \theta ) \nonumber \\
+&= \sum_{{\sf t}'={\sf t}}^{\infty} \int_{\Omega_{{\sf t}'}}{\rm d}X'\int_{\rho_{{\sf t}'}} {\rm d}r \,r\, \prod_{{\sf t}''={\sf t}}^{{\sf t}'} \gamma [\delta t({\sf t}''+1)]P_{({\sf t}''+1){\sf t}''}(r,X'\vert X, z,\theta) \,.
 \end{align}
 %%
-The idea behind this discount factor $\gamma$ is to decrease the contribution of rewards to the optimisation objective (often called the `expected return' in RL) more and more as the prediction increases into the future. Note also that the state value function is inherently recursively defined, such that
+The idea behind this discount factor $\gamma$ is to decrease the contribution of rewards to the optimisation objective (often called the `expected discounted return' in RL) more and more as the prediction increases into the future. Note also that the state value function is inherently recursively defined, such that
 %%
 \begin{align}
 V_{{\sf t}}(X,z,\theta) &= \int_{\Omega_{{\sf t}+1}}{\rm d}X'\int_{\rho_{{\sf t}+1}} {\rm d}r \, P_{({\sf t}+1){\sf t}}(r,X'\vert X, z,\theta)\bigg\{ r+\gamma [\delta t({\sf t}+1)]V_{{\sf t}+1}(X',z,\theta)\bigg\} \,,
@@ -37,14 +38,18 @@ and the optimal $\theta$ can hence be derived from
 By deriving the optimal policy in terms of the parameters $\theta^*_{{\sf t}}(X,z)$, the optimal state value function and policy distribution can therefore be derived from
 %%
 \begin{align}
-\Pi^*_{({\sf t}+1){\sf t}}(A\vert X,z) &= \Pi_{({\sf t}+1){\sf t}}[A\vert X,\theta^*_{{\sf t}}(X,z)] \\
-V^*_{{\sf t}}(X,z) &= V_{{\sf t}}[X,z,\theta^*_{{\sf t}}(X,z)] \,.
+V^*_{{\sf t}}(X,z) &= V_{{\sf t}}[X,z,\theta^*_{{\sf t}}(X,z)] \\
+\Pi^*_{({\sf t}+1){\sf t}}(A\vert X,z) &= \Pi_{({\sf t}+1){\sf t}}[A\vert X,\theta^*_{{\sf t}}(X,z)] \,.
 \end{align}
 %%
 
-In more conventional model-free RL approaches, the state-action value function $Q_{{\sf t}}(X,A,z)$ would be used to evaluate the optimal policy instead of the state value function $V_{{\sf t}}(X,z,\theta )$ that we are using above. We are able to use the latter here because the simulation model gives us explicit knowledge of the $P_{({\sf t}+1){\sf t}}(X'\vert X,z,A)$ distribution which is utilised by Eq.~(\ref{eq:joint-x-and-r}). When this model is not known, $Q_{{\sf t}}(X,A,z)$ must be learned explicitly from the data and experienced outcomes of actions taken by the agent.
-
-%%%% GOT TO HERE
+Note that the type of decision process optimisation which we have introduced above differs from standard RL methodology. In the more conventional `model-free' RL approaches, the state-action value function 
+%%
+\begin{align}
+Q_{{\sf t}}(X,A,z)={\rm E}({\sf Discounted \,Return}\vert X,A,z) \,,
+\end{align}
+%%
+would be used to evaluate the optimal policy instead of the state value function $V_{{\sf t}}(X,z,\theta )$ that we are using above. We are able to use the latter here because the simulation model gives us explicit knowledge of the $P_{({\sf t}+1){\sf t}}(X'\vert X,z,A)$ distribution which is utilised by Eq.~(\ref{eq:joint-x-and-r}). When this model is not known, the state-action value function $Q_{{\sf t}}(X,A,z)$ must be learned explicitly through sample estimation from the measured state and experienced outcomes of actions taken by the agent.
 
 When an agent takes an action to measure the state of the system (or when it is given measurements without needing to take action) there will typically be some uncertainty in how the history of measured real-world data $Y$ maps to the latent states of the system $X$ and its parameters $z$ at time ${\sf t}+1$. It is natural, then, to represent this uncertainty with a posterior probability distribution ${\cal P}_{{\sf t}+1}(X,z\vert Y)$ as we did in the previous chapters of this book.
 
