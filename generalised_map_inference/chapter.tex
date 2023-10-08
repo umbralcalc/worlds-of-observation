@@ -72,14 +72,20 @@ P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\Omega_{{\sf t}+1}} {\rm d}X \, P_{{\sf t}
 shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}). To complete the picture, one can combine the $X$ and $z$ updates into a joint distribution update which takes the following form 
 %%
 \begin{align} 
-P_{{\sf t}+1}(X,z\vert {\sf Y}) &\propto \int_{\Omega_{{\sf t}}} {\rm d}X' P_{{\sf t}+1}({\sf Y}\vert X) P_{({\sf t}+1){\sf t}}(X\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update}\,.
+P_{{\sf t}+1}(X,z\vert {\sf Y}) &\propto P_{{\sf t}+1}({\sf Y}\vert X) P_{({\sf t}+1){\sf t}}(x\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update}\,.
+\end{align}
+%%
+We can also marginalise this distribution over the past state history rows to get a distribution over the latest state row $X_{{\sf t}+1}=x$ like this 
+%%
+\begin{align}
+P_{{\sf t}+1}(x,z\vert {\sf Y}) &= \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1}(X,z\vert {\sf Y}) \propto \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1}({\sf Y}\vert X) P_{({\sf t}+1){\sf t}}(x\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update-latest-row} \,.
 \end{align}
 %%
 
-In the next section, we're going to discuss how to translate all of this probabilistic language into some MAP inference algorithms. Before we do this, however, it will be instructive (particularly for `online' learning algorithms) to consider what happens if the model changes over time and $z$ needs to change in order to better represent the real data. In such situations, we propose to apply the same formula as Eq.~(\ref{eq:x-z-update}) but instead replace the distribution over $(X',z)$ on the right hand side with its `past discounted' version 
+In the next section, we're going to discuss how to translate all of this probabilistic language into some MAP inference algorithms. Before we do this, however, it will be instructive (particularly for `online' learning algorithms) to consider what happens if the model changes over time and $z$ needs to change in order to better represent the real data. In such situations, we propose to apply the same formula as Eq.~(\ref{eq:x-z-update-latest-row}) but instead replace the distribution over $(X',z)$ on the right hand side with its `past discounted' version 
 %%
 \begin{align}
-\int_{\Omega_{{\sf t}}}{\rm d}X' \dots P_{{\sf t}}(X',z\vert {\sf Y}') \,\, \longrightarrow \,\, \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \dots \left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \beta [\delta t({\sf t}'')] \right\} P_{{\sf t}'}(x',z\vert {\sf Y}') \,,
+\int_{\Omega_{{\sf t}}}{\rm d}X' P_{{\sf t}}(X',z\vert {\sf Y}') \,\, \longrightarrow \,\, \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \left\{ \prod_{{\sf t}''={\sf t}'}^{{\sf t}} \beta [\delta t({\sf t}'')] \right\} P_{{\sf t}'}(x',z\vert {\sf Y}') \,,
 \end{align}
 %%
 where $0 < \beta [\delta t({\sf t}'')] < 1$ and we recall the notation which considers distributions over the individual rows $x'$ within the matrix $X'$ in this new version. This time-dependent discount factor could be used to reduce the dependence of the update on data which is much further in the past, and hence will ultimately lead to a more responsive algorithm. This responsiveness would have to be balanced with the tradeoffs associated with discounting potentially valuable data that may offer greater long-term stability. Readers who are familiar with reinforcement learning may be starting to feel in familiar territory here --- they will have to wait for the latter parts of the book to see more on discounting though!
@@ -91,7 +97,7 @@ Eq.~(\ref{eq:x-z-update}) tells us how to probabilistically translate the curren
 So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{eq:likelihood-free-posterior}) and~(\ref{eq:x-z-update}) tell us we need to synthesize the following components into a single algorithm:
 %%
 \begin{enumerate}
-\item{A process $P_{({\sf t}+1){\sf t}}(X\vert X', z)$ which iterates the state matrix of the simulation $X$ forward in time.}
+\item{A process $P_{({\sf t}+1){\sf t}}(x\vert X', z)$ which iterates the state matrix of the simulation $X$ forward in time.}
 \item{A process $P_{{\sf t}+1}({\sf Y}\vert X)$ which generates simulated measurements from the simulated states $X$.}
 \item{A probability distribution= $P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots )$ which represents the posterior distribution of the simulated measurement vector ${\sf y}$ given an optimised compression of the real data into summary statistics.}
 \item{Some way of representing samples from the distribution $P_{{\sf t}+1}(X,z\vert {\sf Y})$ so that their distribution can be updated and will coverge towards the posterior over $(X,z)$.}
@@ -114,7 +120,7 @@ As such an algorithm converges, we can recompute (and hence iteratively improve)
 
 Readers with some machine learning experience may be familiar with the classic exploration vs exploitation tradeoffs. It's clear that these tradeoffs will manifest in our case here when trying to strike a balance between iterating the posterior distribution and optimizing the current posterior with respect to $(X,z)$ to compute the MAP. 
 
-Readers of the previous section may also have recognized that Eq.~(\ref{eq:x-z-update}) contains the same conditional probability $P_{({\sf t}+1){\sf t}}(X\vert X,z)$ as the reweighting algorithm. This structure enables us to reuse all of the exposition we provided for the probabilistic reweighting and highlights how the reweighting itself can be used in the algorithm to optimise the posterior.   
+Readers of the previous section may also have recognized that Eq.~(\ref{eq:x-z-update}) contains the same conditional probability $P_{({\sf t}+1){\sf t}}(x\vert X',z)$ as the reweighting algorithm. This structure enables us to reuse all of the exposition we provided for the probabilistic reweighting and highlights how the reweighting itself can be used in the algorithm to optimise the posterior.   
 
 If we now synthesize both of these observations together, we can see how a stochastic variant of the well-known Expectation-Maximisation Algorithm~\cite{hartley1958maximum, dempster1977maximum, murphy2012machine} naturally emerges.
 
