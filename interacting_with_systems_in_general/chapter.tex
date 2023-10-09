@@ -49,12 +49,6 @@ P_{{\sf t}+1}(X\vert z,\theta ) &= \int_{\Xi_{{\sf t}+1}}{\rm d}A \, P_{{\sf t}}
 %%
 This relationship will be very useful in the last part of this book when we begin to look at optimising control algorithms.
 
-\textcolor{red}{
-Think up some simple example categories of control and go through them here:
-\begin{itemize}
-\item{Markovian and non-Markovian decision processes}
-\item{Discrete action decision processes (like bandit problem) --- choosing between website layouts for E-commerce~\cite{liu2021map}, sensor measurement scheduling, sequential design of large-scale scientific experiments }
-\item{Continuously-acting decision processes --- controlling the temperature of chemical reactions (such as those in a brewery), spacecraft control~\cite{tipaldi2022reinforcement} and guidance systems, autonomous vehicles }
-\item{Continuous event-based acting decision processes --- manager of a sports team, controlling traffic, managing disease spread, financial market portfolio optimisation }
-\end{itemize}
-}
+What are the main categories of action which are possible in the rows of $A$? Since the NMDP described by $\Pi_{({\sf t}+1){\sf t}}(A\vert X',\theta)$ is just another form of stochastic process, the main categories of action will fall into the same as those we covered in defining the stochadex formalism. The first, and perhaps most obvious, category would probably where the actions are defined in a continuous space and are continuously applied on every timestep. Some examples of these `continuously-acting' decision processes include controlling the temperature of chemical reactions~\cite{beeler2023chemgymrl} (such as those in a brewery), spacecraft control~\cite{tipaldi2022reinforcement} and guidance systems,  as well as the driving of autonomous vehicles~\cite{kiran2021deep}. Within a kind of subset of the continuously-acting category; we can also find the event-based acting decision processes (where actions are not necessarily taken every timestep), e.g. controlling traffic through signal timings~\cite{garg2018deep}, managing disease spread through treatment intervals~\cite{ohi2020exploring} and automated trading on stock markets~\cite{meng2019reinforcement}.
+
+Many of the examples we have given above have continuous action spaces, but we might also consider classes of decision processes where actions are defined discretely. Examples of these include the famous multi-armed bandit problem~\cite{gittins2011multi} (like choosing between website layouts for E-commerce~\cite{liu2021map}), managing a sports team through player substitutions, sensor measurement scheduling~\cite{leong2020deep} and the sequential design prioritisation of large-scale scientific experiments~\cite{blau2022optimizing}.
