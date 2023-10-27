@@ -3,19 +3,21 @@
 ## declare filenames
 declare -a filenames=(
     "building_a_generalised_simulator/chapter" \
-    "simulating_a_financial_market/chapter" \
-    "quantum_jumps_on_generic_networks/chapter" \
-    "empirical_probabilistic_reweighting/chapter" \
-    "generalised_map_inference/chapter" \
-    "inferring_2d_spatial_dynamics/chapter" \
-    "learning_from_ants_on_curved_surfaces/chapter" \
-    "a_world_of_hydrodynamic_ensembles/chapter" \
-    "interacting_with_systems_in_general/chapter" \
+    "numerical_time_evolution_of_probabilities/chapter" \
+    "empirical_probabilistic_reweighting_algorithms/chapter" \
+    "generalised_simulation_inference/chapter" \
+    "interacting_with_any_system/chapter" \
+    "optimising_actions_for_control_objectives/chapter" \
+    "influencing_house_prices/chapter" \
+    "resource_allocation_for_epidemics/chapter" \
+    "algo_trading_on_financial_markets/chapter" \
+    "sequential_experimental_design/chapter" \
     "angling_for_freshwater_fish/chapter" \
     "managing_a_rugby_match/chapter" \
-    "influencing_house_prices/chapter" \
-    "optimising_actions_for_control_objectives/chapter" \
-    "resource_allocation_for_epidemics/chapter" \
+    "real_time_optimisation_of_supply_chain_logistics/chapter" \
+    "stimulating_brain_network_responses/chapter" \
+    "inferring_2d_spatial_dynamics/chapter" \
+    "a_world_of_hydrodynamic_ensembles/chapter" \
     "quantum_system_control/chapter"
 )
 

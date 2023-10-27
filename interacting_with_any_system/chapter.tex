@@ -1,4 +1,4 @@
-\chapter{\sffamily Interacting with systems in general}
+\chapter{\sffamily Interacting with any system}
 
 {\bfseries\sffamily Concept.} To design and build a software which can interact with stochastic processes of any kind, either manually through user input, or automatically by introducing a `policy'. The mathematical formalism and software that we introduce here will serve as a common language and interface for any simulation studies into manipulating real world phenomena, and will enable the learning of control algorithms in later chapters of this book. We will implement this new interaction software as an extension to the stochadex package. For the mathematically-inclined, this chapter will cover how interactions are structured in theory by adding some new concepts to the stochadex formalism and illustrating with some simple examples. For the programmers, the public Git repository for the code described in this chapter can be found here: \href{https://github.com/umbralcalc/stochadex}{https://github.com/umbralcalc/stochadex}.
 
@@ -16,7 +16,7 @@ where we have also introduced the concept of the `actions' performed $A_{{\sf t}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=11cm]{images/chapter-9-iterations-with-actions.drawio.png}
+\includegraphics[width=11cm]{images/chapter-5-iterations-with-actions.drawio.png}
 \caption{Code schematic of Eq.~(\ref{eq:generalised-state-actions}).}
 \label{fig:iterations-with-actions}
 \end{figure}
@@ -34,7 +34,7 @@ X'$ and $z$ that we have encountered before, but it now requires $A_{0:{\sf t}+1
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=11cm]{images/chapter-9-fundamental-loop-with-actions.drawio.png}
+\includegraphics[width=11cm]{images/chapter-5-fundamental-loop-with-actions.drawio.png}
 \caption{Graph representation of Eq.~(\ref{eq:generalised-state-actions}) with the policy distribution of Eq.~(\ref{eq:joint-prob-x-and-a}).}
 \label{fig:fundamental-loop-with-actions}
 \end{figure}

@@ -122,7 +122,7 @@
 \vspace{1.2\baselineskip} % Whitespace 
 {\Huge \bfseries\sffamily Diffusing Ideas} \\ 
 \vspace{4mm}
-{\Large \bfseries\sffamily \color{gray75} Software, noise and building mathematical toys \\}
+{\Large \bfseries\sffamily \color{gray75} Building algorithms to control noisy real systems \\}
 \vspace*{0.75\baselineskip}
 {\color{gray75}\rule{13cm}{0.4pt}}\vspace*{-\baselineskip}\vspace*{2.75pt} % Thick horizontal rule
 {\color{gray75}\rule{13cm}{1.3pt}} \\ % Thin horizontal rule
@@ -137,9 +137,9 @@ The code to compile this book is open source and can be found in this repository
 
 \chapter*{Introduction}
 
-\emph{Diffusing Ideas} is a book of research exploration and software development which we have written for the interest of mathematically-inclined programmers and computational scientists. It's the output of many interrelated projects over several years in which we have sought to generalise the maths and code behind simulating, statistically inferring, manipulating and automatically controlling stochastic phenomena into a unified framework.
+\emph{Diffusing Ideas} is a book about building code which is able to automatically control noisy systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms~\cite{sutton2018reinforcement}, this book is devoted to creating algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and unique. 
 
-The book accompanies a lot of new open-source scientific software written predominantly in Go~\cite{golang}, and with some TypeScript~\cite{typescriptlang} to top it off. A major motivation for creating these new tools is to prepare a foundation of code from which to develop new and more complex applications. We also hope that the resulting framework will enable anyone to explore and study new phenomena effectively, regardless of their scientific background.
+The book accompanies a lot of new open-source scientific software written with combinations of Go~\cite{golang}, C++~\cite{c++lang}, Python~\cite{pythonlang} and TypeScript~\cite{typescriptlang}. A major motivation for creating these new tools is to prepare a foundation of code from which to develop new and more complex applications. We also hope that the resulting framework will enable anyone to explore and study new phenomena effectively, regardless of their scientific background.
 
 The need to properly test all this software has also provided a wonderful excuse to study and play with an extensive range of mathematical toy models. we've chosen these models based on a fairly broad background of interests, but also to illustrate the remarkable cross-disciplinary applicability of stochastic processes. However, we've often found that mathematical formalities can obscure the computations that a programmer must implement. So, while we've tried to be as ambitious as possible with the level of technical sophistication in these models, we've also tried to write the expressions in a computer-friendly way where feasible\footnote{For example, we'll typically be thinking more in terms of `matrices' and less about `operators'.} and have pseudocode diagrams throughout.
 
@@ -148,10 +148,8 @@ A quick note on the code: any software that we describe in this book (including 
 No quest would be complete without a guide, so we think this introduction should end with a list of the key milestones in the book; comprising its four major parts. These parts each correspond to answering one of the following interdependent research questions:
 
 \begin{enumerate}[leftmargin=2.5\parindent] 
-\item[{\bfseries\sffamily Part 1.}]{How do we simulate a general set of stochastic phenomena?}
-\item[{\bfseries\sffamily Part 2.}]{How do we then learn/identify the answer to {\bfseries\sffamily Part 1} from real-world data?}
-\item[{\bfseries\sffamily Part 3.}]{How do we simulate a general set of control policies to interact with the answer to {\bfseries\sffamily Part 1}?}
-\item[{\bfseries\sffamily Part 4.}]{How do we then optimise the answer to {\bfseries\sffamily Part 3} to achieve a specified control objective?} 
+\item[{\bfseries\sffamily Part 1.}]{Theoretical background and code design}
+\item[{\bfseries\sffamily Part 2.}]{Applications to realistic examples}
 \end{enumerate}
 
 \newpage \ \newpage
@@ -162,37 +160,37 @@ No quest would be complete without a guide, so we think this introduction should
 
 \input{building_a_generalised_simulator/chapter.tex}
 
-\input{simulating_a_financial_market/chapter.tex}
+\input{numerical_time_evolution_of_probabilities/chapter.tex}
 
-\input{quantum_jumps_on_generic_networks/chapter.tex}
+\input{empirical_probabilistic_reweighting_algorithms/chapter.tex}
+
+\input{generalised_simulation_inference/chapter.tex}
+
+\input{interacting_with_any_system/chapter.tex}
+
+\input{optimising_actions_for_control_objectives/chapter.tex}
 
 \part*{{\sffamily Part 2}}
 
-\input{empirical_probabilistic_reweighting/chapter.tex}
+\input{influencing_house_prices/chapter.tex}
 
-\input{generalised_map_inference/chapter.tex}
+\input{resource_allocation_for_epidemics/chapter.tex}
 
-\input{inferring_2d_spatial_dynamics/chapter.tex}
+\input{algo_trading_on_financial_markets/chapter.tex}
 
-\input{learning_from_ants_on_curved_surfaces/chapter.tex}
-
-\input{a_world_of_hydrodynamic_ensembles/chapter.tex}
-
-\part*{{\sffamily Part 3}}
-
-\input{interacting_with_systems_in_general/chapter.tex}
+\input{sequential_experiment_design/chapter.tex}
 
 \input{angling_for_freshwater_fish/chapter.tex}
 
 \input{managing_a_rugby_match/chapter.tex}
 
-\input{influencing_house_prices/chapter.tex}
+\input{real_time_optimisation_of_supply_chain_logistics/chapter.tex}
 
-\part*{{\sffamily Part 4}}
+\input{stimulating_brain_network_responses/chapter.tex}
 
-\input{optimising_actions_for_control_objectives/chapter.tex}
+\input{inferring_2d_spatial_dynamics/chapter.tex}
 
-\input{resource_allocation_for_epidemics/chapter.tex}
+\input{a_world_of_hydrodynamic_ensembles/chapter.tex}
 
 \input{quantum_system_control/chapter.tex}
  
