@@ -11,7 +11,7 @@ declare -a filenames=(
     "influencing_house_prices/chapter" \
     "resource_allocation_for_epidemics/chapter" \
     "algo_trading_on_financial_markets/chapter" \
-    "sequential_experimental_design/chapter" \
+    "sequential_experiment_design/chapter" \
     "angling_for_freshwater_fish/chapter" \
     "managing_a_rugby_match/chapter" \
     "real_time_optimisation_of_supply_chain_logistics/chapter" \
