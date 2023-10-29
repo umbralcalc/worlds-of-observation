@@ -14,7 +14,7 @@ declare -a filenames=(
     "sequential_experiment_design/chapter" \
     "angling_for_freshwater_fish/chapter" \
     "managing_a_rugby_match/chapter" \
-    "real_time_optimisation_of_supply_chain_logistics/chapter" \
+    "improving_supply_chain_logistics/chapter" \
     "stimulating_brain_network_responses/chapter" \
     "inferring_2d_spatial_dynamics/chapter" \
     "a_world_of_hydrodynamic_ensembles/chapter" \
