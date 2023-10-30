@@ -1,6 +1,6 @@
 \chapter{\sffamily Empirical probabilistic reweighting algorithms}
 
-{\bfseries\sffamily Concept.} To extend the formalism that we developed in previous chapters to enable the empirical emulation of real-world data via a probabilistic reweighting. This technique should enable a researcher to model complex dynamical trends in the data very well; at the cost of making the abstract interpretation of the model less immediately comprehensible than the statistical inference models in some proceeding chapters. As our generalised framework applies to a wide variety stochastic phenomena, our reweighting algorithm will be applicable to a great breadth of data modeling problems as well. We will also explore some examples which illustrate how the reweighting algorithm should be applied in practice and then follow this up with how the code is designed and implemented as part of a new software package called the `learnadex'. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on probabilistic reweightings and their optimisation using real-world data. For the programmers, the software described in this chapter lives in the public Git repository: \href{https://github.com/umbralcalc/learnadex}{https://github.com/umbralcalc/learnadex}.
+{\bfseries\sffamily Concept.} To extend the formalism that we developed in previous chapters to enable the empirical emulation of real-world data via a probabilistic reweighting. This technique should enable a researcher to model complex dynamical trends in the data very well; at the cost of making the abstract interpretation of the model less immediately comprehensible than the statistical inference models in some proceeding chapters. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on probabilistic reweightings and their optimisation using real-world data. For the programmers, the software described in this chapter lives in the public Git repository: \href{https://github.com/umbralcalc/learnadex}{https://github.com/umbralcalc/learnadex}.
 
 \section{\sffamily Probabilistic formalism}
 
@@ -8,9 +8,9 @@ The key distinction between the methods that we will develop in this chapter and
 
 While we think that it's worth going into some mathematical detail to give a better sense of where our formalism comes from; we want to emphasise that the framework we discuss here is not new to the technical literature at all. Our overall framework draws on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and also Gaussian processes~\cite{murphy2012machine} as well. The novelties here, instead, lie more in the specifics of how we combine some of these ideas together when referencing the stochadex formalism, and how this manifests in designing more generally-applicable software for the user. In addition, readers well-versed in machine learning will note that our software design and mathematical formalism reflects our preference for `online' learning\footnote{We'll explain this later in the chapter.} in the context of time series prediction, in contrast to some of the more standard frameworks.
 
-Before we are able to develop this empirical reweighting algorithm, we need to return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. However, when trying robustly assess how far a model is from accurately describing a set of real-world data, trying to use only generated samples of the model process can be diffcult. Instead, in this section, we are going to extend this formalism to look at how probability theory can help with this data comparison problem in a systematic way.
+When trying robustly assess how far a model is from accurately describing a set of real-world data, trying to use only generated samples of the model process can be diffcult. Instead, in this section, we are going to extend this formalism to look at how probability theory can help with this data comparison problem in a systematic way. In order to do this, we need to return to the probabilistic formalism which we discussed in the previous chapter.
 
-If we wanted to compute the mean $M_{{\sf t}+1}(z)$ of the distribution over the matrix row corresponding to time $({\sf t}+1)$, it would be straightforward to just multiply both sides of Eq.~(\ref{eq:master-x-cont}) by $x$ and integrate over it in its $\omega_{{\sf t}+1}$ sub-domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical reweighting. If the probability distribution over each row of the state history matrix is \emph{stationary} --- meaning that $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ --- it's possible to derive
+Given the general master equation $P_{{\sf t}+1}(X\vert z) = P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x\vert X',z)$, if we wanted to compute the mean $M_{{\sf t}+1}(z)$ of the distribution over the matrix row corresponding to time $({\sf t}+1)$, it would be straightforward to just multiply both sides by $x$ and integrate over it in its $\omega_{{\sf t}+1}$ sub-domain. However, there is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when developing the empirical reweighting. If the probability distribution over each row of the state history matrix is \emph{stationary} --- meaning that $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ --- it's possible to derive
 %%
 \begin{align}
 M_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\,P_{{\sf t}+1}(x\vert z) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \,x'\, P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}^nx\, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-mean-estimator}\,.
@@ -45,21 +45,11 @@ C_{({\sf t}+1){\sf t}'}^{ij}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx\int_{\ome
 \end{align}
 %%
 
-What other classes of process can be described by Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row})? For Markovian phenomena, the equations no longer depend on timesteps older than the immediately previous one, hence Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
-%%
-\begin{align}
-P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
-\end{align}
-%%
-An analog of Eq.~(\ref{eq:master-x-cont-latest-row}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
-%%
-\begin{align}
-P_{{\sf t}+1}(x\vert z) &= \sum_{\Omega_{{\sf t}}} P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x \vert X', z) \label{eq:master-x-disc} \,,
-\end{align}
-%%
-where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}.
-
-In this section we looked into how the mathematical formalism used in the stochadex could be extended with probability theory. Now that we have more of a sense of how this formalism works, we are ready to move on to describing the empirical reweighting and its associated learning algorithm. So let's go!
+\textcolor{red}{
+    \begin{itemize}
+    \item{Need to finish the descriptions in this section to move onto the next...} 
+    \end{itemize}
+}
 
 \section{\sffamily Online learning the optimal reweighting}
 

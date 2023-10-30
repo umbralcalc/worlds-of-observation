@@ -1,10 +1,10 @@
 \chapter{\sffamily Numerical time evolution of probabilities}
 
-{\bfseries\sffamily Concept.} To extend the formalism that we developed in previous chapters to... For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on probabilistic modelling. For the programmers, the software described in this chapter lives in the public Git repository: \href{https://github.com/umbralcalc/dennm-torch}{https://github.com/umbralcalc/dennm-torch}.
+{\bfseries\sffamily Concept.} To extend the formalism that we developed in previous chapters to enable the numerical simulation of state probabilities. In the general case this is a very intensive computation to perform, so in this chapter we shall also discuss the practical limitations of this approach. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on the time evolution of probabilities. For the programmers, the software described in this chapter lives in this public Git repository: \href{https://github.com/umbralcalc/dennm-torch}{https://github.com/umbralcalc/dennm-torch}.
 
 \section{\sffamily Probabilistic formalism}
 
-In this section we will return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. However, when trying robustly assess how far a model is from accurately describing a set of real-world data, trying to use only generated samples of the model process can be diffcult. Instead, in this section, we are going to extend this formalism to look at how probability theory can help with this data comparison problem in a systematic way.
+In this section we will return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. We are going to extend this description to consider what happens to the probability that the state history matrix takes a particular set of values over time.
 
 \begin{figure}[h]
 \centering
@@ -92,6 +92,11 @@ P_{{\sf t}+1}(x\vert z) &= \sum_{\Omega_{{\sf t}}} P_{{\sf t}}(X'\vert z) P_{({\
 %%
 where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}.
 
-In this section we looked into how the mathematical formalism used in the stochadex could be extended with probability theory.
+\textcolor{red}{
+\begin{itemize}
+\item{Add some diagrams for the higher-order correlation expressions.}
+\item{Add a software design section and some examples.} 
+\end{itemize}
+}
 
     
