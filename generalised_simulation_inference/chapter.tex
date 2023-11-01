@@ -18,10 +18,10 @@ From the point of view of statistical inference, if we seek to maximise ${\cal P
 How might we calulate the posterior in practice with some arbitrary stochastic process model that has been defined in the stochadex? In order to make the comparison to a real dataset, any stochadex model of interest will always need to be able to generate observations which can be directly compared to the data. To formalise this a little; a stochadex model could be represented as a map from $z$ to a set of stochastic measurements ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$ that are directly comparable to the rows in the real data matrix $Y$. The values in $Y$ may only represent a noisy or partial measurement of the latent states of the simulation $X$, so a more complete picture can be provided by the following probabilistic relation
 %%
 \begin{align}
-P_{{\sf t}+1}({\sf Y} \vert z) = \int_{\Omega_{{\sf t}+1}}{\rm d}X P_{{\sf t}+1}({\sf Y} \vert X)P_{{\sf t}+1}(X \vert z) \,, \label{eq:simulation-measurement}
+P_{{\sf t}+1}({\sf Y} \vert z) = \frac{1}{{\sf t}+1}\sum_{{\sf t}'=0}^{{\sf t}+1}\int_{\omega_{{\sf t}'}}{\rm d}^nx\, P_{{\sf t}'}({\sf y} \vert x)P_{{\sf t}'}(x \vert z) \,, \label{eq:simulation-measurement}
 \end{align}
 %%
-where, in practical terms, the measurement probability $P_{{\sf t}+1}({\sf Y} \vert X)$ of ${\sf Y}$ given $X$ can be represented by sampling from another stochastic process which takes the state of the stochadex simulation as input. Given that we have this capability to compare like-for-like between the data and the simulation; the next problem is to figure out how this comparison between two sequences of vectors can be done in a way which ensures the the statistics of the posterior are ultimately respected. 
+where, in practical terms, the measurement probability $P_{{\sf t}'}({\sf y} \vert x)$ of ${\sf Y}_{{\sf t}'}={\sf y}$ given $X_{{\sf t}'}=x$ can be represented by sampling from another stochastic process which takes the state of the stochadex simulation as input. Given that we have this capability to compare like-for-like between the data and the simulation; the next problem is to figure out how this comparison between two sequences of vectors can be done in a way which ensures the the statistics of the posterior are ultimately respected. 
 
 For an arbitrary simulation model which is defined by the stochadex, the likelihood in Eq.~(\ref{eq:bayes-rule}) is typically not describable as a simple function or distribution. While we could train the probability reweighting we derived in the previous chapter to match the simulation; to do this well would require having an exact formula for the conditional probability, and this is not always easy to derive in the general case. Instead, there is a class of Bayesian inference methods which we shall lean on to help us compute the posterior distribution (and hence the MAP), which are known as `Likelihood-Free' methods~\cite{sisson2018handbook,price2018bayesian,wood2010statistical,drovandi2022comparison}.
 
@@ -39,7 +39,7 @@ As we demonstrated in the previous chapter, it's possible for us to also optimis
 {\cal P}_{{\sf t}+1}({\sf Y}\vert Y) = \prod_{{\sf t}'=0}^{{\sf t}+1}P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'},\dots ) \,.
 \end{align}
 %%
- We do not necessarily need to obtain these statistics from the probability reweighting method, but could instead try to fit them via some other objective function. Either way, this represents a lossy \emph{compression} of the data we want to fit the simulation to, and so the best possible fit is desirable; regardless of overfitting. This choice to summarise the data with statistics means we are using what is known as a Bayesian Synthetic Likelihood (BSL) method~\cite{price2018bayesian,wood2010statistical} instead of another class of methods which approximate an objective function directly using a proximity kernel --- known as Approximate Bayesian Computation (ABC) methods~\cite{sisson2018handbook}.
+We do not necessarily need to obtain these statistics from the probability reweighting method, but could instead try to fit them via some other objective function. Either way, this represents a lossy \emph{compression} of the data we want to fit the simulation to, and so the best possible fit is desirable; regardless of overfitting. This choice to summarise the data with statistics means we are using what is known as a Bayesian Synthetic Likelihood (BSL) method~\cite{price2018bayesian,wood2010statistical} instead of another class of methods which approximate an objective function directly using a proximity kernel --- known as Approximate Bayesian Computation (ABC) methods~\cite{sisson2018handbook}.
 
 Let's consider a few concrete examples of $P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots )$. If the data measurements were well-described by a multivariate normal distribution, then
 %%
@@ -58,27 +58,27 @@ The more statistically-inclined readers may notice that the probability mass fun
 Eq.~(\ref{eq:likelihood-free-posterior}) demonstrates how one can construct a statistically meaningful way to compare the sequence of real data measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ to their modelled equivalents ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$. But we still haven't shown how to compute $P_{{\sf t}+1}(X,z\vert {\sf Y})$ for a given simulation, and this can be the most challenging part. To begin with, we can reapply Bayes' rule and the chaining of conditional probability to find 
 %%
 \begin{align}
-P_{{\sf t}+1}(X,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf Y}\vert X)P_{{\sf t}+1}(X\vert z)P_{{\sf t}}(z\vert {\sf Y}') \,,
+P_{{\sf t}+1}(x,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf y}\vert x)P_{{\sf t}+1}(x\vert z)P_{{\sf t}}(z\vert {\sf Y}') \,,
 \end{align}
 %%
-where here ${\sf Y}$ at ${\sf t}+1$ is the updated version of itself ${\sf Y}'$ at ${\sf t}$.
+where here $P_{{\sf t}}(z\vert {\sf Y}')$ is the probability of ${\sf Y}_{{\sf t}}={\sf Y}'$.
 
 The relationship between $P_{{\sf t}+1}(X\vert z)$ and previous timesteps can be directly inferred from the probabilistic iteration formula that we introduced in the previous chapter. So we can map probabilities of $X_{0:{\sf t}+1} = X$ throughout time and learned information about the state of the system can be applied from previous values, given $z$. But is there a similar relationship we might consider for $P_{{\sf t}+1}(z\vert {\sf Y})$? Yes there is! The marginalisation
 %%
 \begin{align} 
-P_{{\sf t}+1}(z\vert {\sf Y}) = \int_{\Omega_{{\sf t}+1}} {\rm d}X \, P_{{\sf t}+1}(X,z\vert {\sf Y}) &\propto \bigg[ \int_{\Omega_{{\sf t}+1}} {\rm d}X P_{{\sf t}+1}({\sf Y}\vert X) P_{{\sf t}+1}(X\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \label{eq:z-update}\,,
+P_{{\sf t}+1}(z\vert {\sf Y}) &\propto \bigg[ \int_{\Omega_{{\sf t}+1}} {\rm d}^nx \,P_{{\sf t}+1}({\sf y}\vert x) P_{{\sf t}+1}(x\vert z) \bigg] P_{{\sf t}}(z\vert {\sf Y}') \label{eq:z-update}\,,
 \end{align}
 %%
 shows how the $z$ updates can occur in an iterative fashion. The reader may also recognize the factor above in brackets as Eq.~(\ref{eq:simulation-measurement}). To complete the picture, one can combine the $X$ and $z$ updates into a joint distribution update which takes the following form 
 %%
 \begin{align} 
-P_{{\sf t}+1}(X,z\vert {\sf Y}) &\propto P_{{\sf t}+1}({\sf Y}\vert X) P_{({\sf t}+1){\sf t}}(x\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update}\,.
+P_{{\sf t}+1}(X,z\vert {\sf Y}) &\propto P_{{\sf t}+1}({\sf y}\vert x) P_{({\sf t}+1){\sf t}}(x\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update}\,.
 \end{align}
 %%
 We can also marginalise this distribution over the past state history rows to get a distribution over the latest state row $X_{{\sf t}+1}=x$ like this 
 %%
 \begin{align}
-P_{{\sf t}+1}(x,z\vert {\sf Y}) &= \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1}(X,z\vert {\sf Y}) \propto \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1}({\sf Y}\vert X) P_{({\sf t}+1){\sf t}}(x\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update-latest-row} \,.
+P_{{\sf t}+1}(x,z\vert {\sf Y}) &= \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1}(X,z\vert {\sf Y}) \propto \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1}({\sf y}\vert x) P_{({\sf t}+1){\sf t}}(x\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update-latest-row} \,.
 \end{align}
 %%
 
@@ -101,14 +101,19 @@ So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{
 %%
 \begin{enumerate}
 \item{A process $P_{({\sf t}+1){\sf t}}(x\vert X', z)$ which iterates the state matrix of the simulation $X$ forward in time.}
-\item{A process $P_{{\sf t}+1}({\sf Y}\vert X)$ which generates simulated measurements from the simulated states $X$.}
-\item{A probability distribution= $P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots )$ which represents the posterior distribution of the simulated measurement vector ${\sf y}$ given an optimised compression of the real data into summary statistics.}
+\item{A process $P_{{\sf t}+1}({\sf y}\vert x)$ which generates a simulated measurement from the simulated state $x$.}
+\item{A probability distribution $P_{{\sf t}'}({\sf y};{\cal M}_{{\sf t}'},{\cal C}_{{\sf t}'}, \dots )$ which represents the posterior distribution of the simulated measurement vector ${\sf y}$ given an optimised compression of the real data into summary statistics.}
 \item{Some way of representing samples from the distribution $P_{{\sf t}+1}(X,z\vert {\sf Y})$ so that their distribution can be updated and will coverge towards the posterior over $(X,z)$.}
 \end{enumerate}
 %%
 
 \textcolor{red}{
 Before writing this up, should read this paper on efficient amortized inference using neural networks with \texttt{BayesFlow} here in particular:~\cite{radev2020bayesflow}. But also, should cite other works to make amortized inference more efficient by using neural networks to learn convenient functions of the Bayes factor in Evidence networks~\cite{jeffrey2023evidence}.
+\begin{itemize}
+\item{amortized online inference of the posterior update over just $z$ can be 
+achieved by running lots of simulations and solving the inverse problem with the y outputs
+i.e., neural network modelling of the update in Eq.~(\ref{eq:z-update})} 
+\end{itemize}
 }
 
 
