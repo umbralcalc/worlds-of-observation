@@ -108,8 +108,8 @@
 
 \definecolor{gray75}{gray}{0.75}
 
-\title{\Huge \bfseries\sffamily Diffusing Ideas}
-\subtitle{\Large \bfseries\sffamily \color{gray75} Building algorithms to control noisy real systems}
+\title{\Huge \bfseries\sffamily Worlds Of Observation}
+\subtitle{\Large \bfseries\sffamily \color{gray75} Building more realistic environments for machine learning}
 \author{\bfseries\sffamily Robert J. Hardwick  \and C. M. Gomez-Perales}
 \date{\today}
 
@@ -120,9 +120,9 @@
 {\color{gray75}\rule{13cm}{1.3pt}}\vspace*{-\baselineskip}\vspace*{2pt} % Thick horizontal rule
 {\color{gray75}\rule{13cm}{0.4pt}} \\ % Thin horizontal rule
 \vspace{1.2\baselineskip} % Whitespace 
-{\Huge \bfseries\sffamily Diffusing Ideas} \\ 
+{\Huge \bfseries\sffamily Worlds Of Observation} \\ 
 \vspace{4mm}
-{\Large \bfseries\sffamily \color{gray75} Building algorithms to control noisy real systems \\}
+{\Large \bfseries\sffamily \color{gray75} Building more realistic environments\\ for machine learning \\}
 \vspace*{0.75\baselineskip}
 {\color{gray75}\rule{13cm}{0.4pt}}\vspace*{-\baselineskip}\vspace*{2.75pt} % Thick horizontal rule
 {\color{gray75}\rule{13cm}{1.3pt}} \\ % Thin horizontal rule
@@ -132,14 +132,14 @@
 \today
 \vfill
 Shared by the authors under an \href{https://opensource.org/licenses/MIT}{MIT License}.\\ \vspace{1mm}
-The code to compile this book is open source and can be found in this repository: \url{https://github.com/umbralcalc/diffusing-ideas}.
+The code to compile this book is open source and can be found in this repository: \url{https://github.com/umbralcalc/worlds-of-observation}.
 \end{titlepage}
 
 \chapter*{Introduction}
 
 In many systems of practical importance to the real world it's common to find that observing the state of the system itself is only partially possible. One needs to only think of the measurement uncertainties in any scientific experiment, the latent demand behind orders in a financial market, the unknown reservoirs of infection for a disease pathogen or even the limits to complete supply chain component observability in recognising just how ubiquitous this situation is. This obscurity can make the learning of algorithms to control these systems using observations alone an extreme --- if not sometimes an impossible --- challenge without further insight provided by a model.
 
-\emph{Diffusing Ideas} is a book about building software which can automatically control these `noisy' systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms~\cite{sutton2018reinforcement} (especially when there is plenty of data and the system is fully observable), this book is devoted to creating algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and a little different to the usual perspectives. Hopefully, however, the significant overlaps that our approach has with the machine learning literature will still mean that we are in familiar territory for many readers.
+\emph{Worlds Of Observation} is a book about building software environments for training machine learning algorithms to control these `noisy' systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms~\cite{sutton2018reinforcement} (especially when there is plenty of data and the system is fully observable), this book is better suited to creating algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and a little different to the usual perspectives. Hopefully, however, the significant overlaps that our approach has with the machine learning literature will still mean that we are in familiar territory for many readers.
 
 As can be expected from a book about algorithms, this text accompanies a lot of new open-source scientific software written in various combinations of Go~\cite{golang}, C++~\cite{c++lang}, Python~\cite{pythonlang} and TypeScript~\cite{typescriptlang}. A major motivation for creating these new tools is to prepare a foundation of code from which to develop new and more complex applications. We also hope that the resulting framework will enable anyone to study new phenomena and explore complex control problems effectively, regardless of their scientific background.
 
@@ -147,7 +147,7 @@ The need to properly test all this software has also provided a wonderful excuse
 
 It seems silly to us that mathematical formalities can obscure the practical computations that a programmer is being asked to implement when reading an equation. So, while we've tried to be as ambitious as possible with the level of technical detail in this book, we've also attempted to write many of the mathematical expressions in a more computer-friendly way where feasible,\footnote{For example, we'll typically be thinking more in terms of `matrices' and less about `operators'.} in contrast with the more conventional formal descriptions. To help with this goal of explainability, we also make use of quite a lot of illustrations and diagrams.
 
-A quick note on the code: any software that we describe in this book (including the software which compiles the book itself~\cite{diffusingideasbookgithub}) will always be shared under a MIT License~\cite{mitlicense} in a public Git repository.\footnote{The repositories will always be somewhere on this list: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though we apologise in advance if we don't follow these up very quickly as all of this work has to be conducted independently in free time, outside of work hours.
+A quick note on the code: any software that we describe in this book (including the software which compiles the book itself~\cite{worldsofobservationbookgithub}) will always be shared under a MIT License~\cite{mitlicense} in a public Git repository.\footnote{The repositories will always be somewhere on these lists: \href{https://github.com/umbralcalc?tab=repositories}{https://github.com/umbralcalc?tab=repositories}, \href{https://github.com/orgs/WorldsOfObservation/repositories}{https://github.com/orgs/WorldsOfObservation/repositories}.} Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though we apologise in advance if we don't follow these up very quickly as all of this work has to be conducted independently in free time, outside of work hours.
 
 The book is split into two main parts: {\bfseries\sffamily Part 1}, which details the theoretical background and design of code; and {\bfseries\sffamily Part 2}, which explores all of the applications to realistic examples that we wanted to initially try. We hope you, the reader, really enjoy reading through this book and using the all of the code that was built while writing it. We're very grateful to have been able to make use of all the amazing open source software which would otherwise have made this project impossible to achieve.
 
