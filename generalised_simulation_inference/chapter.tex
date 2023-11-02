@@ -18,10 +18,10 @@ From the point of view of statistical inference, if we seek to maximise ${\cal P
 How might we calulate the posterior in practice with some arbitrary stochastic process model that has been defined in the stochadex? In order to make the comparison to a real dataset, any stochadex model of interest will always need to be able to generate observations which can be directly compared to the data. To formalise this a little; a stochadex model could be represented as a map from $z$ to a set of stochastic measurements ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$ that are directly comparable to the rows in the real data matrix $Y$. The values in $Y$ may only represent a noisy or partial measurement of the latent states of the simulation $X$, so a more complete picture can be provided by the following probabilistic relation
 %%
 \begin{align}
-P_{{\sf t}+1}({\sf Y} \vert z) = \frac{1}{{\sf t}+1}\sum_{{\sf t}'=0}^{{\sf t}+1}\int_{\omega_{{\sf t}'}}{\rm d}^nx\, P_{{\sf t}'}({\sf y} \vert x)P_{{\sf t}'}(x \vert z) \,, \label{eq:simulation-measurement}
+P_{{\sf t}+1}({\sf y} \vert z) = \int_{\omega_{{\sf t}+1}}{\rm d}^nx\, P_{{\sf t}+1}({\sf y} \vert x)P_{{\sf t}+1}(x \vert z) \,, \label{eq:simulation-measurement}
 \end{align}
 %%
-where, in practical terms, the measurement probability $P_{{\sf t}'}({\sf y} \vert x)$ of ${\sf Y}_{{\sf t}'}={\sf y}$ given $X_{{\sf t}'}=x$ can be represented by sampling from another stochastic process which takes the state of the stochadex simulation as input. Given that we have this capability to compare like-for-like between the data and the simulation; the next problem is to figure out how this comparison between two sequences of vectors can be done in a way which ensures the the statistics of the posterior are ultimately respected. 
+where, in practical terms, the measurement probability $P_{{\sf t}+1}({\sf y} \vert x)$ of ${\sf Y}_{{\sf t}+1}={\sf y}$ given $X_{{\sf t}+1}=x$ can be represented by sampling from another stochastic process which takes the state of the stochadex simulation as input. Given that we have this capability to compare like-for-like between the data and the simulation; the next problem is to figure out how this comparison between two sequences of vectors can be done in a way which ensures the the statistics of the posterior are ultimately respected. 
 
 For an arbitrary simulation model which is defined by the stochadex, the likelihood in Eq.~(\ref{eq:bayes-rule}) is typically not describable as a simple function or distribution. While we could train the probability reweighting we derived in the previous chapter to match the simulation; to do this well would require having an exact formula for the conditional probability, and this is not always easy to derive in the general case. Instead, there is a class of Bayesian inference methods which we shall lean on to help us compute the posterior distribution (and hence the MAP), which are known as `Likelihood-Free' methods~\cite{sisson2018handbook,price2018bayesian,wood2010statistical,drovandi2022comparison}.
 
@@ -58,7 +58,7 @@ The more statistically-inclined readers may notice that the probability mass fun
 Eq.~(\ref{eq:likelihood-free-posterior}) demonstrates how one can construct a statistically meaningful way to compare the sequence of real data measurements $Y_{{\sf t}+1}, Y_{{\sf t}}, \dots$ to their modelled equivalents ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$. But we still haven't shown how to compute $P_{{\sf t}+1}(X,z\vert {\sf Y})$ for a given simulation, and this can be the most challenging part. To begin with, we can reapply Bayes' rule and the chaining of conditional probability to find 
 %%
 \begin{align}
-P_{{\sf t}+1}(x,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf y}\vert x)P_{{\sf t}+1}(x\vert z)P_{{\sf t}}(z\vert {\sf Y}') \,,
+P_{{\sf t}+1}(x,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf y}\vert z)P_{{\sf t}}(z\vert {\sf Y}') = P_{{\sf t}+1}({\sf y}\vert x)P_{{\sf t}+1}(x\vert z)P_{{\sf t}}(z\vert {\sf Y}') \,,
 \end{align}
 %%
 where here $P_{{\sf t}}(z\vert {\sf Y}')$ is the probability of ${\sf Y}_{{\sf t}}={\sf Y}'$.
@@ -78,7 +78,7 @@ P_{{\sf t}+1}(X,z\vert {\sf Y}) &\propto P_{{\sf t}+1}({\sf y}\vert x) P_{({\sf 
 We can also marginalise this distribution over the past state history rows to get a distribution over the latest state row $X_{{\sf t}+1}=x$ like this 
 %%
 \begin{align}
-P_{{\sf t}+1}(x,z\vert {\sf Y}) &= \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1}(X,z\vert {\sf Y}) \propto \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1}({\sf y}\vert x) P_{({\sf t}+1){\sf t}}(x\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update-latest-row} \,.
+P_{{\sf t}+1}(x,z\vert {\sf Y}) &= \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1}(X,z\vert {\sf Y}) \propto P_{{\sf t}+1}({\sf y}\vert x) \int_{\Omega_{{\sf t}}} {\rm d}X' P_{({\sf t}+1){\sf t}}(x\vert X', z) P_{{\sf t}}(X',z\vert {\sf Y}') \label{eq:x-z-update-latest-row} \,.
 \end{align}
 %%
 
@@ -111,7 +111,7 @@ So how should we proceed? To solve this problem in the general case, Eqs.~(\ref{
 Before writing this up, should read this paper on efficient amortized inference using neural networks with \texttt{BayesFlow} here in particular:~\cite{radev2020bayesflow}. But also, should cite other works to make amortized inference more efficient by using neural networks to learn convenient functions of the Bayes factor in Evidence networks~\cite{jeffrey2023evidence}.
 \begin{itemize}
 \item{amortized online inference of the posterior update over just $z$ can be 
-achieved by running lots of simulations and solving the inverse problem with the y outputs
+achieved by running lots of simulations and solving the inverse problem with the ${\sf y}$ outputs
 i.e., neural network modelling of the update in Eq.~(\ref{eq:z-update})} 
 \end{itemize}
 }

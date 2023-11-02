@@ -8,7 +8,7 @@ declare -a filenames=(
     "generalised_simulation_inference/chapter" \
     "interacting_with_any_system/chapter" \
     "optimising_actions_for_control_objectives/chapter" \
-    "city_power_grid_maintenance/chapter" \
+    "optimising_chemical_reactions/chapter" \
     "resource_allocation_for_epidemics/chapter" \
     "algo_trading_on_financial_markets/chapter" \
     "sequential_experiment_design/chapter" \
@@ -17,7 +17,6 @@ declare -a filenames=(
     "improving_supply_chain_logistics/chapter" \
     "stimulating_brain_network_responses/chapter" \
     "controlling_2d_spatial_processes/chapter" \
-    "optimising_chemical_reactions/chapter" \
     "quantum_system_control/chapter"
 )
 
