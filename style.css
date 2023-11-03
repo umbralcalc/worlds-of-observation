@@ -40,6 +40,11 @@ strong {
     text-align: justify;
 }
 
+.subtitle {
+    font-family: ComputerModernBold;
+    color: #9e9e9e!important;
+}
+
 p {
     text-align: justify;
 }
