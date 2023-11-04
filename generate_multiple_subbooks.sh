@@ -8,12 +8,12 @@ declare -a filenames=(
     "generalised_simulation_inference/chapter" \
     "interacting_with_any_system/chapter" \
     "optimising_actions_for_control_objectives/chapter" \
-    "resource_allocation_for_epidemics/chapter" \
+    "controlling_parasitic_infections/chapter" \
     "algo_trading_on_financial_markets/chapter" \
     "sequential_experiment_design/chapter" \
     "angling_for_freshwater_fish/chapter" \
     "managing_a_rugby_match/chapter" \
-    "improving_supply_chain_logistics/chapter"
+    "optimising_humanitarian_aid_logistics/chapter"
 )
 
 ## loop through filenames
