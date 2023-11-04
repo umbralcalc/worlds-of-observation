@@ -13,9 +13,7 @@ declare -a filenames=(
     "sequential_experiment_design/chapter" \
     "angling_for_freshwater_fish/chapter" \
     "managing_a_rugby_match/chapter" \
-    "improving_supply_chain_logistics/chapter" \
-    "stimulating_brain_network_responses/chapter" \
-    "controlling_2d_spatial_processes/chapter" \
+    "improving_supply_chain_logistics/chapter"
 )
 
 ## loop through filenames
