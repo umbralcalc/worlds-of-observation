@@ -133,38 +133,6 @@
   </p>
   <hr/>
   <hr/>
-  <h2 class="unnumbered" id="introduction">
-    Introduction
-   </h2>
-   <p>
-    In many systems of practical importance to the real world it’s common to find that observing the state of the system itself is only partially possible. One needs to only think of the measurement uncertainties in any scientific experiment, the latent demand behind orders in a financial market, the unknown reservoirs of infection for a disease pathogen or even the limits to complete supply chain component observability in recognising just how ubiquitous this situation is. This obscurity can make the learning of algorithms to control these systems using observations alone an extreme — if not sometimes impossible — challenge without further insight provided by a model.
-  </p>
-  <p>
-   <em>
-    Worlds Of Observation
-   </em>
-   is a book about building more realistic training environments for machine learning algorithms to control these ‘noisy’ systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms
-   <span class="citation" data-cites="sutton2018reinforcement">
-    [1]
-   </span>
-   (especially when there is plenty of data and the system is fully observable), this book is better suited to creating algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and a little different to the usual perspectives. Hopefully, however, the significant overlaps that our approach has with the machine learning literature will still mean that we are in familiar territory for many readers.
-  </p>
-   <p>
-    As can be expected from a book about algorithms, this text accompanies a lot of new open-source scientific software written in various combinations of Go <span class="citation" data-cites="golang"></span>[2]</span>, C++ <span class="citation" data-cites="c++lang"></span>[3]</span>, Python <span class="citation" data-cites="pythonlang"></span>[4]</span> and TypeScript <span class="citation" data-cites="typescriptlang"></span>[5]</span>. It seems silly to us that mathematical formalities can obscure the practical computations that a programmer is being asked to implement when reading an equation. So, while we’ve tried to be as ambitious as possible with the level of technical detail in this book, we’ve also attempted to write many of the mathematical expressions in a more computer-friendly way where feasible,<a class="footnote-ref" href="#fn1" id="fnref1" role="doc-noteref"><sup>1</sup></a> in contrast with the more conventional formal descriptions. To help with this goal of explainability, we also make use of quite a lot of illustrations and diagrams.
-   </p>
-   <p>
-    A quick note on the code: any software that we describe in this book (including the software which compiles the book itself
-    <span class="citation" data-cites="worldsofobservationbookgithub">[6]</span>) will always be shared under a MIT License
-    <span class="citation" data-cites="mitlicense">
-     [7]
-    </span>
-    in a public Git repository.<a class="footnote-ref" href="#fn2" id="fnref2" role="doc-noteref"><sup>2</sup></a> Forking these repositories and submitting pull requests for new features or applications is strongly encouraged too, though we apologise in advance if we don’t follow these up very quickly as all of this work has to be conducted independently in free time, outside of work hours.
-   </p>
-   <p>
-    The book is split into two main parts: <span><strong>Part 1</strong></span>, which details the theoretical background and design of code; and <span><strong>Part 2</strong></span>, which explores all of the applications to realistic examples that we wanted to initially try. We hope you, the reader, really enjoy reading through this book and using the all of the code that was built while writing it. We’re very grateful to have been able to make use of all the amazing open source software which would otherwise have made this project impossible to achieve.
-    </p>
-  <hr/>
-  <hr/>
   <h2 class="unnumbered" id="chapters">
     Chapters
    </h2>
@@ -220,96 +188,6 @@
    <a href="optimising_relief_chain_logistics/chapter.pdf" target="_blank">Optimising relief chain logistics</a>
   </li>
   </ol>
-   <hr/>
-   <hr/>
-  <h2 class="unnumbered" id="references">
-   References
-  </h2>
-  <div class="references" id="refs" role="doc-bibliography">
-    <div id="ref-sutton2018reinforcement">
-      <p>
-       [1] R. S. Sutton and A. G. Barto,
-       <em>
-        Reinforcement learning: An introduction
-       </em>
-       . MIT press, 2018.
-      </p>
-     </div>
-     <div id="ref-golang">
-      <p>
-       [2] “The Go Programming Language.”
-       <a href="https://go.dev/">
-        https://go.dev/
-       </a>
-       .
-      </p>
-     </div>
-     <div id="ref-c++lang">
-      <p>
-       [3] “The C++ Programming Language.”
-       <a href="https://isocpp.org/">
-        https://isocpp.org/
-       </a>
-       .
-      </p>
-     </div>
-     <div id="ref-pythonlang">
-      <p>
-       [4] “The Python Programming Language.”
-       <a href="https://www.python.org/">
-        https://www.python.org/
-       </a>
-       .
-      </p>
-     </div>
-     <div id="ref-typescriptlang">
-      <p>
-       [5] “The TypeScript Programming Language.”
-       <a href="https://www.typescriptlang.org/">
-        https://www.typescriptlang.org/
-       </a>
-       .
-      </p>
-     </div>
-     <div id="ref-worldsofobservationbookgithub">
-      <p>
-       [6] “The Worlds Of Observation Book GitHub Repository.”
-       <a href="https://github.com/umbralcalc/worlds-of-observation">
-        https://github.com/umbralcalc/worlds-of-observation
-       </a>
-       .
-      </p>
-     </div>
-     <div id="ref-mitlicense">
-      <p>
-       [7] “Open Source Initiative: MIT License.”
-       <a href="https://opensource.org/licenses/MIT">
-        https://opensource.org/licenses/MIT
-       </a>
-       .
-      </p>
-     </div>
-  <section class="footnotes" role="doc-endnotes">
-   <hr/>
-   <hr/>
-   <ol>
-    <li id="fn1" role="doc-endnote">
-     <p>
-      For example, we’ll typically be thinking more in terms of ‘matrices’ and less about ‘operators’.
-      <a class="footnote-back" href="#fnref1" role="doc-backlink">
-       ↩︎
-      </a>
-     </p>
-    </li>
-    <li id="fn2" role="doc-endnote">
-     <p>
-      The repositories will always be somewhere on these lists: <a href="https://github.com/umbralcalc?tab=repositories">https://github.com/umbralcalc?tab=repositories</a>, <a href="https://github.com/orgs/WorldsOfObservation/repositories">https://github.com/orgs/WorldsOfObservation/repositories</a>.
-      <a class="footnote-back" href="#fnref2" role="doc-backlink">
-       ↩︎
-      </a>
-     </p>
-    </li>
-   </ol>
   </section>
   <hr/>
   <hr/>
