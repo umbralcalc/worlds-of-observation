@@ -12,7 +12,7 @@ Shared by the authors under an [MIT License](LICENSE)
 
 _Worlds Of Observation_ is a book about building more realistic training environments for machine learning algorithms to control systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms (especially when there is plenty of data and the system is fully observable), this book is better suited to creating algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and a little different to the usual perspectives.
 
-You can read the full book here: [Full Book PDF](book.pdf). For more dynamic visualisations, as well as detailed code documentation, you can also visit the [Worlds Of Observation Webpage](https://worldsofobservation.github.io/).
+You can read the full book here: [Full Book PDF](book.pdf). For more information about the simulation environments in this book, as well as more detailed code documentation, you can also visit the [WorldsOOp webpage](https://worldsoop.github.io/).
 
 ## Chapters
 
