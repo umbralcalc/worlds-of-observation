@@ -1,3 +1,5 @@
+<img src="images/ammonite.png" alt="ammonite" width="100"/>
+
 # Worlds Of Observation
 
 ## Building more realistic environments for machine learning
