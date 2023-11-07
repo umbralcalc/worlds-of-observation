@@ -1,4 +1,4 @@
-<img src="images/ammonite.png" alt="ammonite" width="100"/>
+<img src="images/ammonite.png" alt="ammonite" width="250"/>
 
 # Worlds Of Observation
 
