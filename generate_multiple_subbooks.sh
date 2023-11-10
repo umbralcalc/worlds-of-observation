@@ -6,12 +6,10 @@ declare -a filenames=(
     "numerical_time_evolution_of_probabilities/chapter" \
     "empirical_probabilistic_reweighting_algorithms/chapter" \
     "generalised_simulation_inference/chapter" \
-    "interacting_with_any_system/chapter" \
-    "optimising_actions_for_control_objectives/chapter" \
+    "optimising_interactions_with_any_system/chapter" \
     "controlling_parasitic_infections/chapter" \
     "algo_trading_on_financial_markets/chapter" \
-    "sequential_experiment_design/chapter" \
-    "angling_for_freshwater_fish/chapter" \
+    "sustainable_angling_for_fish/chapter" \
     "managing_a_rugby_match/chapter" \
     "optimising_relief_chain_logistics/chapter"
 )

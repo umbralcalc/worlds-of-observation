@@ -22,14 +22,12 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 2. [Numerical time evolution of probabilities](numerical_time_evolution_of_probabilities/chapter.pdf)
 3. [Empirical probabilistic reweighting algorithms](empirical_probabilistic_reweighting_algorithms/chapter.pdf)
 4. [Generalised simulation inference](generalised_simulation_inference/chapter.pdf)
-5. [Interacting with any system](interacting_with_any_system/chapter.pdf)
-6. [Optimising actions for control objectives](optimising_actions_for_control_objectives/chapter.pdf)
+5. [Optimising interactions with any system](optimising_interactions_with_any_system/chapter.pdf)
 
 **Part 2.** Applications to realistic examples
 
-7. [Controlling parasitic infections](controlling_parasitic_infections/chapter.pdf)
-8. [Algo-trading on financial markets](algo_trading_on_financial_markets/chapter.pdf)
-9. [Sequential experiment design](sequential_experiment_design/chapter.pdf)
-10. [Angling for freshwater fish](angling_for_freshwater_fish/chapter.pdf)
-11. [Managing a rugby match](managing_a_rugby_match/chapter.pdf)
-12. [Optimising relief chain logistics](optimising_relief_chain_logistics/chapter.pdf)
+6. [Controlling parasitic infections](controlling_parasitic_infections/chapter.pdf)
+7. [Algo-trading on financial markets](algo_trading_on_financial_markets/chapter.pdf)
+8. [Sustainable angling for fish](sustainable_angling_for_fish/chapter.pdf)
+9. [Managing a rugby match](managing_a_rugby_match/chapter.pdf)
+10. [Optimising relief chain logistics](optimising_relief_chain_logistics/chapter.pdf)
