@@ -17,6 +17,14 @@ One solution to this scaling problem is to exploit the fact that, in many spatia
 
 \textcolor{red}{
 \begin{itemize}
+\item{Full sim: fully individual-based spatial stochastic model}
+\item{Inference model: spatial mean field inference features using the probabilistic reweighting + exponentially-weighted nonlinear features}
+\item{Also use the likelihood-free inference model}
+\end{itemize}
+}
+
+\textcolor{red}{
+\begin{itemize}
 \item{At some point it might be sensible to move into the Fourier domain here --- at least for derivations and calculations. Probably more intuitive for the reader to keep it mostly in real space though if possible.} 
 \item{The extra detail that's also needed here is to consider how we encode a 2-dimensional spatial process into our state vector, and how the elements of the resulting state vector might be correlated to one another depending on their spatial proximity. If we start with a Markovian Gaussian random field, we can derive the Mat\'{e}rn kernel over these spatial coordinates in order to correlate the state vectors in such a way.} 
 \item{Also look into the Radial Basis Function (RBF) and higher-order derived kernels based on DALI expansion~\cite{sellentin2014breaking} in order to try and capture non-Gaussianity.}

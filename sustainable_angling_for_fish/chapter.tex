@@ -4,6 +4,14 @@
 
 \section{\sffamily A large-scale Lotka-Volterra model}
 
+\textcolor{red}{
+\begin{itemize}
+\item{Full sim: full population-based spatial stochastic model}
+\item{Inference model: mean field network inference features using the probabilistic reweighting using exponential weighting and cross-correlations}
+\item{Also use the likelihood-free inference model}
+\end{itemize}
+}
+
 Inspired by the empirical dynamical modeling approach to sockeye salmon in Ref.~\cite{ye2015equation}, but also desiring a generative model which has some link to the classic causal models promoted by mathematical ecology; the goal here is to create and calibrate a stochastic model which predicts the fish counts, weights, lengths and ages for each species in each area based on the past system states. To do this, we will combine some well-known models from mathematical ecology with supervised learning.
 
 The one-step master equation for the proposed stochastic simulation is given implictly by
