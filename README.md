@@ -4,9 +4,11 @@
 
 ## Building more realistic environments for machine learning
 
-**Co-authored by:** Robert J. Hardwick and C. M. Gomez-Perales
+**Author:** Robert J. Hardwick
 
-Shared by the authors under an [MIT License](LICENSE)
+**Editor:** C. M. Gomez-Perales
+
+Shared by the author under an [MIT License](LICENSE)
 
 ## About
 
@@ -39,7 +41,7 @@ To cite this book in any work, please use the following BibTeX:
 ```bibtex
 @article{worlds-of-observation-2023,
   title   = {Worlds Of Observation: Building more realistic environments for machine learning},
-  author  = {Hardwick, Robert J. and Gomez-Perales, C. M.},
+  author  = {Hardwick, Robert J.},
   journal = {umbralcalc.github.io},
   year    = {2023},
   url     = {https://umbralcalc.github.io/worlds-of-observation/book.pdf},
