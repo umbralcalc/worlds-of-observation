@@ -10,7 +10,7 @@ Shared by the authors under an [MIT License](LICENSE)
 
 ## About
 
-_Worlds Of Observation_ is a book about building more realistic training environments for machine learning algorithms to control systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms (especially when there is plenty of data and the system is fully observable), this book is better suited to creating algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and a little different to the usual perspectives.
+_Worlds Of Observation_ is a book about building more realistic training environments for machine learning algorithms to control systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms (especially when there is plenty of data and the system is fully observable), this book will primarily explore how to create control algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and maybe a little different to the usual perspectives.
 
 You can read the full book here: [Full Book PDF](book.pdf). For more information about the simulation environments in this book, as well as more detailed code documentation, you can also visit the [WorldsOOp webpage](https://worldsoop.github.io/).
 
@@ -31,3 +31,17 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 8. [Sustainable angling for fish](sustainable_angling_for_fish/chapter.pdf)
 9. [Managing a rugby match](managing_a_rugby_match/chapter.pdf)
 10. [Optimising relief chain logistics](optimising_relief_chain_logistics/chapter.pdf)
+
+## Citations
+
+To cite this book in any work, please use the following BibTeX:
+
+```bibtex
+@article{worlds-of-observation-2023,
+  title   = {Worlds Of Observation: Building more realistic environments for machine learning},
+  author  = {Hardwick, Robert J. and Gomez-Perales, C. M.},
+  journal = {umbralcalc.github.io},
+  year    = {2023},
+  url     = {https://umbralcalc.github.io/worlds-of-observation/book.pdf},
+}
+```
