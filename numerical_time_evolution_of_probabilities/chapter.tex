@@ -44,6 +44,26 @@ where lowercase $x, x', \dots$ values will always refer to individual rows withi
 
 To try and understand what Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) are saying, we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
 
+We can approximate the probability $P_{{\sf t}+1}(X\vert z)$ with a logarithmic expansion like this
+%%
+\begin{align}
+\ln P_{{\sf t}+1}(X\vert z) &\simeq \ln P_{{\sf t}+1}(X_*\vert z) + \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} (x-x_*)^i \big[{\cal I}(x_*,x'_*)\big]^{ij}_{({\sf t}+1){\sf t}'} (x'-x'_*)^j \label{eq:second-order-log-expansion} \\
+\big[{\cal I}(x_*,x'_*)\big]^{ij}_{({\sf t}+1){\sf t}'} &= \frac{\partial}{\partial x^i}\frac{\partial}{\partial (x')^j}\ln P_{{\sf t}+1}(X\vert z) \bigg\vert_{X=X_*} \,,
+\end{align}
+%% 
+where the values for $X=X_*$ are defined by the vanishing of the first derivative, i.e., these are chosen such that
+%%
+\begin{align}
+\frac{\partial}{\partial x^i}\ln P_{{\sf t}+1}(X\vert z) \bigg\vert_{X=X_*} &= 0 \,.
+\end{align}
+%%
+If we keep the truncation up to second order in Eq.~(\ref{eq:second-order-log-expansion}), note that this expression implies a pairwise correlation structure of the form
+%%
+\begin{align}
+P_{{\sf t}+1}(X\vert z) &= \prod_{{\sf t}'=0}^{{\sf t}+1}P_{({\sf t}+1){\sf t}'}(x,x'\vert z) \,.
+\end{align}
+%%
+
 Without loss of generality, we can relate the latest probabilities to those from deeper into the past by chaining conditional probabilities together in a non-Markovian equivalent of the Chapman-Kolmogorov equation
 %%
 \begin{align}
@@ -58,10 +78,17 @@ P_{{\sf t}+1}(x\vert z) &= \int_{\Omega_{{\sf t}-1}}{\rm d}X''P_{{\sf t}-1}(X''\
 Depending on the temporal correlation structure of the process, the conditional probabilities can be factorised. For example, processes with second or third-order temporal correlations would be described by the following expressions
 %%
 \begin{align}
-P_{({\sf t}+1){\sf t}}(x\vert X',z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' P_{{\sf t}'}(x'\vert z)P_{({\sf t}+1){\sf t}'}(x\vert x',z) \\
-P_{({\sf t}+1){\sf t}}(x\vert X',z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\frac{1}{{\sf t}'}\sum_{{\sf t}'=0}^{{\sf t}'}\int_{\omega_{{\sf t}'}}{\rm d}^nx'\int_{\omega_{{\sf t}''}}{\rm d}^nx'' P_{{\sf t}''}(x''\vert z) P_{{\sf t}'{\sf t}''}(x'\vert x'',z)P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x',x'',z) \,.
+P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' P_{{\sf t}'}(x'\vert z)P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:second-order-correl} \\
+P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\frac{1}{{\sf t}'-1}\sum_{{\sf t}''=0}^{{\sf t}'-1}\int_{\omega_{{\sf t}'}}{\rm d}^nx'\int_{\omega_{{\sf t}''}}{\rm d}^nx'' P_{{\sf t}''}(x''\vert z) P_{{\sf t}'{\sf t}''}(x'\vert x'',z)P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x',x'',z) \label{eq:third-order-correl} \,.
 \end{align}
 %%
+We can also show that Eq.~(\ref{eq:third-order-correl}) is a marginalisation of this expression
+%%
+\begin{align}
+P_{({\sf t}+1){\sf t}''}(x\vert x'', z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx'P_{{\sf t}'{\sf t}''}(x'\vert x'',z)P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x',x'',z) \,,
+\end{align}
+%%
+which describes the time evolution of the conditional probabilities.
 
 Let's imagine that $x$ is just a scalar (as opposed to a row vector) for simplicity in the expressions. We can then discretise the 1D space over $x$ into separate $i$-labelled regions such that $[P]^i_{{\sf t}+1} - [P]^i_{{\sf t}} = {\cal J}^i_{{\sf t}+1}$, where the probability current ${\cal J}^i_{{\sf t}+1}$ for the factorised processes above would be defined as
 %%
@@ -84,6 +111,33 @@ What other classes of process can be described by Eqs.~(\ref{eq:master-x-cont}) 
 P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
+By performing a Kramers-Moyal expansion on the $P_{({\sf t}+1){\sf t}}(x\vert x',z)$ distribution up to second order,\footnote{The Pawula theorem~\cite{pawula1967generalizations} states that this is, in fact, as far as we can truncate up to unless we include an infinite number of expansion terms.} we can approximate the right hand side of Eq.~(\ref{eq:master-x-cont-markov}) like this 
+%%
+\begin{align}
+P_{({\sf t}+1)}(x\vert z) &\simeq P_{{\sf t}}(x\vert z) - \sum_{i=0}^n\frac{\partial}{\partial x^i}\bigg[ f_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] + \frac{1}{2}\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ K_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] \label{eq:kramers-moyal} \,,
+\end{align}
+%%
+where the components of $f_{{\sf t}}(x,z)$ and $K_{{\sf t}}(x,z)$ have been defined as
+%%
+\begin{align}
+f^i_{{\sf t}}(x,z) &= \int_{\omega_{{\sf t}+1}} {\rm d}^nx' (x'-x)^iP_{({\sf t}+1){\sf t}}(x'\vert x,z) \\
+K^{ij}_{{\sf t}}(x,z) &= \int_{\omega_{{\sf t}+1}} {\rm d}^nx' (x'-x)^i(x'-x)^jP_{({\sf t}+1){\sf t}}(x'\vert x,z)\,.
+\end{align}
+%%
+
+By inspection of Eq.~(\ref{eq:kramers-moyal}) we can define the `probability current'
+%%
+\begin{align}
+J_{{\sf t}}(x,z) &= f_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) - \frac{1}{2}\sum_{j=0}^{n}\frac{\partial}{\partial x^j}\bigg[ K_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] \,.
+\end{align}
+%%
+If the probability current vanishes $J_{{\sf t}}(x,z)=0$ individually (this also implies that the distribution is stationary such that $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}}(x\vert z)$), the implicit solution of Eq.~(\ref{eq:kramers-moyal}) can be found to be
+%%
+\begin{align}
+P_{{\sf t}}(x\vert z) \propto K_{{\sf t}}^{-1}(x,z)\exp \bigg[ \int {\rm d}^nx\, K^{-1}_{{\sf t}}(x,z)f_{{\sf t}}(x,z)\bigg] \,.
+\end{align}
+%%
+
 An analog of Eq.~(\ref{eq:master-x-cont-latest-row}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
 %%
 \begin{align}
@@ -94,6 +148,7 @@ where we note that the $P$'s in the expression above all now refer to \emph{prob
 
 \textcolor{red}{
 \begin{itemize}
+\item{Add in mean and covariance calculation of the process to generalise it continuous data and dev the Learnadex code using Gotch to support this with different data-linking distributions.}
 \item{Add some diagrams for the higher-order correlation expressions.}
 \item{Add a software design section and some examples.} 
 \end{itemize}
