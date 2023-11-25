@@ -73,8 +73,8 @@ To try and understand what Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-c
 We can approximate the probability $P_{{\sf t}+1}(X\vert z)$ with a logarithmic expansion like this
 %%
 \begin{align}
-\ln P_{{\sf t}+1}(X\vert z) &\simeq \ln P_{{\sf t}+1}(X_*\vert z) + \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} (x-x_*)^i \big[{\cal I}(x_*,x'_*)\big]^{ij}_{({\sf t}+1){\sf t}'} (x'-x'_*)^j \label{eq:second-order-log-expansion} \\
-\big[{\cal I}(x_*,x'_*)\big]^{ij}_{({\sf t}+1){\sf t}'} &= \frac{\partial}{\partial x^i}\frac{\partial}{\partial (x')^j}\ln P_{{\sf t}+1}(X\vert z) \bigg\vert_{X=X_*} \,,
+\ln P_{{\sf t}+1}(X\vert z) &\simeq \ln P_{{\sf t}+1}(X_*\vert z) + \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} (x-x_*)^i {\cal I}^{ij}_{({\sf t}+1){\sf t}'}(x_*,x'_*) (x'-x'_*)^j \label{eq:second-order-log-expansion} \\
+{\cal I}^{ij}_{({\sf t}+1){\sf t}'}(x_*,x'_*) &= \frac{\partial}{\partial x^i}\frac{\partial}{\partial (x')^j}\ln P_{{\sf t}+1}(X\vert z) \bigg\vert_{X=X_*} \,,
 \end{align}
 %% 
 where the values for $X=X_*$ are defined by the vanishing of the first derivative, i.e., these are chosen such that
