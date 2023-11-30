@@ -121,6 +121,17 @@ Before moving on to the software design aspects, we need to consider how we migh
 
 \section{\sffamily Software design}
 
+\textcolor{red}{Take a step back and consider all the use-cases for the learnadex:
+\begin{itemize}
+\item{Separate thread context runs of online learning methods using an update method, e.g.,}
+\begin{itemize}
+\item{Gradient-free batch optimisation with any chosen learning algorithm}
+\item{Gradient-based parameter updates}
+\item{Arbitrary parameter updates from a different method}
+\end{itemize}
+\item{Separate thread context forward projection stepper}
+\end{itemize}}
+
 Let's now take a step back from the specifics of the probabilistic reweighting algorithm to introduce our new sofware package for this part of the book: the `learnadex'. At its core, the learnadex algorithm adapts the stochadex iteration engine to iterate through streams of data in order to accumulate a global objective function value with respect to that data. The user may then choose which optimisation algorithm (or write their own) to use in order to leverage this objective for learning a better representation of the data. 
 
 As we discussed at the end of the last section, the algorithms in the learnadex are all applied in an `online' fashion --- refitting for the optimal hyperparameters $z$ as new data is streamed into them. A challenging aspect of online learning is in managing the computational expense of recomputing the optimal value for $z$ after each new datapoint is sent. To help with this; the user may configure the algorithm recompute the optimum value after larger batches of data have been ingested. The last value of optimum $z$ will also frequently be close to the next optimum in the sequence, so using the former as the initial input into the optimisation routine for the latter is typically very valuable for aiding efficiency.
