@@ -136,4 +136,24 @@ Readers of the previous section may also have recognized that Eq.~(\ref{eq:x-z-u
 
 If we now synthesize both of these observations together, we can see how a stochastic variant of the well-known Expectation-Maximisation Algorithm~\cite{hartley1958maximum, dempster1977maximum, murphy2012machine} naturally emerges.
 
+\section{\sffamily Software design}
+
+\textcolor{red}{Take a step back at this point and consider all the use-cases for the learnadex:
+\begin{itemize}
+\item{Core functionality is to enable iterative updates to the $P_{\sf t}(X,z)$ distribution at every timestep. There must also be flexibility in how this distribution can represented, i.e., either:
+\begin{itemize}
+\item{a set of Monte Carlo samples, as in this section, or}
+\item{a set of distribution parameters, as in the previous two sections}
+\end{itemize}
+}
+\item{Separate thread context runs of online learning methods using an update method, e.g.,}
+\begin{itemize}
+\item{Gradient-free batch optimisation with any chosen learning algorithm}
+\item{Gradient-based parameter updates}
+\item{Arbitrary parameter updates from a different method}
+\end{itemize}
+\end{itemize}}
+
+
+
 
