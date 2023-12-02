@@ -70,6 +70,49 @@ and lowercase $x, x', \dots$ values will always refer to individual rows within 
 
 To try and understand what Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) are saying, we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
 
+Before we move onto the learning algorithm and software design sections, let's take a quick mathematical look at some important sub-categories of stochastic process which exist within the general description provided by Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}). For Markovian phenomena, the equations no longer depend on timesteps older than the immediately previous one, hence Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
+%%
+\begin{align}
+P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
+\end{align}
+%%
+By performing a Kramers-Moyal expansion on the $P_{({\sf t}+1){\sf t}}(x\vert x',z)$ distribution up to second order,\footnote{The Pawula theorem~\cite{pawula1967generalizations} states that this is, in fact, as far as we can truncate up to unless we include an infinite number of expansion terms.} we can approximate the right hand side of Eq.~(\ref{eq:master-x-cont-markov}) like this 
+%%
+\begin{align}
+P_{({\sf t}+1)}(x\vert z) &\simeq P_{{\sf t}}(x\vert z) - \sum_{i=0}^n\frac{\partial}{\partial x^i}\bigg[ f_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] + \frac{1}{2}\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ K_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] \label{eq:kramers-moyal} \,,
+\end{align}
+%%
+where the components of $f_{{\sf t}}(x,z)$ and $K_{{\sf t}}(x,z)$ have been defined as
+%%
+\begin{align}
+f^i_{{\sf t}}(x,z) &= \int_{\omega_{{\sf t}+1}} {\rm d}^nx' (x'-x)^iP_{({\sf t}+1){\sf t}}(x'\vert x,z) \\
+K^{ij}_{{\sf t}}(x,z) &= \int_{\omega_{{\sf t}+1}} {\rm d}^nx' (x'-x)^i(x'-x)^jP_{({\sf t}+1){\sf t}}(x'\vert x,z)\,.
+\end{align}
+%%
+
+By inspection of Eq.~(\ref{eq:kramers-moyal}) we can define the `probability current'
+%%
+\begin{align}
+J_{{\sf t}}(x,z) &= f_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) - \frac{1}{2}\sum_{j=0}^{n}\frac{\partial}{\partial x^j}\bigg[ K_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] \,.
+\end{align}
+%%
+If the probability current vanishes $J_{{\sf t}}(x,z)=0$ individually (this also implies that the distribution is stationary such that $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}}(x\vert z)$), the implicit solution of Eq.~(\ref{eq:kramers-moyal}) can be found to be
+%%
+\begin{align}
+P_{{\sf t}}(x\vert z) \propto K_{{\sf t}}^{-1}(x,z)\exp \bigg[ \int {\rm d}^nx\, K^{-1}_{{\sf t}}(x,z)f_{{\sf t}}(x,z)\bigg] \,.
+\end{align}
+%%
+
+An analog of Eq.~(\ref{eq:master-x-cont-latest-row}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
+%%
+\begin{align}
+P_{{\sf t}+1}(x\vert z) &= \sum_{\Omega_{{\sf t}}} P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x \vert X', z) \label{eq:master-x-disc} \,,
+\end{align}
+%%
+where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}.
+
+\section{\sffamily Learning algorithms}
+
 We can approximate the probability $P_{{\sf t}+1}(X\vert z)$ with a logarithmic expansion like this
 %%
 \begin{align}
@@ -131,52 +174,19 @@ The $[P]^{ii'i''}_{({\sf t}+1){\sf t}'{\sf t}''}$ tensor, in particular, will ha
 \end{align}
 %%
 
-What other classes of process can be described by Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row})? For Markovian phenomena, the equations no longer depend on timesteps older than the immediately previous one, hence Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
-%%
-\begin{align}
-P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
-\end{align}
-%%
-By performing a Kramers-Moyal expansion on the $P_{({\sf t}+1){\sf t}}(x\vert x',z)$ distribution up to second order,\footnote{The Pawula theorem~\cite{pawula1967generalizations} states that this is, in fact, as far as we can truncate up to unless we include an infinite number of expansion terms.} we can approximate the right hand side of Eq.~(\ref{eq:master-x-cont-markov}) like this 
-%%
-\begin{align}
-P_{({\sf t}+1)}(x\vert z) &\simeq P_{{\sf t}}(x\vert z) - \sum_{i=0}^n\frac{\partial}{\partial x^i}\bigg[ f_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] + \frac{1}{2}\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ K_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] \label{eq:kramers-moyal} \,,
-\end{align}
-%%
-where the components of $f_{{\sf t}}(x,z)$ and $K_{{\sf t}}(x,z)$ have been defined as
-%%
-\begin{align}
-f^i_{{\sf t}}(x,z) &= \int_{\omega_{{\sf t}+1}} {\rm d}^nx' (x'-x)^iP_{({\sf t}+1){\sf t}}(x'\vert x,z) \\
-K^{ij}_{{\sf t}}(x,z) &= \int_{\omega_{{\sf t}+1}} {\rm d}^nx' (x'-x)^i(x'-x)^jP_{({\sf t}+1){\sf t}}(x'\vert x,z)\,.
-\end{align}
-%%
+\textcolor{red}{
+\begin{itemize}
+\item{Main point of this section is for Gaussian (and higher-order) learning processes + the adjoint master equation learning method before this point}
+\item{Add some diagrams for the higher-order correlation expressions.}
+\end{itemize}
+}
 
-By inspection of Eq.~(\ref{eq:kramers-moyal}) we can define the `probability current'
-%%
-\begin{align}
-J_{{\sf t}}(x,z) &= f_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) - \frac{1}{2}\sum_{j=0}^{n}\frac{\partial}{\partial x^j}\bigg[ K_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] \,.
-\end{align}
-%%
-If the probability current vanishes $J_{{\sf t}}(x,z)=0$ individually (this also implies that the distribution is stationary such that $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}}(x\vert z)$), the implicit solution of Eq.~(\ref{eq:kramers-moyal}) can be found to be
-%%
-\begin{align}
-P_{{\sf t}}(x\vert z) \propto K_{{\sf t}}^{-1}(x,z)\exp \bigg[ \int {\rm d}^nx\, K^{-1}_{{\sf t}}(x,z)f_{{\sf t}}(x,z)\bigg] \,.
-\end{align}
-%%
-
-An analog of Eq.~(\ref{eq:master-x-cont-latest-row}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
-%%
-\begin{align}
-P_{{\sf t}+1}(x\vert z) &= \sum_{\Omega_{{\sf t}}} P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x \vert X', z) \label{eq:master-x-disc} \,,
-\end{align}
-%%
-where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}.
+\section{\sffamily Software design}
 
 \textcolor{red}{
 \begin{itemize}
-\item{Add in mean and covariance calculation of the process to generalise it continuous data and dev the Learnadex code using Gotch to support this with different data-linking distributions.}
-\item{Add some diagrams for the higher-order correlation expressions.}
-\item{Add a software design section and some examples.} 
+\item{Add a software design section and some examples} 
+\item{Dev the learnadex with Gotch to achieve all this stuff}
 \end{itemize}
 }
 
