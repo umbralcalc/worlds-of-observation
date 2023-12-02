@@ -109,6 +109,8 @@ would be used to evaluate the optimal policy instead of the state value function
 
 When an agent takes an action to measure the state of the system (or when it is given measurements without needing to take action) there will typically be some uncertainty in how the history of measured real-world data $Y$ maps to the latent states of the system $X$ and its parameters $z$ at time ${\sf t}+1$. It is natural, then, to represent this uncertainty with a posterior probability distribution ${\cal P}_{{\sf t}+1}(X,z\vert Y)$ as we did in the previous chapters of this book.
 
+\section{\sffamily Algorithm designs}
+
 \textcolor{red}{
 Follow-up this bit with the model-based approach that we're going to take in this book.
 \begin{itemize}
@@ -120,3 +122,12 @@ Follow-up this bit with the model-based approach that we're going to take in thi
 \item{This input prior distribution of policies can itself be optimised by maximising expected discounted utility in a Bayesian design framework. Draw parallels.}
 \end{itemize}
 }
+
+\section{\sffamily Software design}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=11cm]{images/chapter-5-high-level-dependencies.drawio.png}
+\caption{Diagram illustrating the high-level layer inter-dependencies of the Python API.}
+\label{fig:high-level-api-dependencies}
+\end{figure}
