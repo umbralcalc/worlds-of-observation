@@ -15,6 +15,8 @@ In the formula above, one relates the prior probability distribution over a para
 
 From the point of view of statistical inference, if we seek to maximise ${\cal P}_{{\sf t}+1}(z \vert Y)$ --- or its logarithm --- in Eq.~(\ref{eq:bayes-rule}) with respect to $z$, we will obtain what is known as a maximum posteriori (MAP) estimate of the parameters. In fact, we have already encountered this metholodology in the previous chapter when discussing the algorithm which obtains the best fit parameters for the empirical probability reweighting. In this case; while it appears that we optimised the log-likelihood directly as our objective function, one can easily show that this is also technically equivalent obtaining a MAP estimate where one chooses a specfic prior ${\cal P} (z) \propto 1$ (typically known as a `flat prior').
 
+\textcolor{red}{The data and simulation samples are being used the wrong way around below and throughout this section. The BSL and ABC bit in particular needs a rewrite to make the non-parametric likelihood either a compressed BSL which computes the estimated statistics using the \emph{simulation samples} and compares this to each \emph{individual data point} (having learned the right model for the data by fitting it continuously) OR we also should discuss and provide the option to fit this using a constantly refitted Gaussian process which would be more akin to ABC. }
+
 How might we calulate the posterior in practice with some arbitrary stochastic process model that has been defined in the stochadex? In order to make the comparison to a real dataset, any stochadex model of interest will always need to be able to generate observations which can be directly compared to the data. To formalise this a little; a stochadex model could be represented as a map from $z$ to a set of stochastic measurements ${\sf Y}_{{\sf t}+1}(z), {\sf Y}_{{\sf t}}(z), \dots$ that are directly comparable to the rows in the real data matrix $Y$. The values in $Y$ may only represent a noisy or partial measurement of the latent states of the simulation $X$, so a more complete picture can be provided by the following probabilistic relation
 %%
 \begin{align}
@@ -142,8 +144,8 @@ If we now synthesize both of these observations together, we can see how a stoch
 \begin{itemize}
 \item{Core functionality is to enable iterative updates to the $P_{\sf t}(X,z)$ distribution at every timestep. There must also be flexibility in how this distribution can represented, i.e., either:
 \begin{itemize}
-\item{a set of Monte Carlo samples, as in this section, or}
-\item{a set of distribution parameters, as in the previous two sections}
+\item{a set of Monte Carlo samples, or}
+\item{a set of distribution parameters}
 \end{itemize}
 }
 \item{Separate thread context runs of online learning methods using an update method, e.g.,}

@@ -3,7 +3,7 @@
 ## declare filenames
 declare -a filenames=(
     "building_a_generalised_simulator/chapter" \
-    "using_the_time_evolution_of_probabilities/chapter" \
+    "understanding_the_time_evolution_of_probabilities/chapter" \
     "empirical_probabilistic_reweighting_algorithms/chapter" \
     "generalised_simulation_inference/chapter" \
     "optimising_interactions_with_any_system/chapter" \
