@@ -148,6 +148,8 @@ If we now synthesize both of these observations together, we can see how a stoch
 \item{a set of distribution parameters}
 \end{itemize}
 }
+\item{For Monte Carlo samples, we must also keep the flexibility to use either a BSL or ABC-style data-to-sim comparison in order to facilitate the update}
+\item{For distribution parameters, the update can be custom-built by the user with online likelihood-based inference/Bayes estimator methods}
 \item{Separate thread context runs of online learning methods using an update method, e.g.,}
 \begin{itemize}
 \item{Gradient-free batch optimisation with any chosen learning algorithm}

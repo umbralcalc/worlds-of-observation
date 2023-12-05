@@ -1,5 +1,15 @@
 \chapter{\sffamily Understanding the time evolution of probabilities}
 
+\textcolor{red}{
+Rewrite things from here. Main goals for this chapter are:
+\begin{itemize}
+\item{Introduce probabilistic formalism and thinking - needs more diagrams!}
+\item{Talk about mean field solutions and how some stochastic phenomena (particularly Markovian) will have averaged equations on their distribution statistics --- give some examples}
+\item{Get to Gaussian processes and their kernels + discuss how they can be used to compare between separate sample datasets}
+\item{Go through the learning algorithm required to set this all up but don't introduce the learnadex fully}
+\end{itemize}
+}
+
 {\bfseries\sffamily Concept.} To extend the formalism that we developed in the previous chapter to help us better understand the time evolution of state probabilities. With this knowledge we shall derive popular machine learning methods like Gaussian processes, as well as creating numerical procedures to directly solve for discrete state spaces. In the latter case these can be very intensive computations to perform, so in this chapter we shall also discuss the practical limitations of a fully numerical approach as well. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on the time evolution of probabilities. For the programmers, the software lives in this public Git repository: \href{https://github.com/umbralcalc/dennm-torch}{https://github.com/umbralcalc/dennm-torch}.
 
 \section{\sffamily Probabilistic formalism}
@@ -76,32 +86,6 @@ Before we move onto the learning algorithm and software design sections, let's t
 P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
-By performing a Kramers-Moyal expansion on the $P_{({\sf t}+1){\sf t}}(x\vert x',z)$ distribution up to second order,\footnote{The Pawula theorem~\cite{pawula1967generalizations} states that this is, in fact, as far as we can truncate up to unless we include an infinite number of expansion terms.} we can approximate the right hand side of Eq.~(\ref{eq:master-x-cont-markov}) like this 
-%%
-\begin{align}
-P_{({\sf t}+1)}(x\vert z) &\simeq P_{{\sf t}}(x\vert z) - \sum_{i=0}^n\frac{\partial}{\partial x^i}\bigg[ f_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] + \frac{1}{2}\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ K_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] \label{eq:kramers-moyal} \,,
-\end{align}
-%%
-where the components of $f_{{\sf t}}(x,z)$ and $K_{{\sf t}}(x,z)$ have been defined as
-%%
-\begin{align}
-f^i_{{\sf t}}(x,z) &= \int_{\omega_{{\sf t}+1}} {\rm d}^nx' (x'-x)^iP_{({\sf t}+1){\sf t}}(x'\vert x,z) \\
-K^{ij}_{{\sf t}}(x,z) &= \int_{\omega_{{\sf t}+1}} {\rm d}^nx' (x'-x)^i(x'-x)^jP_{({\sf t}+1){\sf t}}(x'\vert x,z)\,.
-\end{align}
-%%
-
-By inspection of Eq.~(\ref{eq:kramers-moyal}) we can define the `probability current'
-%%
-\begin{align}
-J_{{\sf t}}(x,z) &= f_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) - \frac{1}{2}\sum_{j=0}^{n}\frac{\partial}{\partial x^j}\bigg[ K_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] \,.
-\end{align}
-%%
-If the probability current vanishes $J_{{\sf t}}(x,z)=0$ individually (this also implies that the distribution is stationary such that $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}}(x\vert z)$), the implicit solution of Eq.~(\ref{eq:kramers-moyal}) can be found to be
-%%
-\begin{align}
-P_{{\sf t}}(x\vert z) \propto K_{{\sf t}}^{-1}(x,z)\exp \bigg[ \int {\rm d}^nx\, K^{-1}_{{\sf t}}(x,z)f_{{\sf t}}(x,z)\bigg] \,.
-\end{align}
-%%
 
 An analog of Eq.~(\ref{eq:master-x-cont-latest-row}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
 %%
@@ -159,26 +143,10 @@ P_{({\sf t}+1){\sf t}''}(x\vert x'', z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{
 %%
 which describes the time evolution of the conditional probabilities.
 
-Let's imagine that $x$ is just a scalar (as opposed to a row vector) for simplicity in the expressions. We can then discretise the 1D space over $x$ into separate $i$-labelled regions such that $[P]^i_{{\sf t}+1} - [P]^i_{{\sf t}} = {\cal J}^i_{{\sf t}+1}$, where the probability current ${\cal J}^i_{{\sf t}+1}$ for the factorised processes above would be defined as
-%%
-\begin{align}
-{\cal J}^i_{{\sf t}+1} &= - [P]^i_{{\sf t}} + \frac{1}{{\sf t}}\sum^{{\sf t}}_{{\sf t}'=0}\sum_{i'=0}^N\Delta x[P]^{i'}_{{\sf t}'}[P]^{ii'}_{({\sf t}+1){\sf t}'} \\
-{\cal J}^i_{{\sf t}+1} &= - [P]^i_{{\sf t}} + \frac{1}{{\sf t}}\sum^{{\sf t}}_{{\sf t}'=1}\frac{1}{{\sf t}'-1}\sum^{{\sf t}'-1}_{{\sf t}''=0}\sum_{i'=0}^N\sum_{i''=0}^N\Delta x^2[P]^{i''}_{{\sf t}''}[P]^{i'i''}_{{\sf t}'{\sf t}''}[P]^{ii'i''}_{({\sf t}+1){\sf t}'{\sf t}''}\,.
-\end{align}
-%%
-
-The $[P]^{ii'i''}_{({\sf t}+1){\sf t}'{\sf t}''}$ tensor, in particular, will have $N^3{\sf t}({\sf t}^2-1)$ elements. Note that the third-order temporal correlations can be evolved by identifying the pairwise conditional probabilities as time-dependent state variables and evolving them according to the following relation
-%%
-\begin{align}
-[P]^{ii''}_{({\sf t}+1){\sf t}''} &= \frac{1}{{\sf t}}\sum^{{\sf t}}_{{\sf t}'=1}\sum_{i'=0}^N\Delta x[P]^{i'i''}_{{\sf t}'{\sf t}''}[P]^{ii'i''}_{({\sf t}+1){\sf t}'{\sf t}''}\,.
-\end{align}
-%%
-
 \textcolor{red}{
 \begin{itemize}
-\item{Main point of this section is for Gaussian (and higher-order) learning processes + the adjoint master equation learning method before this point}
+\item{Key point is to get the Gaussian process kernel out and discuss options with it.}
 \item{Add some diagrams for the higher-order correlation expressions.}
-\item{Also add note that we explored the direct numerical evaluation of the higher-order process in this repository: \href{https://github.com/umbralcalc/dennm-torch}{https://github.com/umbralcalc/dennm-torch}.}
 \end{itemize}
 }
 
@@ -186,8 +154,7 @@ The $[P]^{ii'i''}_{({\sf t}+1){\sf t}'{\sf t}''}$ tensor, in particular, will ha
 
 \textcolor{red}{
 \begin{itemize}
-\item{Add a software design section and some examples} 
-\item{Dev the learnadex with Gotch to achieve all this stuff}
+\item{Design for the Gaussian process comparison algorithm in the learnadex}
 \end{itemize}
 }
 
