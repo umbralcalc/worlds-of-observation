@@ -1,20 +1,12 @@
 \chapter{\sffamily Understanding the time evolution of probabilities}
 
-\textcolor{red}{
-Rewrite things from here. Main goals for this chapter are:
-\begin{itemize}
-\item{Introduce probabilistic formalism and thinking - needs more diagrams!}
-\item{Talk about mean field solutions and how some stochastic phenomena (particularly Markovian) will have averaged equations on their distribution statistics --- give some examples}
-\item{Get to Gaussian processes and their kernels + discuss how they can be used to compare between separate sample datasets}
-\item{Go through the learning algorithm required to set this all up but don't introduce the learnadex fully}
-\end{itemize}
-}
-
-{\bfseries\sffamily Concept.} To extend the formalism that we developed in the previous chapter to help us better understand the time evolution of state probabilities. With this knowledge we shall derive popular machine learning methods like Gaussian processes, as well as creating numerical procedures to directly solve for discrete state spaces. In the latter case these can be very intensive computations to perform, so in this chapter we shall also discuss the practical limitations of a fully numerical approach as well. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on the time evolution of probabilities. For the programmers, the software lives in this public Git repository: \href{https://github.com/umbralcalc/dennm-torch}{https://github.com/umbralcalc/dennm-torch}.
+{\bfseries\sffamily Concept.} To extend the formalism that we developed in the previous chapter to help us better understand the time evolution of state probabilities. With this knowledge we shall derive popular machine learning methods like Gaussian processes, as well as discussing how some phenomena permit a convenient description via mean field equations. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on the time evolution of probabilities, with a view to statistical inference later on. For the programmers, all of the relevant software lives in this public Git repository: \href{https://github.com/umbralcalc/learndadex}{https://github.com/umbralcalc/learnadex}.
 
 \section{\sffamily Probabilistic formalism}
 
-In this section we will return to the stochadex formalism that we introduced in the first chapter of this book. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. We are going to extend this description to consider what happens to the probability that the state history matrix takes a particular set of values over time.
+In this section we will return to the stochadex formalism that we introduced in the previous chapter. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. We are going to extend this description to consider what happens to the probability that the state history matrix takes a particular set of values over time.
+
+\textcolor{red}{Got to here in rewrite....}
 
 \begin{figure}[h]
 \centering
@@ -144,9 +136,12 @@ P_{({\sf t}+1){\sf t}''}(x\vert x'', z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{
 which describes the time evolution of the conditional probabilities.
 
 \textcolor{red}{
+Rewrite things from here. Main goals for this chapter are:
 \begin{itemize}
-\item{Key point is to get the Gaussian process kernel out and discuss options with it.}
-\item{Add some diagrams for the higher-order correlation expressions.}
+\item{Introduce probabilistic formalism and thinking - needs more diagrams!}
+\item{Talk about mean field solutions and how some stochastic phenomena (particularly Markovian) will have averaged equations on their distribution statistics --- give some examples}
+\item{Get to Gaussian processes and their kernels + discuss how they can be used to compare between separate sample datasets}
+\item{Go through the learning algorithm required to set this all up but don't introduce the learnadex fully}
 \end{itemize}
 }
 
@@ -155,6 +150,7 @@ which describes the time evolution of the conditional probabilities.
 \textcolor{red}{
 \begin{itemize}
 \item{Design for the Gaussian process comparison algorithm in the learnadex}
+\item{Also design modules for mean field sims to be compared to the stochastic sims}
 \end{itemize}
 }
 
