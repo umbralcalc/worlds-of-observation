@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <style>
+    .body {
+      box-sizing: border-box;
+      min-width: 200px;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 45px;
+      color: #1F2328;
+      background-color: #ffff;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+
+    .body h1 {
+      margin: 0;
+      font-size: 200%;
+      color: rgb(42, 65, 83);
+      border-radius: 6px;
+      word-wrap: break-word;
+    }
+
+    .body h2, h3, h4, h5 {
+      margin: 0;
+      font-size: 150%;
+      color: rgb(42, 65, 83);
+      border-radius: 6px;
+      word-wrap: break-word;
+    }
+
+    .body strong {
+      color: rgb(42, 65, 83);
+    }
+
+    .body a {
+      color: #0969da;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .sourceCode {
+      padding: .2em .4em;
+      margin: .2em;
+      font-size: 95%;
+      color: #F5F5F5;
+      background-color: rgb(42, 65, 83);
+      border-radius: 6px;
+      overflow: auto;
+    }
+
+    .math.display {
+      overflow: auto;
+    }
+
+    .articleHeader {
+      padding: .2em .4em;
+      margin: 1em;
+      font-size: 95%;
+      color: rgb(79, 97, 114);
+      background-color: #ffff;
+      border-radius: 6px;
+      overflow: auto;
+      text-align: justify;
+    }
+
+    .articleHeader strong {
+      font-size: 95%;
+      color: rgb(79, 97, 114);
+      background-color: #ffff;
+      border-radius: 6px;
+      overflow: auto;
+    }
+
+    @media (max-width: 767px) {
+      .body {
+        padding: 15px;
+      }
+    }
+  </style>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+</head>
+<article class="body">
+<h1></h1>
+<h1 id="worlds-of-observation">Worlds Of Observation</h1>
+<h2 id="building-more-realistic-environments-for-machine-learning">Building more realistic environments for machine learning</h2>
+<p><strong>Author:</strong> Robert J. Hardwick</p>
+<p><strong>Editor:</strong> C. M. Gomez-Perales</p>
+<p>Shared by the author under an <a href="LICENSE">MIT License</a></p>
+<p><a href="https://github.com/umbralcalc/worlds-of-observation"><img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&amp;logo=github&amp;logoColor=white" alt="Github" /></a></p>
+<h2 id="about">About</h2>
+<p><em>Worlds Of Observation</em> is a book about building more realistic training environments for machine learning algorithms to control systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms (especially when there is plenty of data and the system is fully observable), this book will primarily explore how to create environments for control algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and maybe a little different to the usual perspectives.</p>
+<p>You can read the full book here: <a href="book.pdf">Full Book PDF</a>. For more information about the simulation environments in this book, as well as more detailed code documentation, you can also visit <a href="https://github.com/worldsoop">WorldsOOp</a>.</p>
+<h2 id="chapters">Chapters</h2>
+<p><strong>Part 1.</strong> Theoretical background and code design</p>
+<ol type="1">
+<li><a href="building_a_generalised_simulator/chapter.pdf">Building a generalised simulator</a></li>
+<li><a href="understanding_the_time_evolution_of_probabilities/chapter.pdf">Understanding the time evolution of probabilities</a></li>
+<li><a href="empirical_probabilistic_reweighting_algorithms/chapter.pdf">Empirical probabilistic reweighting algorithms</a></li>
+<li><a href="generalised_simulation_inference/chapter.pdf">Generalised simulation inference</a></li>
+<li><a href="optimising_interactions_with_any_system/chapter.pdf">Optimising interactions with any system</a></li>
+</ol>
+<p><strong>Part 2.</strong> Applications to realistic examples</p>
+<ol start="6" type="1">
+<li><a href="controlling_parasitic_infections/chapter.pdf">Controlling parasitic infections</a></li>
+<li><a href="algo_trading_on_financial_markets/chapter.pdf">Algo-trading on financial markets</a></li>
+<li><a href="sustainable_angling_for_fish/chapter.pdf">Sustainable angling for fish</a></li>
+<li><a href="managing_a_rugby_match/chapter.pdf">Managing a rugby match</a></li>
+<li><a href="optimising_relief_chain_logistics/chapter.pdf">Optimising relief chain logistics</a></li>
+</ol>
+<h2 id="citations">Citations</h2>
+<p>To cite this book in any work, please use the following BibTeX:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bibtex"><code class="sourceCode bibtex"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="va">@book</span>{<span class="ot">worlds</span>-<span class="ot">of</span>-<span class="ot">observation</span>-<span class="ot">2023</span>,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="dt">title</span>   = {Worlds Of Observation: Building more realistic environments for machine learning},</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="dt">author</span>  = {Hardwick, Robert J.},</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="dt">year</span>    = {2023},</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="dt">publisher</span> = {umbralcalc.github.io},</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>  <span class="dt">url</span>     = {https://umbralcalc.github.io/worlds-of-observation/book.pdf},</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>}</span></code></pre></div>
+<script>
+// Used to toggle the menu on small screens when clicking on the menu button
+function myFunction() {
+  var x = document.getElementById("navDemo");
+  if (x.className.indexOf("w3-show") == -1) {
+    x.className += " w3-show";
+  } else { 
+    x.className = x.className.replace(" w3-show", "");
+  }
+}
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</article>
+</html>
