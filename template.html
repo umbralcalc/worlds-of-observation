@@ -175,15 +175,14 @@ $if(concept)$
 </br>
 $endif$
 $body$
-$if(bibtexId)$
+$if(articleId)$
 <hr color="LightGray">
 <div class="articleHeader">You can cite this post using the following BibTeX:
-<code><pre>@misc{$bibtexId$,
-  title = "$title$",
+<code><pre>@article{$articleId$,
+  title = "{$title$}",
   author = "{$author$}",
+  journal = "{umbralcalculations: Technical Article Repository (umbralcalc.github.io/posts/$articleId$.html)}",
   year = $year$,
-  howpublished = {
-    \url{$howPublished$}},
 }</pre></code>
 $endif$
 <script type="text/javascript" id="MathJax-script" async
