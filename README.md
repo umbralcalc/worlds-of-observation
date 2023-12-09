@@ -39,11 +39,11 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 To cite this book in any work, please use the following BibTeX:
 
 ```
-@book{worlds-of-observation-2023,
-  title   = {Worlds Of Observation: Building more realistic environments for machine learning},
-  author  = {Hardwick, Robert J.},
-  year    = {2023},
-  publisher = {umbralcalc.github.io},
-  url     = {https://umbralcalc.github.io/worlds-of-observation/book.pdf},
+@book{worlds-of-observation-WIP,
+  title   = "Worlds Of Observation: Building more realistic environments for machine learning",
+  author  = "Hardwick, Robert J.",
+  year    = WIP,
+  publisher = "umbralcalculations: Technical Article Repository",
+  url     = "https://umbralcalc.github.io/worlds-of-observation/book.pdf",
 }
 ```
