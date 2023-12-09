@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
 $if(date-meta)$
   <meta name="dcterms.date" content="$date-meta$" />
 $endif$
@@ -79,12 +80,46 @@ $endif$
       text-align: justify;
     }
 
+    a.articleTitle h1 {
+      color: rgb(79, 97, 114);
+    }
+
+    a.articleTitle h1:hover {
+      color: LightGrey;
+    }
+
     .articleHeader strong {
       font-size: 95%;
       color: rgb(79, 97, 114);
       background-color: #ffff;
       border-radius: 6px;
       overflow: auto;
+    }
+
+    .body .navbar {
+      padding:8px 16px;
+      float:right;
+      width:auto;
+      border:none;
+      display:block;
+      outline:0;
+      color: LightGrey;
+    }
+
+    .body .repotitle {
+      padding:8px 0px;
+      float: left;
+      color: LightGrey;
+      font-weight: bold;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    strong.nameRepo {
+      color: rgb(42, 65, 83);
+    }
+
+    .body .navbar:hover {
+      color: rgb(42, 65, 83);
     }
 
     @media (max-width: 767px) {
@@ -103,6 +138,19 @@ $endfor$
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 <article class="body">
+<a class="navbar" href="https://umbralcalc.github.io/">
+Home
+</a>
+<a class="navbar" href="https://umbralcalc.github.io/about.html">
+About
+</a>
+<div class="repotitle">
+&#129518; <strong class="nameRepo">umbralcalculations:</strong> Technical Article Repository
+</div>
+</br>
+</br>
+</br>
+
 <h1>$title$</h1>
 $if(author)$
 </br>
@@ -132,17 +180,6 @@ $if(bibtexId)$
   howpublished = {$howPublished$},
 }</pre></code>
 $endif$
-<script>
-// Used to toggle the menu on small screens when clicking on the menu button
-function myFunction() {
-  var x = document.getElementById("navDemo");
-  if (x.className.indexOf("w3-show") == -1) {
-    x.className += " w3-show";
-  } else { 
-    x.className = x.className.replace(" w3-show", "");
-  }
-}
-</script>
 <script type="text/javascript" id="MathJax-script" async
   src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </article>
