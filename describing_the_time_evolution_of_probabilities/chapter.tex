@@ -1,10 +1,10 @@
 \chapter{\sffamily Describing the time evolution of probabilities}
 
-{\bfseries\sffamily Concept.} To extend the formalism that we developed in the previous chapter to help us better understand the time evolution of state probabilities. With this knowledge we shall derive popular machine learning methods like Gaussian processes, as well as discussing how some phenomena permit a convenient description via mean field equations. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on the time evolution of probabilities, with a view to statistical inference later on. For the programmers, all of the relevant software lives in this public Git repository: \href{https://github.com/umbralcalc/learndadex}{https://github.com/umbralcalc/learnadex}.
+{\bfseries\sffamily Concept.} To extend the formalism that we developed in the previous chapter to help us better understand the time evolution of state probabilities. With this knowledge we shall derive popular machine learning methods like Gaussian processes, as well as discussing how some phenomena permit a convenient description via mean field equations or regression of distribution moments. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on the time evolution of probabilities, with a view to statistical inference later on. For the programmers, all of the relevant software lives in this public Git repository: \href{https://github.com/umbralcalc/learndadex}{https://github.com/umbralcalc/learnadex}.
 
 \section{\sffamily Probabilistic formalism}
 
-In this section we will return to the stochadex formalism that we introduced in the previous chapter. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. We are going to extend this description to consider what happens to the probability that the state history matrix takes a particular set of values over time.
+Let's start by returning to the formalism that we introduced in the previous chapter. As we discussed at that point; this formalism is appropriate for sampling from nearly every stochastic phenomenon that one can think of. We are going to extend this description to consider what happens to the probability that the state history matrix takes a particular set of values over time.
 
 \begin{figure}[h]
 \centering
@@ -20,8 +20,6 @@ P_{{\sf t}+1}(X\vert z) &= P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x\vert 
 \end{align}
 %%
 where for the time being we are assuming the state space is continuous in each of the matrix elements and $P_{({\sf t}+1){\sf t}}(x\vert X',z)$ is the conditional probability that $X_{{\sf t}+1}=x$ given that $X_{0:{\sf t}}=X'$ at time ${\sf t}$ and the parameters of the process are $z$.
-
-\textcolor{red}{Got to here in the rewrite...}
 
 Consider what happens when we extend the chain of conditional probabilities in Eq.~(\ref{eq:master-x-cont}) back in time by one step. In doing so, we retrieve a joint probability of rows $X_{{\sf t}+1}=x$ and $X_{{\sf t}}=x'$ on the right hand side of the expression 
 %%
@@ -72,13 +70,12 @@ and lowercase $x, x', \dots$ values will always refer to individual rows within 
 
 To try and understand what Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) are saying, we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
 
-Before we move onto the learning algorithm and software design sections, let's take a quick mathematical look at some important sub-categories of stochastic process which exist within the general description provided by Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}). For Markovian phenomena, the equations no longer depend on timesteps older than the immediately previous one, hence Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
+Note that for Markovian phenomena, Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) no longer depend on timesteps older than the immediately previous one, hence, e.g., Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
 %%
 \begin{align}
 P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
-
 An analog of Eq.~(\ref{eq:master-x-cont-latest-row}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
 %%
 \begin{align}
@@ -87,7 +84,15 @@ P_{{\sf t}+1}(x\vert z) &= \sum_{\Omega_{{\sf t}}} P_{{\sf t}}(X'\vert z) P_{({\
 %%
 where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}.
 
-\section{\sffamily Learning algorithms}
+\textcolor{red}{Got to here in rewriting...
+Maybe start the mean-field discussion here and begin with
+%%
+\begin{align}
+M_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\, P_{{\sf t}+1}(x\vert z) = \frac{1}{{\sf t}}\sum_{{\sf t}''=0}^{{\sf t}} \int_{\Omega_{{\sf t}''}}{\rm d}X'' P_{{\sf t}''}(X''\vert z) M_{({\sf t}+1){\sf t}''}(X'',z) \,.
+\end{align}
+%%
+Then give some examples of what $M_{({\sf t}+1){\sf t}''}(X'',z)$ can be. This is just deriving regression of distribution moments looks like. Show examples (Markovian and non-Markovian) of some phenomena which permit full mean-field equations based on their master equations. Maybe put stochastic resetting and Hawkes process master equations here for examples of non-Markovian phenomena?
+}
 
 We can approximate the probability $P_{{\sf t}+1}(X\vert z)$ with a logarithmic expansion like this
 %%
