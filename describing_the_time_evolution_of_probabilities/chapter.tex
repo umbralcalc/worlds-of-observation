@@ -46,7 +46,7 @@ If we wanted to just look at the distribution over the latest row $X_{{\sf t}+1}
 P_{{\sf t}+1}(x\vert z) = \int_{\Omega_{{\sf t}}}{\rm d}X' P_{{\sf t}+1}(X\vert z) &= \int_{\Omega_{{\sf t}}}{\rm d}X' P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x\vert X',z) \label{eq:master-x-cont-latest-row} \,.
 \end{align}
 %%
-But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible matrix $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. 
+To try and understand what Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) are saying, we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible matrix $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. 
 
 The symbol ${\rm d}X'$ in Eq.~(\ref{eq:master-x-cont-latest-row}) is our shorthand notation throughout the book for computing the sum of integrals over previous state history matrices which can further be reduced via Eq.~(\ref{eq:master-x-cont-sum-gen}) into a product of sub-domain integrals over each matrix row
 %%
@@ -67,31 +67,31 @@ and lowercase $x, x', \dots$ values will always refer to individual rows within 
 \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} \rightarrow \frac{1}{t({\sf t})}\sum_{{\sf t}'=0}^{{\sf t}}\delta t({\sf t}') \,.
 \end{align}
 %%
-
-To try and understand what Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) are saying, we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}.
-
-Note that for Markovian phenomena, Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) no longer depend on timesteps older than the immediately previous one, hence, e.g., Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
+Note also that, for Markovian phenomena, Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) no longer depend on timesteps older than the immediately previous one, hence, e.g., Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
 %%
 \begin{align}
 P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
+
 An analog of Eq.~(\ref{eq:master-x-cont-latest-row}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
 %%
 \begin{align}
 P_{{\sf t}+1}(x\vert z) &= \sum_{\Omega_{{\sf t}}} P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x \vert X', z) \label{eq:master-x-disc} \,,
 \end{align}
 %%
-where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}.
+where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}. In what follows, discrete state space can always be considered by replacing the integrals with summations over probability masses in this manner; we only use the continuous state space formulation for our notation because one could argue it's a little more general.
 
-\textcolor{red}{Got to here in rewriting...
-Maybe start the mean-field discussion here and begin with
+So now that we have become familiar with the notation used by Eq.~(\ref{eq:master-x-cont-latest-row}), let's use it to derive a few important statistical insights. We can begin by pointing out that by integrating over $x$, we compute the mean of the distribution
 %%
 \begin{align}
-M_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\, P_{{\sf t}+1}(x\vert z) = \frac{1}{{\sf t}}\sum_{{\sf t}''=0}^{{\sf t}} \int_{\Omega_{{\sf t}''}}{\rm d}X'' P_{{\sf t}''}(X''\vert z) M_{({\sf t}+1){\sf t}''}(X'',z) \,.
+M_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\, P_{{\sf t}+1}(x\vert z) = \frac{1}{{\sf t}}\sum_{{\sf t}''=0}^{{\sf t}} \int_{\Omega_{{\sf t}''}}{\rm d}X'' P_{{\sf t}''}(X''\vert z) M_{({\sf t}+1){\sf t}''}(X'',z) \,,
 \end{align}
 %%
-Then give some examples of what $M_{({\sf t}+1){\sf t}''}(X'',z)$ can be. This is just deriving regression of distribution moments looks like. Show examples (Markovian and non-Markovian) of some phenomena which permit full mean-field equations based on their master equations. Maybe put stochastic resetting and Hawkes process master equations here for examples of non-Markovian phenomena?
+where one can view the $M_{({\sf t}+1){\sf t}''}(X'',z)$ values as either terms in some regression model, or derivable explicitly from the master equation. A viable approach to statistically infer a stochadex simulation from a set of data is to start by knowing what its master equation is, using this to compute the time evolution of the mean (and potentially higher-order statistics) and then connect these time and $z$-dependent statistics back to the likelihood of observing the data. This is what is commonly known as the `mean-field' approach; averaging over the available degrees of freedom in the statistical moments of distributions.
+
+\textcolor{red}{Got to here in rewriting...
+Give some examples of what $M_{({\sf t}+1){\sf t}''}(X'',z)$ can be. This is just deriving regression of distribution moments looks like. Show examples (Markovian and non-Markovian) of some phenomena which permit full mean-field equations based on their master equations. Maybe put stochastic resetting and Hawkes process master equations here for examples of non-Markovian phenomena?
 }
 
 We can approximate the probability $P_{{\sf t}+1}(X\vert z)$ with a logarithmic expansion like this
