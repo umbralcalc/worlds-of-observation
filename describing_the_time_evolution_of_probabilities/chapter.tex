@@ -92,6 +92,20 @@ where one can view the $M_{({\sf t}+1){\sf t}''}(X'',z)$ values as either terms 
 
 \textcolor{red}{Got to here in rewriting...
 Give some examples of what $M_{({\sf t}+1){\sf t}''}(X'',z)$ can be. This is just deriving regression of distribution moments looks like. Show examples (Markovian and non-Markovian) of some phenomena which permit full mean-field equations based on their master equations. Maybe put stochastic resetting and Hawkes process master equations here for examples of non-Markovian phenomena?
+Examples: Markovian continuous space --- drift-diffusion with a Fokker-Planck master equation
+%%
+\begin{align}
+P_{{\sf t}+1}(x\vert z) &= P_{{\sf t}}(x\vert z) - \sum_{i=0}^n\frac{\partial}{\partial x^i}\bigg[ \mu_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] + \frac{1}{2}\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ D_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) \bigg] \,.
+\end{align}
+%%
+Non-Markovian continuous space --- need something simple here
+Markovian discrete space --- time-dependent Poisson process
+%%
+\begin{align}
+P_{{\sf t}+1}(x\vert z) &= \lambda ({\sf t})\big[ P_{{\sf t}}(x-1\vert z) - P_{{\sf t}}(x\vert z)\big] \,.
+\end{align}
+%%
+Non-Markovian discrete space --- a Hawkes process master equation would look quite complicated since it has to include a coupling between the rate at which events occur and an explicit memory of when the previous ones did occur. 
 }
 
 We can approximate the probability $P_{{\sf t}+1}(X\vert z)$ with a logarithmic expansion like this
