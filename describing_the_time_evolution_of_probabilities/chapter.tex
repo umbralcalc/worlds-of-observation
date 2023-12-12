@@ -8,8 +8,8 @@ Let's start by returning to the formalism that we introduced in the previous cha
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=8cm]{images/chapter-3-master-eq-graph.drawio.png}
-\caption{Graph representation of Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}).}
+\includegraphics[width=12cm]{images/chapter-2-master-eq-graph.drawio.png}
+\caption{Graph representation of Eq.~(\ref{eq:master-x-cont}).}
 \label{fig:master-eqn}
 \end{figure} 
 
@@ -19,7 +19,7 @@ So, how do we begin? In the first chapter, we defined the general stochastic pro
 P_{{\sf t}+1}(X\vert z) &= P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x\vert X',z) \label{eq:master-x-cont}\,,
 \end{align}
 %%
-where for the time being we are assuming the state space is continuous in each of the matrix elements and $P_{({\sf t}+1){\sf t}}(x\vert X',z)$ is the conditional probability that $X_{{\sf t}+1}=x$ given that $X_{0:{\sf t}}=X'$ at time ${\sf t}$ and the parameters of the process are $z$.
+where for the time being we are assuming the state space is continuous in each of the matrix elements and $P_{({\sf t}+1){\sf t}}(x\vert X',z)$ is the conditional probability that $X_{{\sf t}+1}=x$ given that $X_{0:{\sf t}}=X'$ at time ${\sf t}$ and the parameters of the process are $z$. To try and understand what Eq.~(\ref{eq:master-x-cont}) is saying, we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. We've also illustrated this kind of thinking in Fig.~\ref{fig:master-eqn}.
 
 Consider what happens when we extend the chain of conditional probabilities in Eq.~(\ref{eq:master-x-cont}) back in time by one step. In doing so, we retrieve a joint probability of rows $X_{{\sf t}+1}=x$ and $X_{{\sf t}}=x'$ on the right hand side of the expression 
 %%
@@ -46,7 +46,7 @@ If we wanted to just look at the distribution over the latest row $X_{{\sf t}+1}
 P_{{\sf t}+1}(x\vert z) = \int_{\Omega_{{\sf t}}}{\rm d}X' P_{{\sf t}+1}(X\vert z) &= \int_{\Omega_{{\sf t}}}{\rm d}X' P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x\vert X',z) \label{eq:master-x-cont-latest-row} \,.
 \end{align}
 %%
-To try and understand what Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) are saying, we find it's helpful to think of an iterative relationship between probabilities; each of which is connected by their relative conditional probabilities. This kind of thinking is also illustrated in Fig.~\ref{fig:master-eqn}. But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible matrix $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. 
+But what is $\Omega_{\sf t}$? You can think of this as just the domain of possible matrix $X'$ inputs into the integral which will depend on the specific stochastic process we are looking at. 
 
 The symbol ${\rm d}X'$ in Eq.~(\ref{eq:master-x-cont-latest-row}) is our shorthand notation throughout the book for computing the sum of integrals over previous state history matrices which can further be reduced via Eq.~(\ref{eq:master-x-cont-sum-gen}) into a product of sub-domain integrals over each matrix row
 %%
@@ -88,7 +88,7 @@ So now that we have become familiar with the notation used by Eq.~(\ref{eq:maste
 M_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\, P_{{\sf t}+1}(x\vert z) = \frac{1}{{\sf t}}\sum_{{\sf t}''=0}^{{\sf t}} \int_{\Omega_{{\sf t}''}}{\rm d}X'' P_{{\sf t}''}(X''\vert z) M_{({\sf t}+1){\sf t}''}(X'',z) \,,
 \end{align}
 %%
-where one can view the $M_{({\sf t}+1){\sf t}''}(X'',z)$ values as either terms in some regression model, or derivable explicitly from the master equation. A viable approach to statistically infer a stochadex simulation from a set of data is to start by knowing what its master equation is, using this to compute the time evolution of the mean (and potentially higher-order statistics) and then connect these time and $z$-dependent statistics back to the likelihood of observing the data. This is what is commonly known as the `mean-field' approach; averaging over the available degrees of freedom in the statistical moments of distributions.
+where one can view the $M_{({\sf t}+1){\sf t}''}(X'',z)$ values as either terms in some regression model, or derivable explicitly from the master equation. A viable approach to statistically infer a stochastic simulation from data is to start by knowing what its master equation is, using this to compute the time evolution of the mean (and potentially higher-order statistics) and then connect these time and $z$-dependent statistics back to the likelihood of observing the data. This is what is commonly known as the `mean-field' approach; averaging over the available degrees of freedom in the statistical moments of distributions.
 
 \textcolor{red}{Got to here in rewriting...
 Give some examples of what $M_{({\sf t}+1){\sf t}''}(X'',z)$ can be. This is just deriving regression of distribution moments looks like. Show examples (Markovian and non-Markovian) of some phenomena which permit full mean-field equations based on their master equations. Maybe put stochastic resetting and Hawkes process master equations here for examples of non-Markovian phenomena?
@@ -99,7 +99,7 @@ We can approximate the probability $P_{{\sf t}+1}(X\vert z)$ with a logarithmic 
 \begin{align}
 \ln P_{{\sf t}+1}(X\vert z) &\simeq \ln P_{{\sf t}+1}(X_*\vert z) + \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} (x-x_*)^i {\cal I}^{ij}_{({\sf t}+1){\sf t}'}(x_*,x'_*) (x'-x'_*)^j \label{eq:second-order-log-expansion} \\
 {\cal I}^{ij}_{({\sf t}+1){\sf t}'}(x_*,x'_*) &= \frac{\partial}{\partial x^i}\frac{\partial}{\partial (x')^j}\ln P_{{\sf t}+1}(X\vert z) \bigg\vert_{X=X_*} \,,
-\end{align}
+\end{align}y
 %% 
 where the values for $X=X_*$ are defined by the vanishing of the first derivative, i.e., these are chosen such that
 %%

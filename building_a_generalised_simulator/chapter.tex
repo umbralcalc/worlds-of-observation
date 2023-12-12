@@ -38,14 +38,7 @@ For more complex physical models and integrators, the distinct notions of `numer
 t({\sf t}) &= \sum^{{\sf t}}_{{\sf t}'=0}\delta t({\sf t}') \label{eq:t-steps-sum} \,.
 \end{align}
 %%
-This seems a lot of effort, no? Well it's important to remember that our steps in continuous time may not be constant, so by defining the $\delta t({\sf t})$ function and summing over it we can enable this flexibility in the computation. In case the summation notation is no fun for programmers; we're simply adding up all of the differences in time to get a total. We've illustrated this in Fig.~\ref{fig:time-step-summation} for more clarity.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=10cm]{images/chapter-1-time-step-summation.drawio.png}
-\caption{Illustration of Eq.~(\ref{eq:t-steps-sum}).}
-\label{fig:time-step-summation}
-\end{figure}
+It's important to remember that our steps in continuous time may not be constant, so by defining the $\delta t({\sf t})$ function and summing over it we can enable this flexibility in the computation. In case the summation notation is no fun for programmers; we're simply adding up all of the differences in time to get a total.
 
 So, now that we've mathematically defined a really general notion of iterating the stochastic process forward in time, it makes sense to discuss some simple examples. For instance, it is frequently possible to split $F$ up into deteministic (denoted $D$) and stochastic (denoted $S$) matrix-valued functions like so
 %%
