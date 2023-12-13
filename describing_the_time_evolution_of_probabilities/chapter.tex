@@ -102,10 +102,17 @@ Non-Markovian continuous space --- need something simple here
 Markovian discrete space --- time-dependent Poisson process
 %%
 \begin{align}
-P_{{\sf t}+1}(x\vert z) &= \lambda ({\sf t})\big[ P_{{\sf t}}(x-1\vert z) - P_{{\sf t}}(x\vert z)\big] \,.
+P_{{\sf t}+1}(x\vert z) &= \lambda ({\sf t}) \delta t({\sf t}{+}1)P_{{\sf t}}(x{-}1\vert z) + \big[1-\lambda ({\sf t}) \delta t({\sf t}{+}1)\big] P_{{\sf t}}(x\vert z) \,.
 \end{align}
 %%
-Non-Markovian discrete space --- a Hawkes process master equation would look quite complicated since it has to include a coupling between the rate at which events occur and an explicit memory of when the previous ones did occur. 
+Non-Markovian discrete space --- a Hawkes process master equation would look quite complicated since it has to include a coupling between the rate at which events occur and an explicit memory of when the previous ones did occur. Here's a master equation for the Hawkes process where $x$ counts the number of events that occurred...
+%%
+\begin{align}
+P_{{\sf t}+1}(x\vert z) &= \mu \delta t({\sf t}{+}1)P_{{\sf t}}(x{-}1\vert z) + \big[ 1-\mu \delta t({\sf t}{+}1)\big] P_{{\sf t}}(x\vert z) \nonumber \\
+& + \sum_{x'=0}^\infty\sum_{x''=0}^\infty\sum_{{\sf t}'=0}^{{\sf t}} \phi [t({\sf t})-t({\sf t}')] (x'-x'') \delta t({\sf t}{+}1)P_{{\sf t}{\sf t}'({\sf t}'-1)}(x{-}1,x',x''\vert z) \nonumber \\
+&+ \sum_{x'=0}^\infty\sum_{x''=0}^\infty\big[ 1-\sum_{{\sf t}'=0}^{{\sf t}} \phi [t({\sf t})-t({\sf t}')] (x'-x'') \delta t({\sf t}{+}1)\big] P_{{\sf t}{\sf t}'({\sf t}'-1)}(x, x', x''\vert z) \,.
+\end{align}
+%%
 }
 
 We can approximate the probability $P_{{\sf t}+1}(X\vert z)$ with a logarithmic expansion like this
