@@ -67,12 +67,26 @@ and lowercase $x, x', \dots$ values will always refer to individual rows within 
 \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}} \rightarrow \frac{1}{t({\sf t})}\sum_{{\sf t}'=0}^{{\sf t}}\delta t({\sf t}') \,.
 \end{align}
 %%
-Note also that, for Markovian phenomena, Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) no longer depend on timesteps older than the immediately previous one, hence, e.g., Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
+
+Let's go through some examples. Non-Markovian phenomena with continuous state spaces can have quite complex master equations. A simple example is that of pure diffusion processes which exhibit a memory of previous locations
+%%
+\begin{align}
+P_{{\sf t}+1}(x\vert z) &= P_{{\sf t}}(x\vert z) + \frac{1}{2t({\sf t})}\sum_{{\sf t}'=0}^{{\sf t}}\delta t ({\sf t}')\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ D_{{\sf t}'}(x,z)P_{{\sf t}'}(x\vert z) \bigg] \,.
+\end{align}
+%%
+For Markovian phenomena which have a continuous state space, Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) no longer depend on timesteps older than the immediately previous one, hence, e.g., Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
 %%
 \begin{align}
 P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
 \end{align}
 %%
+A famous example of this kind of phenomenon arises from approximating Eq.~(\ref{eq:master-x-cont-markov}) with an expansion (Kramers-Moyal~\cite{kramers1940brownian, moyal1949stochastic}) up to second-order, yielding the Fokker-Planck equation 
+%%
+\begin{align}
+P_{{\sf t}+1}(x\vert z) &= P_{{\sf t}}(x\vert z) - \sum_{i=0}^n\frac{\partial}{\partial x^i}\bigg[ \mu_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] + \frac{1}{2}\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ D_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) \bigg] \,,
+\end{align}
+%%
+which describes a process undergoing drift-diffusion.
 
 An analog of Eq.~(\ref{eq:master-x-cont-latest-row}) exists for discrete state spaces as well. We just need to replace the integral with a sum and the schematic would look something like this
 %%
@@ -80,7 +94,23 @@ An analog of Eq.~(\ref{eq:master-x-cont-latest-row}) exists for discrete state s
 P_{{\sf t}+1}(x\vert z) &= \sum_{\Omega_{{\sf t}}} P_{{\sf t}}(X'\vert z) P_{({\sf t}+1){\sf t}}(x \vert X', z) \label{eq:master-x-disc} \,,
 \end{align}
 %%
-where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}. In what follows, discrete state space can always be considered by replacing the integrals with summations over probability masses in this manner; we only use the continuous state space formulation for our notation because one could argue it's a little more general.
+where we note that the $P$'s in the expression above all now refer to \emph{probability mass functions}. In what follows, discrete state space can always be considered by replacing the integrals with summations over probability masses in this manner; we only use the continuous state space formulation for our notation because one could argue it's a little more general. 
+
+Analogously to continuous state spaces, we can give some examples of master equations for phenomena with a discrete state space as well. In the Markovian case, we need look no further than a simple time-dependent Poisson process
+%%
+\begin{align}
+P_{{\sf t}+1}(x\vert z) &= \lambda ({\sf t}) \delta t({\sf t}{+}1)P_{{\sf t}}(x{-}1\vert z) + \big[1-\lambda ({\sf t}) \delta t({\sf t}{+}1)\big] P_{{\sf t}}(x\vert z) \,.
+\end{align}
+%%
+For such an example of a non-Markovian system, a Hawkes process~\cite{hawkes1971spectra} master equation would look something like this
+%%
+\begin{align}
+P_{{\sf t}+1}(x\vert z) &= \mu \delta t({\sf t}{+}1)P_{{\sf t}}(x{-}1\vert z) + \big[ 1-\mu \delta t({\sf t}{+}1)\big] P_{{\sf t}}(x\vert z) \nonumber \\
+& + \sum_{x'=0}^\infty\sum_{x''=0}^\infty\sum_{{\sf t}'=0}^{{\sf t}} \phi [t({\sf t})-t({\sf t}')] (x'-x'') \delta t({\sf t}{+}1)P_{{\sf t}{\sf t}'({\sf t}'-1)}(x{-}1,x',x''\vert z) \nonumber \\
+&+ \sum_{x'=0}^\infty\sum_{x''=0}^\infty\bigg\lbrace 1-\sum_{{\sf t}'=0}^{{\sf t}} \phi [t({\sf t})-t({\sf t}')] (x'-x'') \delta t({\sf t}{+}1)\bigg\rbrace P_{{\sf t}{\sf t}'({\sf t}'-1)}(x, x', x''\vert z) \,,
+\end{align}
+%%
+where we note the complexity in this expression arises because it has to include a coupling between the rate at which events occur and an explicit memory of when the previous ones did occur (recorded by differencing the count $x'-x''$).
 
 So now that we have become familiar with the notation used by Eq.~(\ref{eq:master-x-cont-latest-row}), let's use it to derive a few important statistical insights. We can begin by pointing out that by integrating over $x$, we compute the mean of the distribution
 %%
@@ -90,30 +120,7 @@ M_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\, P_{{\sf t}+1}(x\ve
 %%
 where one can view the $M_{({\sf t}+1){\sf t}''}(X'',z)$ values as either terms in some regression model, or derivable explicitly from the master equation. A viable approach to statistically infer a stochastic simulation from data is to start by knowing what its master equation is, using this to compute the time evolution of the mean (and potentially higher-order statistics) and then connect these time and $z$-dependent statistics back to the likelihood of observing the data. This is what is commonly known as the `mean-field' approach; averaging over the available degrees of freedom in the statistical moments of distributions.
 
-\textcolor{red}{Got to here in rewriting...
-Give some examples of what $M_{({\sf t}+1){\sf t}''}(X'',z)$ can be. This is just deriving regression of distribution moments looks like. Show examples (Markovian and non-Markovian) of some phenomena which permit full mean-field equations based on their master equations. Maybe put stochastic resetting and Hawkes process master equations here for examples of non-Markovian phenomena?
-Examples: Markovian continuous space --- drift-diffusion with a Fokker-Planck master equation
-%%
-\begin{align}
-P_{{\sf t}+1}(x\vert z) &= P_{{\sf t}}(x\vert z) - \sum_{i=0}^n\frac{\partial}{\partial x^i}\bigg[ \mu_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] + \frac{1}{2}\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ D_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) \bigg] \,.
-\end{align}
-%%
-Non-Markovian continuous space --- need something simple here
-Markovian discrete space --- time-dependent Poisson process
-%%
-\begin{align}
-P_{{\sf t}+1}(x\vert z) &= \lambda ({\sf t}) \delta t({\sf t}{+}1)P_{{\sf t}}(x{-}1\vert z) + \big[1-\lambda ({\sf t}) \delta t({\sf t}{+}1)\big] P_{{\sf t}}(x\vert z) \,.
-\end{align}
-%%
-Non-Markovian discrete space --- a Hawkes process master equation would look quite complicated since it has to include a coupling between the rate at which events occur and an explicit memory of when the previous ones did occur. Here's a master equation for the Hawkes process where $x$ counts the number of events that occurred...
-%%
-\begin{align}
-P_{{\sf t}+1}(x\vert z) &= \mu \delta t({\sf t}{+}1)P_{{\sf t}}(x{-}1\vert z) + \big[ 1-\mu \delta t({\sf t}{+}1)\big] P_{{\sf t}}(x\vert z) \nonumber \\
-& + \sum_{x'=0}^\infty\sum_{x''=0}^\infty\sum_{{\sf t}'=0}^{{\sf t}} \phi [t({\sf t})-t({\sf t}')] (x'-x'') \delta t({\sf t}{+}1)P_{{\sf t}{\sf t}'({\sf t}'-1)}(x{-}1,x',x''\vert z) \nonumber \\
-&+ \sum_{x'=0}^\infty\sum_{x''=0}^\infty\bigg\lbrace 1-\sum_{{\sf t}'=0}^{{\sf t}} \phi [t({\sf t})-t({\sf t}')] (x'-x'') \delta t({\sf t}{+}1)\bigg\rbrace P_{{\sf t}{\sf t}'({\sf t}'-1)}(x, x', x''\vert z) \,.
-\end{align}
-%%
-}
+\textcolor{red}{Got to here in the rewrite...}
 
 We can approximate the probability $P_{{\sf t}+1}(X\vert z)$ with a logarithmic expansion like this
 %%
