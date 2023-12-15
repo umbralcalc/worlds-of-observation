@@ -68,13 +68,13 @@ and lowercase $x, x', \dots$ values will always refer to individual rows within 
 \end{align}
 %%
 
-Let's go through some examples. Non-Markovian phenomena with continuous state spaces can have quite complex master equations. A simple example is that of pure diffusion processes which exhibit a memory of previous locations
+Let's go through some examples. Non-Markovian phenomena with continuous state spaces can have quite complex master equations. A relatively simple example is that of pure diffusion processes which exhibit stochastic resetting at a rate $r$ to a remembered location from the trajectory history~\cite{boyer2017long}
 %%
 \begin{align}
-P_{{\sf t}+1}(x\vert z) &= P_{{\sf t}}(x\vert z) + \frac{1}{2t({\sf t})}\sum_{{\sf t}'=0}^{{\sf t}}\delta t ({\sf t}')\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ D_{{\sf t}'}(x,z)P_{{\sf t}'}(x\vert z) \bigg] \,.
+P_{{\sf t}+1}(x\vert z) &= (1-r)P_{{\sf t}}(x\vert z) + \sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ D_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) \bigg] + r\sum_{{\sf t}'=0}^{{\sf t}}\delta t ({\sf t}')K[t({\sf t}){-}t({\sf t}')]P_{{\sf t}'}(x\vert z) \,,
 \end{align}
 %%
-For Markovian phenomena which have a continuous state space, Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) no longer depend on timesteps older than the immediately previous one, hence, e.g., Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
+where here $K$ is some memory kernel. For Markovian phenomena which have a continuous state space, Eqs.~(\ref{eq:master-x-cont}) and~(\ref{eq:master-x-cont-latest-row}) no longer depend on timesteps older than the immediately previous one, hence, e.g., Eq.~(\ref{eq:master-x-cont-latest-row}) reduces to just
 %%
 \begin{align}
 P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert z) P_{({\sf t}+1){\sf t}}(x\vert x',z) \label{eq:master-x-cont-markov} \,.
@@ -83,7 +83,7 @@ P_{{\sf t}+1}(x\vert z) &= \int_{\omega_{\sf t}}{\rm d}^nx' \, P_{\sf t}(x'\vert
 A famous example of this kind of phenomenon arises from approximating Eq.~(\ref{eq:master-x-cont-markov}) with an expansion (Kramers-Moyal~\cite{kramers1940brownian, moyal1949stochastic}) up to second-order, yielding the Fokker-Planck equation 
 %%
 \begin{align}
-P_{{\sf t}+1}(x\vert z) &= P_{{\sf t}}(x\vert z) - \sum_{i=0}^n\frac{\partial}{\partial x^i}\bigg[ \mu_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] + \frac{1}{2}\sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ D_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) \bigg] \,,
+P_{{\sf t}+1}(x\vert z) &= P_{{\sf t}}(x\vert z) - \sum_{i=0}^n\frac{\partial}{\partial x^i}\bigg[ \mu_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z)\bigg] + \sum_{i=0}^n\sum_{j=0}^n\frac{\partial}{\partial x^i}\frac{\partial}{\partial x^j}\bigg[ D_{{\sf t}}(x,z)P_{{\sf t}}(x\vert z) \bigg] \,,
 \end{align}
 %%
 which describes a process undergoing drift-diffusion.
@@ -151,7 +151,7 @@ P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\om
 \begin{figure}[h]
 \centering
 \includegraphics[width=8cm]{images/chapter-2-second-temporal-correlation.drawio.png}
-\caption{Blah...}
+\caption{A graph representation of the correlations in Eq.~(\ref{eq:second-order-correl}).}
 \label{fig:second-temporal-correlation}
 \end{figure} 
 
@@ -178,7 +178,7 @@ which describes the time evolution of the conditional probabilities.
 \begin{figure}[h]
 \centering
 \includegraphics[width=10cm]{images/chapter-2-third-temporal-correlation.drawio.png}
-\caption{Blah...}
+\caption{A graph representation of the correlations in Eq.~(\ref{eq:third-order-correl}).}
 \label{fig:third-temporal-correlation}
 \end{figure} 
 
