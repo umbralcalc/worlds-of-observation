@@ -21,8 +21,8 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 **Part 1.** Theoretical background and code design
 
 1. [Building a generalised simulator](building_a_generalised_simulator/chapter.pdf)
-2. [Describing the time evolution of probabilities](describing_the_time_evolution_of_probabilities/chapter.pdf)
-3. [Empirical probabilistic reweighting algorithms](empirical_probabilistic_reweighting_algorithms/chapter.pdf)
+2. [Probabilistic learning algorithms](probabilistic_learning_algorithms/chapter.pdf)
+3. [Probabilistic learning software](probabilistic_learning_software/chapter.pdf)
 4. [Generalised simulation inference](generalised_simulation_inference/chapter.pdf)
 5. [Optimising interactions with any system](optimising_interactions_with_any_system/chapter.pdf)
 
