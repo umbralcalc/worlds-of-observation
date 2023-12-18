@@ -40,10 +40,10 @@ To cite this book in any work, please use the following BibTeX:
 
 ```
 @book{worlds-of-observation,
-  title   = "Worlds Of Observation: Building more realistic environments for machine learning",
-  author  = "Hardwick, Robert J",
-  year    = "WIP",
-  publisher = "umbralcalculations",
-  url     = "https://umbralcalc.github.io/worlds-of-observation/book.pdf",
+  title   = {Worlds Of Observation: Building more realistic environments for machine learning},
+  author  = {Hardwick, Robert J},
+  year    = {WIP},
+  publisher = {umbralcalculations},
+  url     = {https://umbralcalc.github.io/worlds-of-observation/book.pdf},
 }
 ```
