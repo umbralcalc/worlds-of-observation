@@ -116,15 +116,22 @@ where we note the complexity in this expression arises because it has to include
 
 \section{\sffamily Derived learning algorithms}
 
-\textcolor{red}{Got to here in rewrite...}
+So now that we are more familiar with the notation used by Eq.~(\ref{eq:master-x-cont-latest-row}), we can use it to derive some useful learning algorithms. While we think that it's worth going into some mathematical detail to give a better sense of where each technique comes from; we want to emphasise that the methodologies we discuss here are not new to the technical literature at all. We draw on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and also Gaussian processes~\cite{murphy2012machine}.  
 
-So now that we have become familiar with the notation used by Eq.~(\ref{eq:master-x-cont-latest-row}), let's use it to derive a few important statistical insights. We can begin by pointing out that by integrating over $x$, we compute the mean of the distribution
+Let's begin our discussion of algorithms by integrating Eq.~(\ref{eq:master-x-cont-latest-row}) over $x$ to obtain a relation for the mean of the distribution
 %%
 \begin{align}
 M_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\, P_{{\sf t}+1}(x\vert z) = \frac{1}{{\sf t}}\sum_{{\sf t}''=0}^{{\sf t}} \int_{\Omega_{{\sf t}''}}{\rm d}X'' P_{{\sf t}''}(X''\vert z) M_{({\sf t}+1){\sf t}''}(X'',z) \label{eq:mean-field-master}\,,
 \end{align}
 %%
 where you can view the $M_{({\sf t}+1){\sf t}''}(X'',z)$ values as either terms in some regression model, or derivable explicitly from a known master equation. The latter of these provides one approach to statistically infer the states and parameters of stochastic simulations from data: one begins by knowing what the master equation is, uses this to compute the time evolution of the mean (and potentially higher-order statistics) and then connects these ${\sf t}$ and $z$-dependent statistics back to the likelihood of observing the data. This is what is commonly known as the `mean-field' inference approach; averaging over the available degrees of freedom in the statistical moments of distributions. Knowing what precisely the master equation for an arbitrarily-defined stochastic phenomenon can be quite a tall order to fill, however. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=8cm]{images/chapter-2-second-temporal-correlation.drawio.png}
+\caption{A graph representation of the correlations in Eq.~(\ref{eq:second-order-correl}).}
+\label{fig:second-temporal-correlation}
+\end{figure} 
 
 Given that the mean-field approach isn't always going to be viable as an inference method, we should also consider other ways to describe the shape and time evolution characteristics of $P_{{\sf t}+1}(X\vert z)$. For continuous state spaces, it's possible to approximate this whole distribution with a logarithmic expansion like so
 %%
@@ -151,13 +158,14 @@ Given this pairwise temporal correlation structure, Eq.~(\ref{eq:master-x-cont-l
 P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' P_{{\sf t}'}(x'\vert z)P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:second-order-correl} \,.
 \end{align}
 %%
+We have illustrated these second-order correlations with a graph visualisation in Fig.~(\ref{fig:second-temporal-correlation}).
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=8cm]{images/chapter-2-second-temporal-correlation.drawio.png}
-\caption{A graph representation of the correlations in Eq.~(\ref{eq:second-order-correl}).}
-\label{fig:second-temporal-correlation}
-\end{figure} 
+\includegraphics[width=10cm]{images/chapter-2-third-temporal-correlation.drawio.png}
+\caption{A graph representation of the correlations in Eq.~(\ref{eq:third-order-correl}).}
+\label{fig:third-temporal-correlation}
+\end{figure}
 
 In a similar fashion, we can increase the expansion order of Eq.~(\ref{eq:second-order-log-expansion}) to include third-order correlations such that 
 %%
@@ -171,7 +179,7 @@ and, in this instance, one can show that Eq.~(\ref{eq:master-x-cont-latest-row-g
 P_{{\sf t}+1}(x\vert z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\frac{1}{{\sf t}'-1}\sum_{{\sf t}''=0}^{{\sf t}'-1}\int_{\omega_{{\sf t}'}}{\rm d}^nx'\int_{\omega_{{\sf t}''}}{\rm d}^nx'' P_{{\sf t}'{\sf t}''}(x',x''\vert z)P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x',x'',z) \label{eq:third-order-correl} \,.
 \end{align}
 %%
-Using $P_{{\sf t}'{\sf t}''}(x',x''\vert z) = P_{{\sf t}''}(x''\vert z) P_{{\sf t}'{\sf t}''}(x'\vert x'', z)$ one can also show that this integral is a marginalisation of this expression
+We have also illustrated these third-order correlations with another graph visualisation in Fig.~(\ref{fig:third-temporal-correlation}). Using $P_{{\sf t}'{\sf t}''}(x',x''\vert z) = P_{{\sf t}''}(x''\vert z) P_{{\sf t}'{\sf t}''}(x'\vert x'', z)$ one can also show that this integral is a marginalisation of this expression
 %%
 \begin{align}
 P_{({\sf t}+1){\sf t}''}(x\vert x'', z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx'P_{{\sf t}'{\sf t}''}(x'\vert x'',z)P_{({\sf t}+1){\sf t}'{\sf t}''}(x\vert x',x'',z) \,,
@@ -179,16 +187,9 @@ P_{({\sf t}+1){\sf t}''}(x\vert x'', z) &= \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{
 %%
 which describes the time evolution of the conditional probabilities.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=10cm]{images/chapter-2-third-temporal-correlation.drawio.png}
-\caption{A graph representation of the correlations in Eq.~(\ref{eq:third-order-correl}).}
-\label{fig:third-temporal-correlation}
-\end{figure}
+\textcolor{red}{Got to here in rewrite...}
 
-Another probabilistic learning technique which we are now ready to discuss is what we shall call `empirical probabilistic reweighting'. While we think that it's worth going into some mathematical detail to give a better sense of where this technique comes from; we want to emphasise that the methodology we discuss here is not new to the technical literature at all. You could argue this method draws on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and also Gaussian processes~\cite{murphy2012machine} to some extent as well. 
-
-There is another similar expression for the mean that we can derive under certain conditions which will be valuable to us when conceptualising the empirical reweighting algorithm. If the probability distribution over each row of the state history matrix is \emph{stationary} --- meaning that $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ --- it's possible to go one step further than Eq.~(\ref{eq:mean-field-master}) and assert that
+Another probabilistic learning algorithm that we can derive is what we shall call `empirical probabilistic reweighting'. There is another expression for the mean of the distribution, that we can derive under certain conditions, which will be valuable to motivating this algorithm. If the probability distribution over each row of the state history matrix is \emph{stationary} --- meaning that $P_{{\sf t}+1}(x\vert z)=P_{{\sf t}'}(x\vert z)$ --- it's possible to go one step further than Eq.~(\ref{eq:mean-field-master}) and assert that
 %%
 \begin{align}
 M_{{\sf t}+1}(z) &= \int_{\omega_{{\sf t}+1}}{\rm d}^nx \,x\,P_{{\sf t}+1}(x\vert z) = \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \,x'\, P_{{\sf t}'}(x'\vert z) \int_{\omega_{{\sf t}+1}}{\rm d}^nx\, P_{({\sf t}+1){\sf t}'}(x\vert x',z) \label{eq:stationary-mean-estimator}\,.
