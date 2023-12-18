@@ -39,7 +39,7 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 To cite this book in any work, please use the following BibTeX:
 
 ```
-@book{worlds-of-observation,
+@book{worlds-of-observation-WIP,
   title   = {Worlds Of Observation: Building more realistic environments for machine learning},
   author  = {Hardwick, Robert J},
   year    = {WIP},
