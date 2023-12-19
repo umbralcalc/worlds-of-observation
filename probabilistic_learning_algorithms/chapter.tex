@@ -248,7 +248,7 @@ where the summation continues until all of the past measurements $Y_{{\sf t}+1},
 \begin{figure}[h]
 \centering
 \includegraphics[width=8cm]{images/chapter-2-prob-reweighting-code.drawio.png}
-\caption{Code schematic of the probability reweighting optimisation.}
+\caption{Code schematic of the probability reweighting objective computation.}
 \label{fig:prob-reweighting-code}
 \end{figure} 
 
@@ -269,6 +269,13 @@ It's worth pointing out that other machine learning frameworks could easily be u
 In the case of Eqs.~(\ref{eq:time-dependent-kernel}) and~(\ref{eq:gaussian-data-prob}) above, the hyperparameters that would be optimised could relate to the kernel in a wide variety of ways. Optimising them would make our optimised reweighting similar to (but very much \emph{not} the same as) evaluating maximum a posteriori (MAP) of a Gaussian process regression. In a Gaussian process regression, one is concerned with inferring the the whole of $X_{{\sf t}}$ as a function of time using the pairwise correlations implied by Eq.~(\ref{eq:second-order-log-expansion}). In this case, one may choose  algorithm to optimise the hyperparameters $z$ of the Gaussian \textcolor{red}{process kernel...}
 
 \textcolor{red}{Got to here in rewrite... Need to add algorithm graph for Gaussian process computation and quote its log-likelihood and gradient!}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=5.5cm]{images/chapter-2-gaussian-process-code.drawio.png}
+\caption{Code schematic of the Gaussian process objective computation.}
+\label{fig:gaussian-process-code}
+\end{figure}
 
 The optimisation approach that we choose to use for obtaining the best hyperparameters in the conditional probability of Eq.~(\ref{eq:log-likelihood-reweighting}) will depend on a few factors. For example, if the number of hyperparameters is relatively low, but their gradients are difficult to calculate exactly; then a gradient-free optimiser (such as the Nelder-Mead~\cite{nelder1965simplex} method or something like a particle swarm~\cite{kennedy1995particle, shi1998modified}) would likely be the most effective choice. On the other hand, when the number of hyperparameters ends up being relatively large, it's usually quite desriable to utilise the gradients in algorithms like vanilla Stochastic Gradient Descent~\cite{robbins1951stochastic} (SGD) or Adam~\cite{kingma2014adam}.
 
