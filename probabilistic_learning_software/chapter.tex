@@ -6,6 +6,8 @@
 
 \section{\sffamily Online learning with any algorithm}
 
+Before discussing the software design aspects, we need to consider how we might structure learning by optimisation of Eq.~(\ref{eq:log-likelihood-reweighting}) for a sequence of observations in time. One of the issues that can arise when learning streams of data is `concept drift'. In our context, this would be when the optimal value for $z$ does not match the optimal value at some later point in time. In order to solve this issue, our learning algorithm should track an up-to-date optimal value for $z$ as data is continually passed into it. Iteratively updating the optimal parameters as new data is ingested into the objective function is typically called `online learning'~\cite{hazan2016introduction,sutton2018reinforcement}, in contrast to `offline learning' which would correspond to learning an optimal $z$ only once with the entire dataset provided upfront.\footnote{This book will mostly be focussed on using online learning techniques due to the inherently sequential nature of stochastic processes.}
+
 \section{\sffamily Software design}
 
 Let's now take a step back from the specifics of the probabilistic reweighting algorithm to introduce our new sofware package for this part of the book: the `learnadex'. At its core, the learnadex algorithm adapts the stochadex iteration engine to iterate through streams of data in order to accumulate a global objective function value with respect to that data. The user may then choose which optimisation algorithm (or write their own) to use in order to leverage this objective for learning a better representation of the data. 
