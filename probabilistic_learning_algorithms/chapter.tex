@@ -114,7 +114,7 @@ P_{{\sf t}+1}(x\vert z) &= \mu \delta t({\sf t}{+}1)P_{{\sf t}}(x{-}1\vert z) + 
 %%
 where we note the complexity in this expression arises because it has to include a coupling between the rate at which events occur and an explicit memory of when the previous ones did occur (recorded by differencing the count between adjacent timesteps by 1).
 
-\section{\sffamily Motivating the learning methods}
+\section{\sffamily Motivating probabilistic learning}
 
 So now that we are more familiar with the notation used by Eq.~(\ref{eq:master-x-cont-latest-row}), we can use it to motivate some useful probabilistic learning methods. While it's worth going into some mathematical detail to give a better sense of where each technique comes from, we should emphasise that the methodologies we discuss here are not new to the technical literature at all. We draw on influences from Empirical Dynamical Modeling (EDM)~\cite{sugihara1990nonlinear}, some classic nonparametric local regression techniques --- such as LOWESS/Savitzky-Golay filtering~\cite{savitzky1964smoothing} --- and also Gaussian processes~\cite{murphy2012machine}.  
 
@@ -136,8 +136,8 @@ where you can view the $M_{({\sf t}+1){\sf t}''}(X'',z)$ values as either terms 
 Given that the mean-field approach isn't always going to be viable as an inference method, we should also consider other ways to describe the shape and time evolution characteristics of $P_{{\sf t}+1}(X\vert z)$. For continuous state spaces, it's possible to approximate this whole distribution with a logarithmic expansion like so
 %%
 \begin{align}
-\ln P_{{\sf t}+1}(X\vert z) &\simeq \ln P_{{\sf t}+1}(X_*\vert z) + \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} (x-x_*)^i {\cal H}^{ij}_{({\sf t}+1){\sf t}'}(x_*,x'_*\vert z) (x'-x'_*)^j \label{eq:second-order-log-expansion} \\
-{\cal H}^{ij}_{({\sf t}+1){\sf t}'}(x_*,x'_*\vert z) &= \frac{\partial}{\partial x^i}\frac{\partial}{\partial (x')^j}\ln P_{{\sf t}+1}(X\vert z) \bigg\vert_{X=X_*} \label{eq:second-order-log-expansion-kernel} \,,
+\ln P_{{\sf t}+1}(X\vert z) &\simeq \ln P_{{\sf t}+1}(X_*\vert z) + \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} (x-x_*)^i {\cal H}^{ij}_{({\sf t}+1){\sf t}'}(z) (x'-x'_*)^j \label{eq:second-order-log-expansion} \\
+{\cal H}^{ij}_{({\sf t}+1){\sf t}'}(z) &= \frac{\partial}{\partial x^i}\frac{\partial}{\partial (x')^j}\ln P_{{\sf t}+1}(X\vert z) \bigg\vert_{X=X_*} \label{eq:second-order-log-expansion-kernel} \,,
 \end{align}
 %% 
 where the values for $X_*$ (and its rows $x_*, x_*', \dots$) are defined by the vanishing of the first derivative, i.e., these are chosen such that
@@ -266,9 +266,14 @@ P_{{\sf t}+1}[y;M_{{\sf t}+1}(z),C_{{\sf t}+1}(z),\dots ] = {\sf MultivariateNor
 %%
 It's worth pointing out that other machine learning frameworks could easily be used to model these conditional probabilities. For example, neural networks could be used to infer the optimal reweighting scheme and this would still allow us to use the data-linking distribution.\footnote{One can think of using this neural network-based reweighting scheme as similar to constructing a normalising flow model~\cite{kobyzev2020normalizing} with an autoregressive layer. Invertibility and further network structural constraints mean that these are not exactly equivalent, however.} It would still be desirable to keep the data-linking distribution as it can usually be sampled from very easily --- something that can be quite difficult to achieve with a purely machine learning-based representation of the distribution. Sampling itself could even be made more flexible by leveraging a Variational Autoencoder (VAE)~\cite{pinheiro2021variational}; these use neural networks not just on the compression (or `encode') step to estimate the statistics but also use them as a layer between the sample from the data distribution model and the output (the `decode' step).
 
-In the case of Eqs.~(\ref{eq:time-dependent-kernel}) and~(\ref{eq:gaussian-data-prob}) above, the hyperparameters that would be optimised could relate to the kernel in a wide variety of ways. Optimising them would make our optimised reweighting similar to (but very much \emph{not} the same as) evaluating maximum a posteriori (MAP) of a Gaussian process regression. In a Gaussian process regression, one is concerned with inferring the the whole of $X_{{\sf t}}$ as a function of time using the pairwise correlations implied by Eq.~(\ref{eq:second-order-log-expansion}). In this case, one may choose  algorithm to optimise the hyperparameters $z$ of the Gaussian \textcolor{red}{process kernel...}
+In the case of Eqs.~(\ref{eq:time-dependent-kernel}) and~(\ref{eq:gaussian-data-prob}) above, the hyperparameters that would be optimised could relate to the kernel in a wide variety of ways. Optimising them would make our optimised reweighting similar to (but very much \emph{not} the same as) evaluating maximum a posteriori (MAP) of a Gaussian process regression. In a Gaussian process regression, one is concerned with inferring the the whole of $X_{{\sf t}}$ as a function of time using the pairwise correlations implied by Eq.~(\ref{eq:second-order-log-expansion}). Based on this expression, the cumulative log-likelihood for a Gaussian process can be calculated as follows
+%%
+\begin{align}
+\ln {\cal L}_{{\sf t}+1}(Y\vert z) &= -\frac{n}{2}\ln (2\pi ) - \frac{1}{2}\ln \vert {\cal H}(z)\vert - \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} y^i {\cal H}^{ij}_{({\sf t}+1){\sf t}'}(z) (y')^j \,. \label{eq:log-likelihood-gaussian-proc}    
+\end{align}
+%%
 
-\textcolor{red}{Got to here in rewrite... Need to add algorithm graph for Gaussian process computation and quote its log-likelihood and gradient!}
+As we did for the reweighting algorithm, in Fig.~\ref{fig:gaussian-process-code} we have illustrated a schematic of the basic code needed to compute the objective function of a learning algorithm based on Eq.~(\ref{eq:log-likelihood-gaussian-proc}). Note that, in the expression above, we have replaced $x-x_*$ with $y$ and so it is assumed that the data has already been shifted such that its values are positioned around the distribution peak. Knowing where this peak will be a priori is not possible. However, for Gaussian data, an unbiased estimator for this peak will be the sample mean and so we have included an initial data standardisation in the steps outlined by Fig.~\ref{fig:gaussian-process-code}.
 
 \begin{figure}[h]
 \centering
@@ -287,5 +292,13 @@ If the gradients of Eq.~(\ref{eq:log-likelihood-reweighting}) are needed, we can
 \end{align}
 %%
 By factoring derivatives in this manner, the computation can be separated into two parts: the derivatives with respect to $M_{{\sf t}'}$ and $C_{{\sf t}'}$, which are typically quite straightforward; and the derivatives with respect to $z$ elements, which typically need a more involved calculation depending on the model. Incidentally, this separation also neatly lends itself to abstracting gradient calculations as having a simpler, general purpose component that can be built directly into a library of data models and a more complex, model-specific component that the user must specify.
+
+The same logic should apply to a learning algorithm which optimises $z$ to obtain the MAP for a Gaussian process. If the gradients of Eq.~(\ref{eq:log-likelihood-gaussian-proc}) are required, the user would have to specify derivatives of the kernel matrix (and its determinant) with respect to $z$ in order to calculate
+%%
+\begin{align}
+\frac{\partial}{\partial z^k}\ln {\cal L}_{{\sf t}+1}(Y \vert z) &= -\frac{1}{2}\frac{\partial}{\partial z^k}\ln \vert {\cal H}(z)\vert - \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} y^i \frac{\partial}{\partial z^k}{\cal H}^{ij}_{({\sf t}+1){\sf t}'}(z) (y')^j \,. \label{eq:log-likelihood-gaussian-proc-grad}
+\end{align}
+%%
+
 
     
