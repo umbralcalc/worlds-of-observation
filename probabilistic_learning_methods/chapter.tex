@@ -1,6 +1,6 @@
-\chapter{\sffamily Probabilistic learning algorithms}
+\chapter{\sffamily Probabilistic learning methods}
 
-{\bfseries\sffamily Concept.} To extend the formalism that we developed in the previous chapter to better understand the time evolution of state probabilities in order to motivate the construction of various learning algorithms. With this knowledge we will see how Gaussian processes and empirical probabilistic reweighting work, as well as discuss how some phenomena permit a convenient description via `mean-field' equations or regression of distribution moments. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on the time evolution of probabilities, with a view to probabilistic learning later on. For the programmers, this chapter will mostly focus on the algorithm concepts, but all of the relevant software lives in this public Git repository: \href{https://github.com/umbralcalc/learndadex}{https://github.com/umbralcalc/learnadex}.
+{\bfseries\sffamily Concept.} To extend the formalism that we developed in the previous chapter to describe the time evolution of state probabilities. Having introduced the basic concepts, we then use this formalism to motivate some important methods for probabilistic learning. In particular, we will see how Gaussian processes regression and `empirical probabilistic reweighting' work, as well as discuss how some phenomena permit a convenient description via `mean-field' equations or regression of distribution moments. For the mathematically-inclined, this chapter will take a detailed look at how our formalism can be extended to focus on the time evolution of probabilities, with a view to probabilistic learning later on. For the programmers, this chapter will mostly focus on the algorithm concepts, but all of the relevant software lives in this public Git repository: \href{https://github.com/umbralcalc/learndadex}{https://github.com/umbralcalc/learnadex}.
 
 \section{\sffamily Probabilistic formalism} 
 
@@ -277,7 +277,7 @@ As we did for the reweighting algorithm, in Fig.~\ref{fig:gaussian-process-code}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=5.5cm]{images/chapter-2-gaussian-process-code.drawio.png}
+\includegraphics[width=6cm]{images/chapter-2-gaussian-process-code.drawio.png}
 \caption{Code schematic of the Gaussian process objective computation.}
 \label{fig:gaussian-process-code}
 \end{figure}

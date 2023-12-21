@@ -3,9 +3,9 @@
 ## declare filenames
 declare -a filenames=(
     "building_a_generalised_simulator/chapter" \
-    "probabilistic_learning_algorithms/chapter" \
-    "probabilistic_learning_software/chapter" \
-    "generalised_simulation_inference/chapter" \
+    "probabilistic_learning_methods/chapter" \
+    "probabilistic_online_learning_software/chapter" \
+    "online_simulation_inference/chapter" \
     "optimising_interactions_with_any_system/chapter" \
     "controlling_parasitic_infections/chapter" \
     "algo_trading_on_financial_markets/chapter" \

@@ -21,9 +21,9 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 **Part 1.** Theoretical background and code design
 
 1. [Building a generalised simulator](building_a_generalised_simulator/chapter.pdf)
-2. [Probabilistic learning algorithms](probabilistic_learning_algorithms/chapter.pdf)
-3. [Probabilistic learning software](probabilistic_learning_software/chapter.pdf)
-4. [Generalised simulation inference](generalised_simulation_inference/chapter.pdf)
+2. [Probabilistic learning methods](probabilistic_learning_methods/chapter.pdf)
+3. [Probabilistic online learning software](probabilistic_online_learning_software/chapter.pdf)
+4. [Online simulation inference](online_simulation_inference/chapter.pdf)
 5. [Optimising interactions with any system](optimising_interactions_with_any_system/chapter.pdf)
 
 **Part 2.** Applications to realistic examples
