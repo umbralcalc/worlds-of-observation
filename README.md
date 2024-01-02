@@ -1,4 +1,4 @@
-# Worlds Of Observation
+# Worlds of Observation
 
 ## Building more realistic environments for machine learning
 
@@ -12,7 +12,7 @@ Shared by the author under an [MIT License](LICENSE)
 
 ## About
 
-_Worlds Of Observation_ is a book about building more realistic training environments for machine learning algorithms to control systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms (especially when there is plenty of data and the system is fully observable), this book will primarily explore how to create environments for control algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and maybe a little different to the usual perspectives.
+_Worlds of Observation_ is a book about building more realistic training environments for machine learning algorithms to control systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms (especially when there is plenty of data and the system is fully observable), this book will primarily explore how to create environments for control algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and maybe a little different to the usual perspectives.
 
 You can read the full book here: [Full Book PDF](book.pdf). For more information about the simulation environments in this book, as well as more detailed code documentation, you can also visit [WorldsOOp](https://github.com/worldsoop).
 
@@ -40,7 +40,7 @@ To cite this book in any work, please use the following BibTeX:
 
 ```
 @book{worlds-of-observation-WIP,
-  title   = {Worlds Of Observation: Building more realistic environments for machine learning},
+  title   = {Worlds of Observation: Building more realistic environments for machine learning},
   author  = {Hardwick, Robert J},
   year    = {WIP},
   publisher = {umbralcalculations},
