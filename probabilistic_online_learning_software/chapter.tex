@@ -10,6 +10,10 @@ One of the issues that can arise when learning streams of data is `concept drift
 
 The reader may recall that this book is about building more realistic environments for machine learning systems. An important part of learning from environments in a robust manner is ensuring \emph{adaptability to new data}. In addition to this, stochastic processes are inherently sequential. Many types of system evolve not just their states, but also dynamical description, over time. Online learning is the natural framework to use in this context.
 
+Recall the models we discussed in the previous chapter which optimise the cumulative log-likelihood of the data matrix $Y$ with respect to $z$ at a particular point in time, i.e., optimise $\ln {\cal L}_{{\sf t}+1}(Y\vert z)$ with respect to $z$ at time ${\sf t}+1$. The simplest (and most generally applicable) way to implement an online learning approach in these probabilistic learning models is to rerun the whole optimisation algorithm for $z$ after each new datapoint has been received. For algorithms which take a long time to run in each case, this can be an extremely slow procedure. 
+
+One way to speed things up is to assume that the optimal value for $z$ which was obtained from the previous data iterations can be related to the one we will find in the most recent iteration. We can formalise this idea into a probabilistic statement. \textcolor{red}{Take the $\beta$-weighting idea and introduce it here...}
+
 \textcolor{red}{Got to here in rewrite...}
 \textcolor{red}{Still need to discuss:
 \begin{itemize}
