@@ -156,6 +156,15 @@ Shared by the author under an \href{https://opensource.org/licenses/MIT}{MIT Lic
 
 \chapter*{Introduction}
 
+\textcolor{red}{Change the 5 examples into 5 realistic environment archetypes...
+\begin{itemize}
+\item{Spatially-distributed populations - epidemiology, ecosystems}
+\item{Correlated state networks - brain or traffic networks}
+\item{Event-based process graphs - logistics pipelines, sports matches}
+\item{Multi-agent interactions - markets and social systems}
+\item{Maybe one more example? Sequential design?}
+\end{itemize}}
+
 In designing automated control algorithms of practical importance to the real world it's common to find that only partial observations of the system state are possible. One needs only to think of the measurement uncertainties in any scientific experiment, the latent demand behind orders in a financial market, the unknown reservoirs of infection for a disease pathogen or even the limits to complete supply chain component observability in recognising just how commonly we find ourselves in this situation. This obscurity can make the learning of algorithms to control these systems using data alone an extreme --- if not sometimes impossible --- challenge, at least without further insight provided by a more domain-specific model.
 
 \emph{Worlds of Observation} is a book about building more realistic training environments for machine learning algorithms to control these `noisy' systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms~\cite{sutton2018reinforcement} (especially when there is plenty of data and the system is fully observable), this book will primarily explore how to create environments for control algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and maybe a little different to the usual perspectives.
