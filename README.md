@@ -26,13 +26,13 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 4. [Online simulation inference](online_simulation_inference/chapter.pdf)
 5. [Optimising interactions with any system](optimising_interactions_with_any_system/chapter.pdf)
 
-**Part 2.** Applications to realistic examples
+**Part 2.** Environment archetypes
 
-6. [Controlling parasitic infections](controlling_parasitic_infections/chapter.pdf)
-7. [Algo-trading on financial markets](algo_trading_on_financial_markets/chapter.pdf)
-8. [Sustainable angling for fish](sustainable_angling_for_fish/chapter.pdf)
-9. [Managing a rugby match](managing_a_rugby_match/chapter.pdf)
-10. [Optimising relief chain logistics](optimising_relief_chain_logistics/chapter.pdf)
+6. [State transition models](state_transition_models/chapter.pdf)
+7. [Spatial density fields](spatial_density_fields/chapter.pdf)
+8. [Correlated state networks](correlated_state_networks/chapter.pdf)
+9. [Processing pipelines](processing_pipelines/chapter.pdf)
+10. [Multi-agent markets](multi_agent_markets/chapter.pdf)
 
 ## Citations
 
