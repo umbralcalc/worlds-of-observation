@@ -10,7 +10,7 @@ declare -a filenames=(
     "state_transition_models/chapter" \
     "spatial_density_fields/chapter" \
     "distributed_state_networks/chapter" \
-    "processing_pipelines/chapter" \
+    "multi_stage_pipelines/chapter" \
     "centralised_information_exchanges/chapter"
 )
 

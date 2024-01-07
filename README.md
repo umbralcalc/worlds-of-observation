@@ -31,7 +31,7 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 6. [State transition models](state_transition_models/chapter.pdf)
 7. [Spatial density fields](spatial_density_fields/chapter.pdf)
 8. [Distributed state networks](distributed_state_networks/chapter.pdf)
-9. [Processing pipelines](processing_pipelines/chapter.pdf)
+9. [Multi-stage pipelines](multi_stage_pipelines/chapter.pdf)
 10. [Centralised information exchanges](centralised_information_exchanges/chapter.pdf)
 
 ## Citations
