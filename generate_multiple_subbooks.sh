@@ -6,12 +6,12 @@ declare -a filenames=(
     "probabilistic_learning_methods/chapter" \
     "probabilistic_online_learning_software/chapter" \
     "online_simulation_inference/chapter" \
-    "optimising_interactions_with_any_system/chapter" \
+    "optimising_system_interactions/chapter" \
     "state_transition_models/chapter" \
     "spatial_density_fields/chapter" \
-    "correlated_state_networks/chapter" \
+    "distributed_state_networks/chapter" \
     "processing_pipelines/chapter" \
-    "multi_agent_markets/chapter"
+    "centralised_information_exchanges/chapter"
 )
 
 ## loop through filenames

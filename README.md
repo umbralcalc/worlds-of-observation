@@ -24,15 +24,15 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 2. [Probabilistic learning methods](probabilistic_learning_methods/chapter.pdf)
 3. [Probabilistic online learning software](probabilistic_online_learning_software/chapter.pdf)
 4. [Online simulation inference](online_simulation_inference/chapter.pdf)
-5. [Optimising interactions with any system](optimising_interactions_with_any_system/chapter.pdf)
+5. [Optimising system interactions](optimising_system_interactions/chapter.pdf)
 
 **Part 2.** Environment archetypes
 
 6. [State transition models](state_transition_models/chapter.pdf)
 7. [Spatial density fields](spatial_density_fields/chapter.pdf)
-8. [Correlated state networks](correlated_state_networks/chapter.pdf)
+8. [Distributed state networks](distributed_state_networks/chapter.pdf)
 9. [Processing pipelines](processing_pipelines/chapter.pdf)
-10. [Multi-agent markets](multi_agent_markets/chapter.pdf)
+10. [Centralised information exchanges](centralised_information_exchanges/chapter.pdf)
 
 ## Citations
 
