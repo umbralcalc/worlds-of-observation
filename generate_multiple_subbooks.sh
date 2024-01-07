@@ -11,7 +11,7 @@ declare -a filenames=(
     "spatial_density_fields/chapter" \
     "distributed_state_networks/chapter" \
     "multi_stage_pipelines/chapter" \
-    "centralised_information_exchanges/chapter"
+    "centralised_exchanges/chapter"
 )
 
 ## loop through filenames
