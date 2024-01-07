@@ -1,8 +1,15 @@
-\chapter{\sffamily Controlling parasitic infections}
+\chapter{\sffamily Spatial density fields}
 
 {\bfseries\sffamily Concept.} The idea here is to limit the spread of some abstract spatial parasitic infections through the correct time-dependent resource allocation.
 
 \section{\sffamily Adapting the probabilistic formalism}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=9cm]{images/chapter-7-state-partition-graph.drawio.png}
+\caption{State partition graph topology for spatial density field archetypes.}
+\label{fig:state-partition-graph-spatial-density-fields}
+\end{figure}
 
 Let's by returning to the probabilistic formalism that we introduced earlier and noting that the covariance matrix estimate with elements $C^{ij}_{{\sf t}+1}(z)$ represents a matrix that could get very large, depending on the problem. For example; if we encoded the state of a 2-dimensional spatial field of values into the elements $X^i_{\sf t}$, the number of elements in the covariance matrix $C^{ij}_{{\sf t}+1}(z)$ would scale as $4N^2$ --- where $N$ here is the number of spatial points we wanted to encode. 
 
@@ -10,7 +17,7 @@ One solution to this scaling problem is to exploit the fact that, in many spatia
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=9cm]{images/chapter-6-banded-matrix.drawio.png}
+\includegraphics[width=9cm]{images/chapter-7-banded-matrix.drawio.png}
 \caption{An illustration of a banded covariance matrix with a bandwidth of 2.}
 \label{fig:banded-matrix}
 \end{figure}

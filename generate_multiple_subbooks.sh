@@ -7,11 +7,11 @@ declare -a filenames=(
     "probabilistic_online_learning_software/chapter" \
     "online_simulation_inference/chapter" \
     "optimising_interactions_with_any_system/chapter" \
-    "controlling_parasitic_infections/chapter" \
-    "algo_trading_on_financial_markets/chapter" \
-    "sustainable_angling_for_fish/chapter" \
-    "managing_a_rugby_match/chapter" \
-    "optimising_relief_chain_logistics/chapter"
+    "state_transition_models/chapter" \
+    "spatial_density_fields/chapter" \
+    "correlated_state_networks/chapter" \
+    "processing_pipelines/chapter" \
+    "multi_agent_markets/chapter"
 )
 
 ## loop through filenames
