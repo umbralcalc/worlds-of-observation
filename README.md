@@ -26,7 +26,7 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 4. [Online simulation inference](online_simulation_inference/chapter.pdf)
 5. [Optimising system interactions](optimising_system_interactions/chapter.pdf)
 
-**Part 2.** Environment archetypes
+**Part 2.** Applications to environment archetypes
 
 6. [State transition models](state_transition_models/chapter.pdf)
 7. [Spatial density fields](spatial_density_fields/chapter.pdf)
