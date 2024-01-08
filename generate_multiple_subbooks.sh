@@ -7,7 +7,7 @@ declare -a filenames=(
     "probabilistic_online_learning_software/chapter" \
     "online_simulation_inference/chapter" \
     "optimising_system_interactions/chapter" \
-    "state_transition_models/chapter" \
+    "simple_state_transitions/chapter" \
     "spatial_density_fields/chapter" \
     "distributed_state_networks/chapter" \
     "multi_stage_pipelines/chapter" \
