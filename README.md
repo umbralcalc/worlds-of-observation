@@ -20,16 +20,16 @@ You can read the full book here: [Full Book PDF](book.pdf). For more information
 
 **Part 1.** Theoretical background and code design
 
-1. [Building a generalised simulator](building_a_generalised_simulator/chapter.pdf)
+1. [Generalising simulation engines](generalising_simulation_engines/chapter.pdf)
 2. [Probabilistic learning methods](probabilistic_learning_methods/chapter.pdf)
-3. [Probabilistic online learning software](probabilistic_online_learning_software/chapter.pdf)
+3. [Online learning software](online_learning_software/chapter.pdf)
 4. [Online simulation inference](online_simulation_inference/chapter.pdf)
 5. [Optimising system interactions](optimising_system_interactions/chapter.pdf)
 
 **Part 2.** Applications to environment archetypes
 
 6. [Simple state transitions](simple_state_transitions/chapter.pdf)
-7. [Spatial density fields](spatial_density_fields/chapter.pdf)
+7. [Dynamic spatial fields](dynamic_spatial_fields/chapter.pdf)
 8. [Distributed state networks](distributed_state_networks/chapter.pdf)
 9. [Multi-stage pipelines](multi_stage_pipelines/chapter.pdf)
 10. [Centralised exchanges](centralised_exchanges/chapter.pdf)

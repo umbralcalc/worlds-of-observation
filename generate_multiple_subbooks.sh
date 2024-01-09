@@ -2,13 +2,13 @@
 
 ## declare filenames
 declare -a filenames=(
-    "building_a_generalised_simulator/chapter" \
+    "generalising_simulation_engines/chapter" \
     "probabilistic_learning_methods/chapter" \
-    "probabilistic_online_learning_software/chapter" \
+    "online_learning_software/chapter" \
     "online_simulation_inference/chapter" \
     "optimising_system_interactions/chapter" \
     "simple_state_transitions/chapter" \
-    "spatial_density_fields/chapter" \
+    "dynamic_spatial_fields/chapter" \
     "distributed_state_networks/chapter" \
     "multi_stage_pipelines/chapter" \
     "centralised_exchanges/chapter"
