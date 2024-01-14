@@ -5,6 +5,8 @@
 
 \section{\sffamily Defining the archetype}
 
+The multi-stage pipeline archetype refers to simulation environments with a directional state partition graph with arbitrary connection topology. In this case, each state partition corresponds to a separate stage in some pipeline model of the real-world phenomenon. Directionality in the connection structure is the key distinction between this archetype and the others in our classification scheme. We've provided one illustrated example of a multi-stage pipeline state partition graph in Fig.~\ref{fig:state-partition-graph-multi-stage-pipelines}.
+
 \begin{figure}[h]
 \centering
 \includegraphics[width=12cm]{images/chapter-9-state-partition-graph.drawio.png}
@@ -12,10 +14,10 @@
 \label{fig:state-partition-graph-multi-stage-pipelines}
 \end{figure}
 
-\textcolor{red}{
+We're now ready to discuss how multi-stage pipelines are typically observed with data from realistic scenarios. To do this, it will help to first consider which real-world problem domains are best-suited to this archetype structure. From the literature, we can identify these as:
+%%
 \begin{itemize}
-\item{Talk about data}
-\item{Logistics control papers}
-\item{Data pipeline control papers}
+\item{Simulations of human logistics pipelines, e.g., organised supply chains~\cite{yan2022reinforcement}, humanitarian aid distribution pipelines~\cite{yu2021reinforcement}, hospital capacity planning~\cite{shuvo2021deep}, etc. }
+\item{Environments which emulate data pipeline optimisation problems~\cite{nagrecha2023intune}.}
 \end{itemize}
-}
+%%
