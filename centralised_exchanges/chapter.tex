@@ -4,7 +4,7 @@
 
 \section{\sffamily Defining the archetype}
 
-
+The centralised exchange archetype refers to simulation environments with a very specific bidirectional state partition graph topology. The graph connection structure is a star configuration where every state partition is connected to the same, centralised state partition which itself has a unique function in the model. In case this description isn't that clear, we've added an illustration of the graph for this archetype in Fig.~\ref{fig:state-partition-graph-centralised-exchanges}.
 
 \begin{figure}[h]
 \centering
@@ -13,13 +13,11 @@
 \label{fig:state-partition-graph-centralised-exchanges}
 \end{figure}
 
-\textcolor{red}{
+Before moving on to discuss how data is typically collected for centralised exchanges, it will be informative to list the examples of phenomena where this archetype can be found in the real-world. These problem domains are:
+%%
 \begin{itemize}
-\item{Talk about data}
-\item{Financial market RL papers}
-\item{Betting market RL papers}
-\item{Housing market policy control papers}
-\item{(Biological?) Resource exchange control papers} 
+\item{Financial~\cite{fischer2018reinforcement,meng2019reinforcement} and sports betting~\cite{cliff2021bbe} market simulations for developing algo-trading strategies and portfolio optimisation~\cite{dangi2013financial}, as well as housing market simulations~\cite{yilmaz2018stochastic,carro2023heterogeneous} to evaluate government policies.}
+\item{Simulations of other forms of resource exchange through centralised mediation, such as in prosumer energy markets~\cite{may2023multi}.} 
 \end{itemize}
-}
+%%
 
