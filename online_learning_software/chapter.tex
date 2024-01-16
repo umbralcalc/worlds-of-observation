@@ -12,7 +12,13 @@ The reader may recall that this book is about building more realistic environmen
 
 Recall the models we discussed in the previous chapter which optimise the cumulative log-likelihood of the data matrix $Y$ with respect to $z$ at a particular point in time, i.e., optimise $\ln {\cal L}_{{\sf t}+1}(Y\vert z)$ with respect to $z$ at time ${\sf t}+1$. The simplest (and most generally applicable) way to implement an online learning approach in these probabilistic learning models is to rerun the whole optimisation algorithm for $z$ after each new datapoint has been received. For algorithms which take a long time to run in each case, this can be an extremely slow procedure. 
 
-One way to speed things up is to assume that the optimal value for $z$ which was obtained from the previous data iterations can be related to the one we will find in the most recent iteration. We can formalise this idea into a probabilistic statement. \textcolor{red}{Take the $\beta$-weighting idea and introduce it here...}
+One way to speed things up is to assume that the optimal value for $z$ which was obtained from the previous data iterations is close to the one we will find in the most recent iteration. Hence, by inserting this previous value into the next run of the optimisation procedure as an initial condition, most algorithms will converge much more quickly to the optimum. 
+
+When gradients of the log-likelihood are available, we can make things even more efficient. \textcolor{red}{Need to discuss the literature on online learning and this expression here...}
+
+We can formalise this idea into a probabilistic statement. \textcolor{red}{This is the gradient expression below...}
+
+\textcolor{red}{Take the $\beta$-weighting idea and introduce it here...}
 
 \textcolor{red}{Got to here in rewrite...}
 \textcolor{red}{Still need to discuss:

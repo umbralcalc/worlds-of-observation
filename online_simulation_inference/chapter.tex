@@ -85,7 +85,8 @@ P_{{\sf t}+1}(x,z\vert {\sf Y}) &= \int_{\Omega_{{\sf t}}} {\rm d}X'P_{{\sf t}+1
 In the next section, we're going to discuss how to translate all of this probabilistic language into some MAP inference algorithms. Before we do this, however, it will be instructive (particularly for `online' learning algorithms) to consider what happens if the model changes over time and $z$ needs to change in order to better represent the real data. In such situations, we propose to apply the same formula as Eq.~(\ref{eq:x-z-update-latest-row}) but instead replace the distribution over $(X',z)$ on the right hand side with its `past discounted' version\footnote{In the continuous-time version, this past-discounting factor can depend on the stepsize such that we replace
 $$
 \beta^{{\sf t}-{\sf t}'} \longrightarrow \frac{1}{\beta [\delta t({\sf t})]}\prod_{{\sf t}''={\sf t}'}^{{\sf t}} \beta [\delta t({\sf t}'')] \,.
-$$} 
+$$}
+\textcolor{red}{Formula below is wrong --- reformulate in terms of a $\beta^{{\sf t}-{\sf t}'}$ Bayesian evidence weighting factor for each past timestep and the result will be a $\prod$ expression here not a $\sum$...} 
 %%
 \begin{align}
 \int_{\Omega_{{\sf t}}}{\rm d}X' P_{{\sf t}}(X',z\vert {\sf Y}') \,\, \longrightarrow \,\, \frac{1}{{\sf t}}\sum_{{\sf t}'=0}^{{\sf t}}\int_{\omega_{{\sf t}'}}{\rm d}^nx' \beta^{{\sf t}-{\sf t}'} P_{{\sf t}'}(x',z\vert {\sf Y}') \,,
