@@ -273,7 +273,7 @@ It's worth pointing out that other machine learning frameworks could easily be u
 In the case of Eqs.~(\ref{eq:time-dependent-kernel}) and~(\ref{eq:gaussian-data-prob}) above, the hyperparameters that would be optimised could relate to the kernel in a wide variety of ways. Optimising them would make our optimised reweighting similar to (but very much \emph{not} the same as) evaluating maximum a posteriori (MAP) of a Gaussian process regression. In a Gaussian process regression, one is concerned with inferring the the whole of $X_{{\sf t}}$ as a function of time using the pairwise correlations implied by Eq.~(\ref{eq:second-order-log-expansion}). Based on this expression, the cumulative log-likelihood for a Gaussian process can be calculated as follows
 %%
 \begin{align}
-\ln {\cal L}_{{\sf t}+1}(Y\vert z) &= -\frac{n}{2}\ln (2\pi ) - \frac{1}{2}\ln \vert {\cal H}(z)\vert - \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} y^i {\cal H}^{ij}_{({\sf t}+1){\sf t}'}(z) (y')^j \,. \label{eq:log-likelihood-gaussian-proc}    
+\ln {\cal L}_{{\sf t}+1}(Y\vert z) &= -\frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1} \bigg[ n\ln (2\pi ) + \ln \big\vert {\cal H}_{({\sf t}+1){\sf t}'}(z)\big\vert + \sum_{i=0}^{n}\sum_{j=0}^{n} y^i {\cal H}^{ij}_{({\sf t}+1){\sf t}'}(z) (y')^j \bigg] \,. \label{eq:log-likelihood-gaussian-proc}    
 \end{align}
 %%
 
@@ -300,7 +300,7 @@ By factoring derivatives in this manner, the computation can be separated into t
 The same logic should apply to a learning algorithm which optimises $z$ to obtain the MAP for a Gaussian process. If the gradients of Eq.~(\ref{eq:log-likelihood-gaussian-proc}) are required, the user would have to specify derivatives of the kernel matrix (and its determinant) with respect to $z$ in order to calculate
 %%
 \begin{align}
-\frac{\partial}{\partial z^k}\ln {\cal L}_{{\sf t}+1}(Y \vert z) &= -\frac{1}{2}\frac{\partial}{\partial z^k}\ln \vert {\cal H}(z)\vert - \frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1}\sum_{i=0}^{n}\sum_{j=0}^{n} y^i \frac{\partial}{\partial z^k}{\cal H}^{ij}_{({\sf t}+1){\sf t}'}(z) (y')^j \,. \label{eq:log-likelihood-gaussian-proc-grad}
+\frac{\partial}{\partial z^k}\ln {\cal L}_{{\sf t}+1}(Y \vert z) &= -\frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1} \bigg[ \frac{\partial}{\partial z^k}\ln \big\vert {\cal H}_{({\sf t}+1){\sf t}'}(z)\big\vert + \sum_{i=0}^{n}\sum_{j=0}^{n} y^i \frac{\partial}{\partial z^k}{\cal H}^{ij}_{({\sf t}+1){\sf t}'}(z) (y')^j \bigg] \,. \label{eq:log-likelihood-gaussian-proc-grad}
 \end{align}
 %%
 

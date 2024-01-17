@@ -10,13 +10,21 @@ One of the issues that can arise when learning streams of data is `concept drift
 
 The reader may recall that this book is about building more realistic environments for machine learning systems. An important part of learning from environments in a robust manner is ensuring \emph{adaptability to new data}. In addition to this, stochastic processes are inherently sequential. Many types of system evolve not just their states, but also dynamical description, over time. Online learning is the natural framework to use in this context.
 
-Recall the models we discussed in the previous chapter which optimise the cumulative log-likelihood of the data matrix $Y$ with respect to $z$ at a particular point in time, i.e., optimise $\ln {\cal L}_{{\sf t}+1}(Y\vert z)$ with respect to $z$ at time ${\sf t}+1$. The simplest (and most generally applicable) way to implement an online learning approach in these probabilistic learning models is to rerun the whole optimisation algorithm for $z$ after each new datapoint has been received. For algorithms which take a long time to run in each case, this can be an extremely slow procedure. 
+\textcolor{red}{Introduce $y$ as datapoints of $Y$ below here...}
 
-One way to speed things up is to assume that the optimal value for $z$ which was obtained from the previous data iterations is close to the one we will find in the most recent iteration. Hence, by inserting this previous value into the next run of the optimisation procedure as an initial condition, most algorithms will converge much more quickly to the optimum. 
+Let's return to the models we discussed in the previous chapter which optimise the cumulative log-likelihood of the data matrix $Y$ with respect to $z$ at a particular point in time, i.e., which optimise $\ln {\cal L}_{{\sf t}+1}(Y\vert z)$ with respect to $z$ at time ${\sf t}+1$. The simplest (and most generally applicable) way to implement an online learning approach with any machnine learning model is to rerun the whole optimisation algorithm for $z$ after each new datapoint has been received using the entire batch of training data with the new addition to it. This kind of `batch' learning will work for most of the standard machine learning algorithms, but the re-training process can take a long time to run in each instance. 
 
-When gradients of the log-likelihood are available, we can make things even more efficient. \textcolor{red}{Need to discuss the literature on online learning and this expression here...}
+One way to speed things up is to assume that the optimal value for $z$ which was obtained from the previous data iterations is close to the one we will find in the most recent iteration. Hence, by inserting this previous value into the next run of the optimisation procedure as an initial guess, the algorithm will typically converge much more quickly to the optimum. This is more of a practical insight, but are there any quantitative methods which can reduce the amount of computation required to update $z$ when the latest datapoint in the series has been received?
 
-We can formalise this idea into a probabilistic statement. \textcolor{red}{This is the gradient expression below...}
+\textcolor{red}{Need to convert the log-likelihood gradient expressions below to be in terms of $y$ instead of $Y$...}
+
+This is where `pure' online learning comes in. When gradients of the log-likelihood are available, we can make things much more efficient. If we denote the $z$ which we have learned from the data up to timestep ${\sf t}$ as $z_*({\sf t})$, we write the following expression for learning from each new datpoint arrival
+%%
+\begin{align}
+z_*({\sf t}+1) &= z_*({\sf t}) - \alpha ({\sf t}+1,\dots ) \frac{\partial}{\partial z} \ln {\cal L}_{{\sf t}+1}(y\vert z) \,,
+\end{align}
+%%
+which is based on a stochastic gradient descent (SGD) algorithm approach. In contrast to the more standard SGD approach --- which would be applied to mini-batches of the data --- this update is applied to $z_*$ using the log-likelihood at each point in time in sequence.
 
 \textcolor{red}{Got to here in rewrite...}
 \textcolor{red}{Still need to discuss:
