@@ -297,7 +297,7 @@ If the gradients of Eq.~(\ref{eq:log-likelihood-reweighting}) are needed, we can
 %%
 By factoring derivatives in this manner, the computation can be separated into two parts: the derivatives with respect to $M_{{\sf t}'}$ and $C_{{\sf t}'}$, which are typically quite straightforward; and the derivatives with respect to $z$ elements, which typically need a more involved calculation depending on the model. Incidentally, this separation also neatly lends itself to abstracting gradient calculations as having a simpler, general purpose component that can be built directly into a library of data models and a more complex, model-specific component that the user must specify.
 
-The same logic should apply to a learning algorithm which optimises $z$ to obtain the MAP for a Gaussian process. If the gradients of Eq.~(\ref{eq:log-likelihood-gaussian-proc}) are required, the user would have to specify derivatives of the kernel matrix (and its determinant) with respect to $z$ in order to calculate
+The same logic should apply to a learning algorithm which optimises $z$ to obtain the MAP for a Gaussian process. If the gradients of Eq.~(\ref{eq:log-likelihood-gaussian-proc}) are required, the user would have to specify derivatives of the kernel matrix (and its determinant) with respect to each hyperparameter $z^k$ in order to calculate
 %%
 \begin{align}
 \frac{\partial}{\partial z^k}\ln {\cal L}_{{\sf t}+1}(Y \vert z) &= -\frac{1}{2}\sum_{{\sf t}'=0}^{{\sf t}+1} \bigg[ \frac{\partial}{\partial z^k}\ln \big\vert {\cal H}_{({\sf t}+1){\sf t}'}(z)\big\vert + \sum_{i=0}^{n}\sum_{j=0}^{n} y^i \frac{\partial}{\partial z^k}{\cal H}^{ij}_{({\sf t}+1){\sf t}'}(z) (y')^j \bigg] \,. \label{eq:log-likelihood-gaussian-proc-grad}
