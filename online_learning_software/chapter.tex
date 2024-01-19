@@ -30,13 +30,13 @@ which is based on a stochastic gradient descent (SGD) algorithm approach. In con
 
 In Eq.~(\ref{eq:sgd-online}) the $\alpha ({\sf t}+1,\dots )$ function, or `learning rate' function, returns a value which controls the step size towards the optimal value. As indicated by the arguments to this function, the learning rate can be time-dependent, which allows the user to set a schedule of steps which help convergence in certain problems. Other inputs can depend on the specific flavour of stochastic gradient descent algorithm that is being run. For example, an Adam optimiser~\cite{kingma2014adam} makes use of the statistics computed from the history of gradient values obtained as the algorithm progresses.
 
-\textcolor{red}{Got to here in rewrite...}
 \textcolor{red}{Still need to discuss:
 \begin{itemize}
 \item{batch learning algorithms --- more like Gaussian processes}
 \item{`pure' online learning algorithms --- more like empirical probabilistic reweighting}
-\item{refactor the code so that it's always doing online learning under the hood --- this can either be rolling refits in blocks on a refitting schedule with any optimisation algorithm of choice or full online learning Adam optimisation $$z_*({\sf t}+1) = -\alpha [{\sf t}+1,\text{stats of gradient history like Adam}] \frac{\partial}{\partial z} \ln {\cal L}_{{\sf t}+1} + z_*({\sf t})$$}
 \end{itemize}}
+
+\textcolor{red}{Got to here in rewrite...}
 
 Note that other excellent online machine learning frameworks are available --- see, e.g., River~\cite{river} and Vowpal Wabbit~\cite{vowpalwabbit}. The motivation for designing our own probabilistic online learning software is to ensure maximal integration with the stochadex simulation engine. We'll aim to achieve this by designing the code to use the same data structures and and concepts as we used when building the stochadex, where possible. In the next section on software design, we will show how this can be done while still maintaining extensibility and interoperability with other machine learning libraries and APIs. So let's get on with it!
 
