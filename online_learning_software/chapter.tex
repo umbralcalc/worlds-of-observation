@@ -20,7 +20,7 @@ This is where `pure' online learning comes in. When gradients of the log-likelih
 \ln {\cal L}_{{\sf t}+1}(Y\vert z) = \sum^{{\sf t}+1}_{{\sf t}'=0}\ln {\cal L}_{{\sf t}'}(y\vert z)\,.
 \end{align}
 %%
-If we now denote the $z$ which we have learned from the data up to timestep ${\sf t}$ as $z_*({\sf t})$, we may write the following expression which uses the gradient of the log-likelihood to learn from each new datpoint arrival
+If we now denote the $z$ which we have learned from the data up to timestep ${\sf t}$ as $z_*({\sf t})$, we may write the following expression which uses the gradient of the log-likelihood to learn from each new datapoint arrival
 %%
 \begin{align}
 z^i_*({\sf t}+1) &= z^i_*({\sf t}) - \alpha ({\sf t}+1,\dots ) \frac{\partial}{\partial z^i} \ln {\cal L}_{{\sf t}+1}(y\vert z) \label{eq:sgd-online} \,,
