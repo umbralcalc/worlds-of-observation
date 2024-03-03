@@ -14,25 +14,14 @@ Shared by the author under an [MIT License](LICENSE)
 
 _Worlds of Observation_ is a book about building more realistic training environments for machine learning algorithms to control systems in the real world. While model-free reinforcement learning is a popular and very powerful approach to generating such algorithms (especially when there is plenty of data and the system is fully observable), this book will primarily explore how to create environments for control algorithms using a more model-based approach. Those readers who are data scientists, research engineers, statistical programmers or computational scientists may find our mathematically descriptive, yet practically-minded, approach in this book quite interesting and maybe a little different to the usual perspectives.
 
-You can read the full book here: [Full Book PDF](book.pdf). For more information about the simulation environments in this book, as well as more detailed code documentation, you can also visit [WorldsOOp](https://github.com/worldsoop).
+You can read the full book here: [Full Book PDF](book.pdf). For more information about the simulation environments in this book, you can also visit [WorldsOOp on GitHub](https://github.com/worldsoop).
 
 ## Chapters
 
-**Part 1.** Theoretical background and code design
-
 1. [Generalising simulation engines](generalising_simulation_engines/chapter.pdf)
-2. [Probabilistic learning methods](probabilistic_learning_methods/chapter.pdf)
-3. [Online learning software](online_learning_software/chapter.pdf)
-4. [Online simulation inference](online_simulation_inference/chapter.pdf)
-5. [Optimising system interactions](optimising_system_interactions/chapter.pdf)
-
-**Part 2.** Applications to environment archetypes
-
-6. [Simple state transitions](simple_state_transitions/chapter.pdf)
-7. [Dynamic spatial fields](dynamic_spatial_fields/chapter.pdf)
-8. [Distributed state networks](distributed_state_networks/chapter.pdf)
-9. [Multi-stage pipelines](multi_stage_pipelines/chapter.pdf)
-10. [Centralised exchanges](centralised_exchanges/chapter.pdf)
+2. [Online simulation inference](online_simulation_inference/chapter.pdf)
+3. [Optimising system interactions](optimising_system_interactions/chapter.pdf)
+4. [Environment archetypes](environment_archetypes/chapter.pdf)
 
 ## Citations
 

@@ -3,15 +3,9 @@
 ## declare filenames
 declare -a filenames=(
     "generalising_simulation_engines/chapter" \
-    "probabilistic_learning_methods/chapter" \
-    "online_learning_software/chapter" \
     "online_simulation_inference/chapter" \
     "optimising_system_interactions/chapter" \
-    "simple_state_transitions/chapter" \
-    "dynamic_spatial_fields/chapter" \
-    "distributed_state_networks/chapter" \
-    "multi_stage_pipelines/chapter" \
-    "centralised_exchanges/chapter"
+    "environment_archetypes/chapter"
 )
 
 ## loop through filenames
